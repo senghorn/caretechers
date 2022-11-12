@@ -3,15 +3,15 @@ const mysql = require('mysql2');
 
 // create the connection to database
 const connection = mysql.createConnection({
-  host: '192.168.0.58',
-  user: 'root',
-  database: 'test',
-  password: 'password'
+  host: 'caretechers-db.cyvcqcx1nbv9.us-east-1.rds.amazonaws.com',
+  user: 'admin',
+  database: 'cctest',
+  password: ''
 });
 
 // execute will internally call prepare and query
 connection.execute(
-  'SELECT * FROM `user`',
+  'SELECT * FROM `User`',
   [],
   function(err, results, fields) {
     console.log(results); // results contains rows returned by server
