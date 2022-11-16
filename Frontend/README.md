@@ -23,8 +23,6 @@ Again, make sure you have Node.js installed (see Prerequisites section above).
 Install dependencies by entering the following command in your terminal:
 
 `npm install`
-`npx expo isntall firebase`
-`npm install firebase`
 
 ### Step 3: Start the UI development server
 
