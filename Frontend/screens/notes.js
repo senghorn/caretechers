@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, TextInput } from "react-native";
+import { SafeAreaView, StyleSheet, TextInput, Text } from "react-native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState, useEffect } from "react";
 import { Button } from "react-native-paper";
@@ -6,6 +6,7 @@ import { Button } from "react-native-paper";
 export default function Notes() {
   const [text, onChangeText] = React.useState("testuser@gmail.com");
   const [password, onChangePassword] = React.useState("123123");
+  const [userEmail, onChangeUserEmail] = React.useState("empty");
 
   const auth = getAuth();
   const signInGoogle = function () {
@@ -13,6 +14,7 @@ export default function Notes() {
       .then((userCredential) => {
         const user = userCredential.user;
         console.log("Signed In.");
+        onChangeUserEmail(user.email);
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -22,6 +24,7 @@ export default function Notes() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Text>{userEmail}</Text>
       <TextInput
         style={styles.input}
         onChangeText={onChangeText}
