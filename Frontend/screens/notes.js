@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, TextInput } from "react-native";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState, useEffect } from "react";
 import { Button } from "react-native-paper";
-
+// Test
 export default function Notes() {
   const [text, onChangeText] = React.useState("testuser@gmail.com");
   const [password, onChangePassword] = React.useState("123123");
