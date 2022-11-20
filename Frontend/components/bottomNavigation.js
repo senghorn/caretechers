@@ -5,6 +5,7 @@ import Messages from '../screens/messages';
 import Metrics from '../screens/metrics';
 import Calendar from '../screens/calendar';
 import Tasks from '../screens/tasks';
+import SignIn from '../screens/singin'
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -36,6 +37,13 @@ export default function BottomNavigation() {
         component={Tasks}
         options={{
           tabBarIcon: ({ color }) => <MaterialCommunityIcons name="checkbox-multiple-marked" color={color} size={26} />,
+        }}
+      />
+      <Tab.Screen
+        name="Login"
+        component={SignIn}
+        options={{
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account" color={color} size={26} />,
         }}
       />
     </Tab.Navigator>
