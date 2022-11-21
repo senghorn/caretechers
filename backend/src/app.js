@@ -14,11 +14,11 @@ app.use('/notes', notes);
 
 app.use((err, req, res, next) => {
 	console.error({
-		status: err.status,
-		message: err.status,
-		stack: err.stack
+		status: err.status || '',
+		message: err.message || '',
+		stack: err.stack || ''
 	});
-	res.status(err.status).send(err.message);
+	res.status(err.status || 500).send(err.message || '');
 })
 
 app.listen(port, () => {

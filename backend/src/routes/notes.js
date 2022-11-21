@@ -6,14 +6,14 @@ const sharedMiddleware = require('../middlewares/shared');
 
 const router = express.Router();
 
-router.get('/:groupId',[
-	groupMiddleware.checkIfGroupExists,
-	notesMiddleware.getNotesByGroupId,
+router.get('/:noteId',[
+	notesMiddleware.getNoteByNoteId,
 	sharedMiddleware.sendResult
 ]);
 
-router.get('/:noteId',[
-	notesMiddleware.getNoteByNoteId,
+router.get('/group/:groupId',[
+	groupMiddleware.checkIfGroupExists,
+	notesMiddleware.getNotesByGroupId,
 	sharedMiddleware.sendResult
 ]);
 
