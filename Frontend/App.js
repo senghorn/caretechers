@@ -1,26 +1,14 @@
-import { NavigationContainer } from '@react-navigation/native';
+import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import BottomNavigation from './components/bottomNavigation';
-
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyABMnAsXYbgsDCxytM43ewN717YMZ3bX2Y',
-  authDomain: 'carecoord.firebaseapp.com',
-  projectId: 'carecoord',
-  storageBucket: 'carecoord.appspot.com',
-  messagingSenderId: '899499604143',
-  appId: '1:899499604143:web:442e998e0ea3fdaf92fc5a',
-  measurementId: 'G-0Q5YSNK95C',
-};
-
-const app = initializeApp(firebaseConfig);
+import { StyleSheet } from 'react-native';
+import 'react-native-gesture-handler';
+import Navigation from './components/Navigation'
+import { NavigationContainer} from "@react-navigation/native";
 
 export default function App() {
   return (
     <NavigationContainer>
-      <BottomNavigation />
+      <Navigation/>
       <StatusBar style="auto" />
     </NavigationContainer>
   );

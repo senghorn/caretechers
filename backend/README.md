@@ -23,16 +23,9 @@ Again, make sure you have Node.js installed (see Prerequisites section above).
 Install dependencies by entering the following command in your terminal:
 
 `npm install`
-`npm install mysql2`
 
 ### Step 3: Start the backend development server
 
 To start the development server, just type the singular command in your terminal below
 
 `npm start`
-
-This will generate a QR code that you can scan using the iOS camera app. Assuming you have installed
-the Expo Go app on your iPhone, the UI should automatically load once the QR Code is scanned.
-
-Note: These instructions are specifically for iPhone users, as this project is tailored for the iPhone. Instructions may
-differ for Android users. If you are an Android user, we recommend visiting [these React Native docs](https://reactnative.dev/docs/environment-setup) for more information.
