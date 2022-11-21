@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
+    "moment": "^2.29.4",
     "mysql2": "^2.3.3",
     "sql-template-strings": "^2.2.2"
   }

@@ -12,6 +12,13 @@ router.get('/group/:groupId',[
 	sharedMiddleware.sendResult
 ]);
 
+router.post('/group/:groupId',[
+	groupMiddleware.checkIfGroupExists,
+	notesMiddleware.checkIfNoteIsValid,
+	notesMiddleware.createNewNote,
+	sharedMiddleware.sendNoResult
+]);
+
 router.get('/:noteId',[
 	notesMiddleware.getNoteByNoteId,
 	sharedMiddleware.sendResult
