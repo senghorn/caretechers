@@ -12,9 +12,4 @@ router.get('/:groupId',[
 	sharedMiddleware.sendResult
 ]);
 
-router.get('/:noteId',[
-	notesMiddleware.getNoteByNoteId,
-	sharedMiddleware.sendResult
-]);
-
 module.exports = router;
