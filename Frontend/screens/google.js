@@ -11,13 +11,13 @@ import {
   Image,
 } from "react-native";
 import COLORS from "../constants/colors";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleLogin({ navigation }) {
   const [accessToken, setAccessToken] = React.useState(null);
   const [userInfo, setUserInfo] = React.useState(null);
-  const googleBtn = require("../assets/google-btn1.png");
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
@@ -64,17 +64,23 @@ export default function GoogleLogin({ navigation }) {
           <View style={styles.row}>
             <Text style={styles.subWelcomeText}>Let's get started.</Text>
           </View>
-          <Text style={styles.loginContinueTxt}>Login to continue</Text>
-          <TouchableOpacity
+          <View style={styles.row}>
+            <Image
+              style={styles.image}
+              source={require("../assets/caretaker.png")}
+            />
+          </View>
+          <FontAwesome.Button
+            name="google"
+            backgroundColor="#FFFFFF"
+            size={35}
+            iconStyle={styles.icon}
             onPress={() => {
               promptAsync();
             }}
-            activeOpacity={0.7}
-            style={styles.loginBtn}
           >
-            <Image source={googleBtn} />
-            <Text style={styles.loginText}>Log In</Text>
-          </TouchableOpacity>
+            <Text style={styles.loginText}>Continue with Google</Text>
+          </FontAwesome.Button>
         </View>
       </View>
     </SafeAreaView>
@@ -98,16 +104,15 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 28,
-    textAlign: "center",
     fontWeight: "bold",
     color: COLORS.white,
     opacity: 1,
   },
   subWelcomeText: {
     fontSize: 22,
-    textAlign: "center",
     color: COLORS.grayLight,
     opacity: 1,
+    marginBottom: 20,
   },
   loginContinueTxt: {
     fontSize: 21,
@@ -136,19 +141,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 3,
     elevation: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
   loginBtn: {
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
-    width: "100%",
+    width: "50%",
     height: 55,
     color: COLORS.dark,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: COLORS.gradientForm,
   },
   loginText: {
-    color: COLORS.gradientForm,
-    fontSize: 16,
-    fontWeight: "400",
+    color: COLORS.gray,
+    fontSize: 20,
+    fontWeight: "bold",
   },
   forgotPassText: {
     color: COLORS.primary,
@@ -178,10 +188,19 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
   },
   mr7: {
     marginRight: 7,
+  },
+  image: {
+    marginBottom: 40,
+    width: "100%",
+    height: 380,
+    resizeMode: "stretch",
+    borderRadius: 10,
+  },
+  icon: {
+    height:35,
+    color:COLORS.bgColor,
   },
 });
