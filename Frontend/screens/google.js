@@ -21,7 +21,7 @@ export default function GoogleLogin({ navigation }) {
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
-      "899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com",
+      "899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com",
     iosClientId:
       "899499604143-5oqn70f2r4uu7lp1mbajpkv15ks3p368.apps.googleusercontent.com",
     androidClientId:
@@ -48,8 +48,7 @@ export default function GoogleLogin({ navigation }) {
     );
     userInfoResponse.json().then((data) => {
       setUserInfo(data);
-      console.log("Logged in user's name: ", data.name);
-      console.log("Logged in user's email: ", data.email);
+      console.log(data);
       navigation.navigate("Home");
     });
   }
@@ -79,8 +78,13 @@ export default function GoogleLogin({ navigation }) {
               promptAsync();
             }}
           >
-            <Text style={styles.loginText}>Continue with Google</Text>
-          </FontAwesome.Button>
+            <Text style={styles.loginText}>Login with Google</Text>
+          </FontAwesome.Button> 
+          <View style={styles.row}>
+            <Text style={styles.footerText}>
+              Proudly presented by the Caretechers
+            </Text>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -114,12 +118,6 @@ const styles = StyleSheet.create({
     opacity: 1,
     marginBottom: 20,
   },
-  loginContinueTxt: {
-    fontSize: 21,
-    textAlign: "center",
-    color: COLORS.white,
-    marginBottom: 16,
-  },
   input: {
     borderWidth: 1,
     borderColor: COLORS.grayLight,
@@ -128,21 +126,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     height: 55,
     paddingVertical: 0,
-  },
-  // Login Btn Styles
-  loginBtnWrapper: {
-    height: 55,
-    marginTop: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 3,
-    elevation: 5,
-    justifyContent: "center",
-    alignItems: "center",
   },
   loginBtn: {
     textAlign: "center",
@@ -159,23 +142,19 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontSize: 20,
     fontWeight: "bold",
-  },
-  forgotPassText: {
-    color: COLORS.primary,
-    textAlign: "center",
-    fontWeight: "bold",
-    marginTop: 15,
+    marginLeft: 30
   },
   // footer
   footer: {
     position: "absolute",
-    bottom: 20,
+    bottom: -50,
     textAlign: "center",
+    alignItems: "center",
+    justifyContent: "center",
     flexDirection: "row",
   },
   footerText: {
-    color: COLORS.gray,
-    fontWeight: "bold",
+    color: COLORS.white
   },
   signupBtn: {
     color: COLORS.primary,
@@ -200,7 +179,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   icon: {
-    height:35,
-    color:COLORS.bgColor,
+    height: 35,
+    color: COLORS.bgColor,
   },
 });
