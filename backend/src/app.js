@@ -1,7 +1,5 @@
 const express = require('express')
 
-const notes = require('./routes/notes');
-
 const app = express()
 const port = 3000
 
@@ -12,7 +10,9 @@ app.get('/', (req, res) => {
 })
 
 // MAIN API ENDPOINTS
-app.use('/notes', notes);
+app.use('/notes', require('./routes/notes'));
+app.use('/messages', require('./routes/messages'));
+// ------------------
 
 app.use((err, req, res, next) => {
 	console.error({
