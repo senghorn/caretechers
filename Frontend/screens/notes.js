@@ -1,27 +1,55 @@
 import { useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { Button, Colors } from "react-native-paper";
+import { Button,Text  } from "react-native-paper";
 import Task from "../components/tasks/task";
-
+import { SearchBar } from "@rneui/themed";
+import { Dropdown } from "react-native-element-dropdown";
 
 export default function Notes() {
   const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
-    { label: "Alphabetical", value: "alpha" },
-    { label: "Date", value: "date" },
-  ]);
-
   const updateSearch = (search) => {
     setSearch(search);
-    console.log("searching");
-    console.log(search);
+    console.log(search.nativeEvent.text);
   };
+
+  const data = [
+    { label: "Date", value: "1" },
+    { label: "Alphabets", value: "2" },
+    { label: "Relevant", value: "3" },
+  ];
+  const [sortValue, setSortValue] = useState(null);
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
+      <View style={styles.row}>
+        <View style={styles.title}>
+          <Text style={styles.titleText}>Notes</Text>
+        </View>
+        <View style={styles.search}>
+          <SearchBar
+            placeholder="Search..."
+            onEndEditing={updateSearch}
+            value={search}
+            lightTheme
+            platform="ios"
+          />
+        </View>
+        <View style={styles.sort}>
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            iconStyle={styles.iconStyle}
+            data={data}
+            labelField="label"
+            valueField="value"
+            placeholder="Sort By"
+            value={sortValue}
+            onChange={(item) => {
+              setSortValue(item.value);
+            }}
+          />
+        </View>
       </View>
       <ScrollView style={styles.tasksContainer}>
         <Task title="Wifi code: 123123" />
@@ -53,18 +81,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 64,
   },
-  bar: {
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    alignSelf: "flex-start",
-    marginHorizontal: "1%",
-    marginBottom: 6,
-    minWidth: "48%"
-  },
-  headerContainer: {
-    flexDirection: "column",
-    flexBasis: "auto",
+  search: {
     width: "40%",
+  },
+  title:{
+    marginLeft: 2,
+    width: "28%",
+  },
+  titleText:{
+    fontSize: 26,
+    fontWeight: "bold"
+  },  
+  sort: {
+    width: "20%",
+    borderRadius: 5,
+  },
+  row: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
   },
   tasksContainer: {
     flex: 1,
