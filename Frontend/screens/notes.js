@@ -1,24 +1,20 @@
 import { useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { Button,Text  } from "react-native-paper";
+import { Button, Text, Searchbar, Colors } from "react-native-paper";
 import Task from "../components/tasks/task";
-import { SearchBar } from "@rneui/themed";
 import { Dropdown } from "react-native-element-dropdown";
+import COLORS from "../constants/colors"
 
 export default function Notes() {
-  const [search, setSearch] = useState("");
-  const updateSearch = (search) => {
-    setSearch(search);
-    console.log(search.nativeEvent.text);
-  };
-
   const data = [
     { label: "Date", value: "1" },
     { label: "Alphabets", value: "2" },
     { label: "Relevant", value: "3" },
   ];
   const [sortValue, setSortValue] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
+  const onChangeSearch = (query) => setSearchQuery(query);
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -26,12 +22,11 @@ export default function Notes() {
           <Text style={styles.titleText}>Notes</Text>
         </View>
         <View style={styles.search}>
-          <SearchBar
-            placeholder="Search..."
-            onEndEditing={updateSearch}
-            value={search}
-            lightTheme
-            platform="ios"
+          <Searchbar
+            placeholder="Search"
+            onChangeText={onChangeSearch}
+            value={searchQuery}
+            style={styles.box}
           />
         </View>
         <View style={styles.sort}>
@@ -47,6 +42,7 @@ export default function Notes() {
             value={sortValue}
             onChange={(item) => {
               setSortValue(item.value);
+              console.log(item);
             }}
           />
         </View>
@@ -82,16 +78,22 @@ const styles = StyleSheet.create({
     paddingTop: 64,
   },
   search: {
-    width: "40%",
+    width: "49%",
+    padding:8
   },
-  title:{
-    marginLeft: 2,
+  box :{
+    elevation:0,
+    borderWidth: 1,
+    borderColor:COLORS.grayLight
+  },  
+  title: {
+    marginLeft: "1%",
     width: "28%",
   },
-  titleText:{
-    fontSize: 26,
-    fontWeight: "bold"
-  },  
+  titleText: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
   sort: {
     width: "20%",
     borderRadius: 5,

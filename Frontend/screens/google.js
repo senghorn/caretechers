@@ -1,15 +1,7 @@
 import React from "react";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  SafeAreaView,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image } from "react-native";
 import COLORS from "../constants/colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
@@ -79,12 +71,17 @@ export default function GoogleLogin({ navigation }) {
             }}
           >
             <Text style={styles.loginText}>Login with Google</Text>
-          </FontAwesome.Button> 
-          <View style={styles.row}>
+          </FontAwesome.Button>
+          {/* <View style={styles.row}>
             <Text style={styles.footerText}>
               Proudly presented by the Caretechers
             </Text>
-          </View>
+          </View> */}
+        </View>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Proudly presented by the Caretechers
+          </Text>
         </View>
       </View>
     </SafeAreaView>
@@ -142,19 +139,19 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontSize: 20,
     fontWeight: "bold",
-    marginLeft: 30
+    marginLeft: 30,
   },
   // footer
   footer: {
-    position: "absolute",
-    bottom: -50,
+    position: "relative",
+    bottom: -100,
     textAlign: "center",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
   },
   footerText: {
-    color: COLORS.white
+    color: COLORS.white,
   },
   signupBtn: {
     color: COLORS.primary,
