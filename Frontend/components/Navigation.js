@@ -3,7 +3,7 @@ import { Button, View, StyleSheet } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomNavigation from "./bottomNavigation";
-import LogIn from "../screens/login";
+import GoogleLogin from "../screens/google"
 
 const Stack = createNativeStackNavigator();
 export default function Navigation() {
@@ -11,7 +11,7 @@ export default function Navigation() {
     <Stack.Navigator screenOptions={{}} initialRouteName={"Login"}>
       <Stack.Screen
         name={"Login"}
-        component={LogIn}
+        component={GoogleLogin}
         options={{ headerShown: false }}
       />
       <Stack.Screen

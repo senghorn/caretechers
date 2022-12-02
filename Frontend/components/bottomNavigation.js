@@ -5,7 +5,6 @@ import Messages from "../screens/messages";
 import Metrics from "../screens/metrics";
 import Calendar from "../screens/calendar";
 import Tasks from "../screens/tasks";
-import LogIn from "../screens/login";
 
 // const Drawer = createDrawerNavigator();
 // <Drawer.Navigator initialRouteName="Home">
