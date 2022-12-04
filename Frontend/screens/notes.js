@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
     borderColor:COLORS.grayLight
   },  
   title: {
-    marginLeft: "1%",
-    width: "28%",
+    marginLeft: "5%",
+    width: "23%",
   },
   titleText: {
     fontSize: 24,

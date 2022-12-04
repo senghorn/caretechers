@@ -34,7 +34,11 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   title: {
-    marginLeft: "1%",
-    width: "50%",
+    marginLeft: "5%",
+    width: "45%",
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });
