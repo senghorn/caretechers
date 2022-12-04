@@ -1,5 +1,5 @@
-import { View, StyleSheet } from "react-native";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { View, StyleSheet, Button } from "react-native";
+import { GiftedChat, Bubble, BtnRound,Send , Icon} from "react-native-gifted-chat";
 import React, { useState, useCallback, useEffect } from "react";
 import COLORS from "../constants/colors";
 
@@ -16,7 +16,7 @@ const users = [
   },
   {
     _id: 2,
-    name: "Benjamin Hatch",
+    name: "Ben Hatch",
     avatar: "https://source.unsplash.com/140x140/?racoon",
   },
   {
@@ -39,32 +39,32 @@ export default function Messages() {
     setMessages([
       {
         _id: 0,
-        text: "oops! that was my kid. Mom is doing fine. I took her to a sushi place downtown, she liked it.",
-        createdAt: new Date(),
-        user: users[2],
-      },
-      {
-        _id: 1,
-        text: "hi1k",
-        createdAt: new Date(),
-        user: users[2],
-      },
-      {
-        _id: 2,
-        text: "Not me! I was out of town.",
-        createdAt: new Date(),
-        user: users[3],
-      },
-      {
-        _id: 3,
-        text: "Who checked on mom last week? How is she?",
-        createdAt: new Date(),
+        text: "Hey all.  Just refilled Mom’s blood pressure medication.  They gave us a 3 month supply, so we should be good on that for a while.",
+        createdAt: new Date("2022-10-07"),
         user: users[4],
       },
       {
+        _id: 1,
+        text: "Cool thanks. I can do the next one.",
+        createdAt: new Date("2022-09-28"),
+        user: users[4],
+      },
+      {
+        _id: 2,
+        text: "Thanks for doing that!",
+        createdAt: new Date("2022-09-28"),
+        user: users[2],
+      },
+      {
+        _id: 3,
+        text: "Good to hear!",
+        createdAt: new Date("2022-09-28"),
+        user: users[3],
+      },
+      {
         _id: 4,
-        text: "Welcome everyone!",
-        createdAt: new Date("2022-03-25"),
+        text: "Hey guys! Just checked on Mom. She's doing fine.",
+        createdAt: new Date("2022-09-28"),
         user: users[1],
       },
     ]);
@@ -106,6 +106,27 @@ export default function Messages() {
         renderUsernameOnMessage={true}
         onSend={(messages) => onSend(messages)}
         user={users[1]}
+        textInputStyle={styles.textInput}
+        minComposerHeight={40}
+        minInputToolbarHeight={60}
+        renderSend={(props) => (
+          <View
+            style={{ flexDirection: "row", alignItems: "center", height: 60 }}
+          >
+            <Button
+              icon="camera"
+              iconColor={COLORS.primary}
+              size={40}
+              style={{ marginHorizontal: 5 }}
+              onPress={() => this.choosePicture()}
+            />
+            <Send {...props}>
+              <View style={styles.btnSend}>
+                <Icon name="ios-send" size={24} color="#ffffff" />
+              </View>
+            </Send>
+          </View>
+        )}
       />
     </View>
   );
@@ -115,5 +136,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingTop: 64,
+  },
+  textInput: {
+    // height: 40,
+    // margin: 12,
+    // borderWidth: 0.2,
+    // padding: 10,
+    // borderRadius: 10
   },
 });
