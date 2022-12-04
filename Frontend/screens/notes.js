@@ -3,7 +3,8 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { Button, Text, Searchbar, Colors } from "react-native-paper";
 import Task from "../components/tasks/task";
 import { Dropdown } from "react-native-element-dropdown";
-import COLORS from "../constants/colors"
+import COLORS from "../constants/colors";
+
 
 export default function Notes() {
   const data = [

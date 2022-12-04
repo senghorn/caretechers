@@ -1,7 +1,9 @@
-import { View, StyleSheet, Button } from "react-native";
-import { GiftedChat, Bubble, BtnRound,Send , Icon} from "react-native-gifted-chat";
+import { View, StyleSheet } from "react-native";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect } from "react";
 import COLORS from "../constants/colors";
+import TopBar from "../components/topBar";
 
 const users = [
   {
@@ -99,6 +101,8 @@ export default function Messages() {
 
   return (
     <View style={styles.container}>
+      <TopBar />
+      <Divider style={styles.divider} />
       <GiftedChat
         renderBubble={renderBubble}
         showUserAvatar={true}
@@ -109,24 +113,6 @@ export default function Messages() {
         textInputStyle={styles.textInput}
         minComposerHeight={40}
         minInputToolbarHeight={60}
-        renderSend={(props) => (
-          <View
-            style={{ flexDirection: "row", alignItems: "center", height: 60 }}
-          >
-            <Button
-              icon="camera"
-              iconColor={COLORS.primary}
-              size={40}
-              style={{ marginHorizontal: 5 }}
-              onPress={() => this.choosePicture()}
-            />
-            <Send {...props}>
-              <View style={styles.btnSend}>
-                <Icon name="ios-send" size={24} color="#ffffff" />
-              </View>
-            </Send>
-          </View>
-        )}
       />
     </View>
   );
@@ -138,10 +124,13 @@ const styles = StyleSheet.create({
     paddingTop: 64,
   },
   textInput: {
-    // height: 40,
-    // margin: 12,
-    // borderWidth: 0.2,
-    // padding: 10,
-    // borderRadius: 10
+    height: 40,
+    margin: 12,
+    borderWidth: 0.2,
+    padding: 10,
+    borderRadius: 10,
   },
+  divider:{
+
+  }
 });
