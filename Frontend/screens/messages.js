@@ -1,18 +1,136 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from "react-native";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { Divider } from "react-native-paper";
+import React, { useState, useCallback, useEffect } from "react";
+import COLORS from "../constants/colors";
+import TopBar from "../components/topBar";
+
+const users = [
+  {
+    _id: 0,
+    name: "Annonymous",
+    avatar: "https://source.unsplash.com/140x140/?person",
+  },
+  {
+    _id: 1,
+    name: "Brynnli Borrowman",
+    avatar: "https://source.unsplash.com/140x140/?wolf",
+  },
+  {
+    _id: 2,
+    name: "Ben Hatch",
+    avatar: "https://source.unsplash.com/140x140/?racoon",
+  },
+  {
+    _id: 3,
+    name: "Seng Rith",
+    avatar: "https://source.unsplash.com/140x140/?fox",
+  },
+  {
+    _id: 4,
+    name: "Aaron Heo",
+    avatar: "https://source.unsplash.com/140x140/?cat",
+  },
+];
 
 export default function Messages() {
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    // Seeding the messages for prototype phase
+    setMessages([
+      {
+        _id: 0,
+        text: "Hey all.  Just refilled Mom’s blood pressure medication.  They gave us a 3 month supply, so we should be good on that for a while.",
+        createdAt: new Date("2022-10-07"),
+        user: users[4],
+      },
+      {
+        _id: 1,
+        text: "Cool thanks. I can do the next one.",
+        createdAt: new Date("2022-09-28"),
+        user: users[4],
+      },
+      {
+        _id: 2,
+        text: "Thanks for doing that!",
+        createdAt: new Date("2022-09-28"),
+        user: users[2],
+      },
+      {
+        _id: 3,
+        text: "Good to hear!",
+        createdAt: new Date("2022-09-28"),
+        user: users[3],
+      },
+      {
+        _id: 4,
+        text: "Hey guys! Just checked on Mom. She's doing fine.",
+        createdAt: new Date("2022-09-28"),
+        user: users[1],
+      },
+    ]);
+  }, []);
+
+  const onSend = useCallback((messages = []) => {
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, messages)
+    );
+  }, []);
+
+  // Message render bubble
+  const renderBubble = (props) => {
+    const message_sender_id = props.currentMessage.user._id;
+    return (
+      <Bubble
+        {...props}
+        position={message_sender_id == 1 ? "right" : "left"}
+        wrapperStyle={{
+          right: {
+            backgroundColor: COLORS.warning,
+            marginVertical: 5,
+          },
+          left: {
+            backgroundColor: COLORS.grayLight,
+            marginVertical: 5,
+          },
+        }}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Messages Page</Text>
+      <TopBar />
+      <Divider style={styles.divider} />
+      <GiftedChat
+        renderBubble={renderBubble}
+        showUserAvatar={true}
+        messages={messages}
+        renderUsernameOnMessage={true}
+        onSend={(messages) => onSend(messages)}
+        user={users[1]}
+        textInputStyle={styles.textInput}
+        minComposerHeight={40}
+        minInputToolbarHeight={60}
+      />
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    paddingTop: 64,
   },
+  textInput: {
+    height: 40,
+    margin: 12,
+    borderWidth: 0.2,
+    padding: 10,
+    borderRadius: 10,
+  },
+  divider:{
+
+  }
 });

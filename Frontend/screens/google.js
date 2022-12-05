@@ -72,11 +72,6 @@ export default function GoogleLogin({ navigation }) {
           >
             <Text style={styles.loginText}>Login with Google</Text>
           </FontAwesome.Button>
-          {/* <View style={styles.row}>
-            <Text style={styles.footerText}>
-              Proudly presented by the Caretechers
-            </Text>
-          </View> */}
         </View>
         <View style={styles.footer}>
           <Text style={styles.footerText}>
