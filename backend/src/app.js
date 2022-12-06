@@ -12,6 +12,7 @@ app.get('/', (req, res) => {
 // MAIN API ENDPOINTS
 app.use('/notes', require('./routes/notes'));
 app.use('/messages', require('./routes/messages'));
+app.use('/tasks', require('./routes/tasks'));
 // ------------------
 
 app.use((err, req, res, next) => {
