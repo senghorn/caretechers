@@ -43,3 +43,33 @@ module.exports.createNewNote = asyncHandler(async(req, _res, next) => {
 	await db.query(query);
 	next();
 });
+
+module.exports.checkIfNoteExists = asyncHandler(async (req, _res, next) => {
+	const query = sql`SELECT id FROM Notes WHERE id = ${req.params.noteId};`;
+	const [note] = await db.query(query);
+	if (!note) {
+		return next(newError(`This note(${req.params.noteId}) does not exist!`), 404);
+	}
+	next();
+});
+
+module.exports.updateNote = asyncHandler(async (req, _res, next) => {
+	let query = sql`UPDATE Notes SET `;
+	if (!req.body.title && !req.body.content) {
+		return next(newError('Note title or content must be provided!', 400));
+	}
+	if (req.body.title && req.body.content) {
+		query.append(sql`title = ${req.body.title}, content = ${req.body.content}`);
+	} else {
+		if (req.body.title) {
+			query.append(sql`title = ${req.body.title}`);
+		}
+		if (req.body.content) {
+			query.append(sql`content = ${req.body.content}`);
+		}
+	}
+
+	query.append(sql` WHERE id = ${req.params.noteId};`);
+	await db.query(query);
+	next();
+});

@@ -24,4 +24,11 @@ router.get('/:noteId',[
 	sharedMiddleware.sendResult
 ]);
 
+router.patch('/:noteId', [
+	notesMiddleware.checkIfNoteExists,
+	notesMiddleware.updateNote,
+	notesMiddleware.getNoteByNoteId,
+	sharedMiddleware.sendResult
+]);
+
 module.exports = router;
