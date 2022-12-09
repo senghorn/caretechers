@@ -4,50 +4,13 @@ import { Button, Text, Searchbar, Colors } from "react-native-paper";
 import Task from "../components/tasks/task";
 import { Dropdown } from "react-native-element-dropdown";
 import COLORS from "../constants/colors";
-
+import Header from "../components/notes/header";
 
 export default function Notes() {
-  const data = [
-    { label: "Date", value: "1" },
-    { label: "Alphabets", value: "2" },
-    { label: "Relevant", value: "3" },
-  ];
-  const [sortValue, setSortValue] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
-  const onChangeSearch = (query) => setSearchQuery(query);
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
-        <View style={styles.title}>
-          <Text style={styles.titleText}>Notes</Text>
-        </View>
-        <View style={styles.search}>
-          <Searchbar
-            placeholder="Search"
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-            style={styles.box}
-          />
-        </View>
-        <View style={styles.sort}>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            iconStyle={styles.iconStyle}
-            data={data}
-            labelField="label"
-            valueField="value"
-            placeholder="Sort By"
-            value={sortValue}
-            onChange={(item) => {
-              setSortValue(item.value);
-              console.log(item);
-            }}
-          />
-        </View>
-      </View>
+      <Header />
       <ScrollView style={styles.tasksContainer}>
         <Task title="Wifi code: 123123" />
         <Task title="Garage code: 321321" />
@@ -75,34 +38,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    paddingTop: 64,
+    paddingTop: 40,
   },
-  search: {
-    width: "49%",
-    padding:8
-  },
-  box :{
-    elevation:0,
-    borderWidth: 1,
-    borderColor:COLORS.grayLight
-  },  
-  title: {
-    marginLeft: "5%",
-    width: "23%",
-  },
-  titleText: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  sort: {
-    width: "20%",
-    borderRadius: 5,
-  },
-  row: {
+  headerContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
+    flexBasis: "auto",
+  },
+  box: {
+    elevation: 0,
+    borderWidth: 1,
+    borderColor: COLORS.grayLight,
   },
   tasksContainer: {
     flex: 1,
@@ -112,6 +57,8 @@ const styles = StyleSheet.create({
   },
   createButton: {
     marginVertical: 32,
+    width: "40%",
+    alignSelf: "center",
   },
   createButtonText: {
     fontSize: 14,
