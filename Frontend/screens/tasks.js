@@ -5,7 +5,7 @@ import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 
 const connectToBackend = async () => {
-  const result = await fetch('http://<BACKEND_ADDR>:3000/tasks/group/1');
+  const result = await fetch('http://ec2-54-153-120-183.us-west-1.compute.amazonaws.com:3000/tasks/group/1');
   const data = await result.text();
   console.log(data);
 };
