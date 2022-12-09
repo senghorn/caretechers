@@ -1,5 +1,6 @@
 import { View, StyleSheet } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import * as ImagePicker from "expo-image-picker";
 import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect } from "react";
 import COLORS from "../constants/colors";
@@ -32,9 +33,47 @@ const users = [
     avatar: "https://source.unsplash.com/140x140/?cat",
   },
 ];
+// For the testing purposes, you should probably use https://github.com/uuidjs/uuid
+const uuidv4 = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = Math.floor(Math.random() * 16);
+    const v = c === "x" ? r : (r % 4) + 8;
+    return v.toString(16);
+  });
+};
 
 export default function Messages() {
   const [messages, setMessages] = useState([]);
+
+  // Getting user permission to access photo gallery
+  const [hasGalPermission, setGalPermission] = useState(null);
+  useEffect(() => {
+    (async () => {
+      const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
+      setGalPermission(galleryStatus.status === "granted");
+    })();
+  }, []);
+
+  // Handles image selection
+  const handleImageSelection = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    result = result.assets;
+    imgValues = result[0];
+    const imageMessage = {
+      user: user[0],
+      createdAt: Date.now(),
+      _id: uuidv4(),
+      messageType: "image",
+      image: imgValues["uri"]
+    };
+    console.log(imageMessage);
+  };
 
   useEffect(() => {
     // Seeding the messages for prototype phase
@@ -130,7 +169,5 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
   },
-  divider:{
-
-  }
+  divider: {},
 });
