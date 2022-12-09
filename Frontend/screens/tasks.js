@@ -4,8 +4,15 @@ import { Button } from 'react-native-paper';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 
+const connectToBackend = async () => {
+  const result = await fetch('http://<BACKEND_ADDR>:3000/tasks/group/1');
+  const data = await result.text();
+  console.log(data);
+};
+
 export default function Tasks() {
   const [selected, setSelected] = useState('every');
+  connectToBackend();
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
