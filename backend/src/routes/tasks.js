@@ -12,4 +12,11 @@ router.get('/group/:groupId',[
 	sharedMiddleware.sendResult
 ]);
 
+router.post('/group/:groupId', [
+	groupMiddleware.checkIfGroupExists,
+	tasksMiddleware.verifyTaskIsValid,
+	tasksMiddleware.createNewTask,
+	sharedMiddleware.sendNoResult
+]);
+
 module.exports = router;
