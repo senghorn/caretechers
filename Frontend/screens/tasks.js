@@ -1,32 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Button } from 'react-native-paper';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 
-const connectToBackend = async () => {
-  const result = await fetch('http://ec2-54-153-120-183.us-west-1.compute.amazonaws.com:3000/tasks/group/1');
-  const data = await result.text();
-  console.log(data);
+const connectToBackend = async (selected, setRenderedTasks) => {
+  try {
+    const result = await fetch('http://BACKEND:3000/tasks/group/1');
+    const tasks = await result.json();
+    const renderedTasks = tasks.map((task) => <Task title={task.description} key={task.id} />);
+    setRenderedTasks(renderedTasks);
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
 export default function Tasks() {
   const [selected, setSelected] = useState('every');
-  connectToBackend();
+  const [renderedTasks, setRenderedTasks] = useState(null);
+
+  useEffect(() => {
+    connectToBackend(selected, setRenderedTasks);
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Header title="Every Visit" id="every" selected={selected} setSelected={setSelected} />
         <Header title="Scheduled" id="scheduled" selected={selected} setSelected={setSelected} />
       </View>
-      <ScrollView style={styles.tasksContainer}>
-        <Task title="Take out trash" />
-        <Task title="Clean dishes" />
-        <Task title="Fetch mail" />
-        <Task title="Give mom medicine" />
-        <Task title="Check pantry" />
-        <Task title="Check thermostat" />
-      </ScrollView>
+      <ScrollView style={styles.tasksContainer}>{renderedTasks}</ScrollView>
       <Button
         mode="contained"
         uppercase={false}
