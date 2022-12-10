@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { View, StyleSheet, ScrollView, Modal, TextInput } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Modal,
+  TextInput,
+  Text,
+} from "react-native";
 import { Button } from "react-native-paper";
 import Note from "../components/notes/note";
 import COLORS from "../constants/colors";
@@ -65,8 +72,11 @@ export default function Notes() {
   return (
     <View style={styles.container}>
       <Header />
-      <Modal visible={modalVisible} >
+
+      {/* Add new note view */}
+      <Modal visible={modalVisible}>
         <View style={styles.modal}>
+          <Text style={styles.label}>Note title</Text>
           <TextInput
             style={styles.input}
             placeholder="Note Title"
@@ -74,6 +84,7 @@ export default function Notes() {
             onChangeText={(text) => setNoteTitle(text)}
             labelStyle={styles.noteInput}
           />
+          <Text style={styles.label}>Note description</Text>
           <TextInput
             style={styles.input}
             placeholder="Note Content"
@@ -107,6 +118,7 @@ export default function Notes() {
           </View>
         </View>
       </Modal>
+
       <ScrollView style={styles.tasksContainer}>
         {/* Map over the notes and create a Note component for each note */}
         {notes.map((note) => (
@@ -134,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingTop: 40,
   },
-  row:{
+  row: {
     flexDirection: "row",
     flexWrap: "wrap",
     alignSelf: "center",
@@ -173,21 +185,26 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: '#ddd',
     padding: 10,
     marginBottom: 10,
     width: "80%",
+    color: '#333',
   },
   cancelNoteButton: {
     marginVertical: 32,
     width: "40%",
     alignSelf: "center",
-    marginEnd: 10
+    marginEnd: 10,
   },
   addNoteButton: {
     marginVertical: 32,
     width: "40%",
     alignSelf: "center",
-    marginStart: 10
+    marginStart: 10,
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 10,
   },
 });
