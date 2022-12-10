@@ -1,22 +1,33 @@
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import COLORS from '../../constants/colors'
 
-export default function Notes({ title }) {
-  return (
-    <View style={styles.taskContainer}>
-      <Text style={styles.taskText}>{title}</Text>
-    </View>
-  );
-}
+const Note = ({ content, title }) => (
+  <View style={styles.note}>
+    {/* Add a title for the note */}
+    <Text style={styles.title}>{title}</Text>
+    {/* Display the note content */}
+    <Text style={styles.content}>{content}</Text>
+  </View>
+);
 
 const styles = StyleSheet.create({
-  taskContainer: {
-    backgroundColor: '#e3f2fd',
+  note: {
+    padding: 10,
+    margin: 10,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginTop: 8,
   },
-  taskText: {
-    fontWeight: '500',
+  title: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  content: {
+    fontSize: 16,
   },
 });
+
+export default Note;

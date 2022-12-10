@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text } from "react-native";
 import { useState } from "react";
-import { Divider, Searchbar } from "react-native-paper";
+import { Searchbar } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
 import COLORS from "../../constants/colors";
 
