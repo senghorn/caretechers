@@ -1,15 +1,24 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Button } from 'react-native-paper';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 
-const connectToBackend = async (selected, setRenderedTasks) => {
+const connectToBackend = async (selected, setRenderedTasks, setLoading) => {
   try {
     const result = await fetch('http://BACKEND:3000/tasks/group/1');
-    const tasks = await result.json();
-    const renderedTasks = tasks.map((task) => <Task title={task.description} key={task.id} />);
+    let tasks = await result.json();
+    if (selected === 'every') {
+      tasks = tasks.filter((task) => task.recurring_type === 'everytime');
+    } else {
+      tasks = tasks.filter((task) => task.recurring_type !== 'everytime');
+    }
+    const renderedTasks = tasks.map((task) => (
+      <Task title={task.description} key={task.id} reccurence={task.recurring_type} selected={selected} />
+    ));
+
     setRenderedTasks(renderedTasks);
+    setLoading(false);
   } catch (error) {
     console.log(error.message);
   }
@@ -18,10 +27,12 @@ const connectToBackend = async (selected, setRenderedTasks) => {
 export default function Tasks() {
   const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    connectToBackend(selected, setRenderedTasks);
-  }, []);
+    setLoading(true);
+    connectToBackend(selected, setRenderedTasks, setLoading);
+  }, [selected]);
 
   return (
     <View style={styles.container}>
@@ -29,7 +40,9 @@ export default function Tasks() {
         <Header title="Every Visit" id="every" selected={selected} setSelected={setSelected} />
         <Header title="Scheduled" id="scheduled" selected={selected} setSelected={setSelected} />
       </View>
-      <ScrollView style={styles.tasksContainer}>{renderedTasks}</ScrollView>
+      <ScrollView style={styles.tasksContainer}>
+        {loading ? <ActivityIndicator size="large" color="#2196f3" style={styles.loader} /> : renderedTasks}
+      </ScrollView>
       <Button
         mode="contained"
         uppercase={false}
@@ -67,5 +80,8 @@ const styles = StyleSheet.create({
   },
   createButtonText: {
     fontSize: 14,
+  },
+  loader: {
+    marginTop: 96,
   },
 });
