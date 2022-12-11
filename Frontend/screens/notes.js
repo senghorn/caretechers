@@ -1,69 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { Button, Text, Searchbar, Colors } from "react-native-paper";
-import Task from "../components/tasks/task";
-import { Dropdown } from "react-native-element-dropdown";
+import { Button } from "react-native-paper";
+import Note from "../components/notes/note";
 import COLORS from "../constants/colors";
+import Header from "../components/notes/header";
+import AddNote from "../components/notes/addNote";
+import config from "../constants/config";
 
+
+const fetchNotes = async (setNotes) => {
+  try {
+    let connection_string =
+      "http://" + config.backend_server + "/notes/group/1";
+    const result = await fetch(connection_string);
+    const data = await result.json();
+    setNotes(data);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 export default function Notes() {
-  const data = [
-    { label: "Date", value: "1" },
-    { label: "Alphabets", value: "2" },
-    { label: "Relevant", value: "3" },
-  ];
-  const [sortValue, setSortValue] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [notes, setNotes] = useState([]);
+  useEffect(() => {
+    fetchNotes(setNotes);
+  }, []);
 
-  const onChangeSearch = (query) => setSearchQuery(query);
+  const [newNote, addNewNote] = useState(null);
+  useEffect(() => {
+    if (newNote != null) {
+      // TODO: calls to backend and save the new note
+      console.log(newNote);
+      addNewNote(null);
+    }
+  }, [newNote]);
+
+  // Add a state variable to control the visibility of the modal
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
-        <View style={styles.title}>
-          <Text style={styles.titleText}>Notes</Text>
-        </View>
-        <View style={styles.search}>
-          <Searchbar
-            placeholder="Search"
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-            style={styles.box}
-          />
-        </View>
-        <View style={styles.sort}>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            iconStyle={styles.iconStyle}
-            data={data}
-            labelField="label"
-            valueField="value"
-            placeholder="Sort By"
-            value={sortValue}
-            onChange={(item) => {
-              setSortValue(item.value);
-              console.log(item);
-            }}
-          />
-        </View>
-      </View>
+      <Header />
+      <AddNote
+        notes={notes}
+        setNotes={setNotes}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        addNewNote={addNewNote}
+      />
       <ScrollView style={styles.tasksContainer}>
-        <Task title="Wifi code: 123123" />
-        <Task title="Garage code: 321321" />
-        <Task title="Door code: 123321" />
-        <Task title="Operate Roomba: Click on play button" />
-        <Task title="How to fix water heater: CLOSE gas pipe, slide the heater small glass window, turn on pilot and then use lighter to ignite the pilot. Hold on to pilot for 1mn." />
-        <Task title="How to use AC: located in the second floor master bedroom. Adjust it accordingly." />
+        {/* Map over the notes and create a Note component for each note */}
+        {notes.map((note) => (
+          <Note key={note.id} title={note.title} content={note.content} />
+        ))}
       </ScrollView>
       <Button
         mode="contained"
         uppercase={false}
         color="#2196f3"
         icon="checkbox-marked-circle-plus-outline"
-        onPress={() => console.log("Create new note")}
         style={styles.createButton}
         labelStyle={styles.createButtonText}
+        onPress={() => setModalVisible(true)}
       >
         Add New Note
       </Button>
@@ -75,34 +73,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    paddingTop: 64,
+    paddingTop: 40,
   },
-  search: {
-    width: "49%",
-    padding:8
-  },
-  box :{
-    elevation:0,
-    borderWidth: 1,
-    borderColor:COLORS.grayLight
-  },  
-  title: {
-    marginLeft: "5%",
-    width: "23%",
-  },
-  titleText: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  sort: {
-    width: "20%",
-    borderRadius: 5,
-  },
-  row: {
+  headerContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
+    flexBasis: "auto",
+  },
+  box: {
+    elevation: 0,
+    borderWidth: 1,
+    borderColor: COLORS.grayLight,
   },
   tasksContainer: {
     flex: 1,
@@ -112,6 +92,8 @@ const styles = StyleSheet.create({
   },
   createButton: {
     marginVertical: 32,
+    width: "40%",
+    alignSelf: "center",
   },
   createButtonText: {
     fontSize: 14,
