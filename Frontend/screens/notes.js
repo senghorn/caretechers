@@ -5,22 +5,35 @@ import Note from "../components/notes/note";
 import COLORS from "../constants/colors";
 import Header from "../components/notes/header";
 import AddNote from "../components/notes/addNote";
+import config from "../constants/config";
+
 
 const fetchNotes = async (setNotes) => {
-  const result = await fetch("http://192.168.0.43:3000/notes/group/1");
-  const data = await result.text();
-  console.log(data);
-  // setNotes(data);
-  console.log("fetching notes");
+  try {
+    let connection_string =
+      "http://" + config.backend_server + "/notes/group/1";
+    const result = await fetch(connection_string);
+    const data = await result.json();
+    setNotes(data);
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
 export default function Notes() {
-  const [notes, setNotes] = useState([
-    { title: "Hi", content: "Hello", id: 100 },
-  ]);
+  const [notes, setNotes] = useState([]);
   useEffect(() => {
     fetchNotes(setNotes);
   }, []);
+
+  const [newNote, addNewNote] = useState(null);
+  useEffect(() => {
+    if (newNote != null) {
+      // TODO: calls to backend and save the new note
+      console.log(newNote);
+      addNewNote(null);
+    }
+  }, [newNote]);
 
   // Add a state variable to control the visibility of the modal
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,15 +46,12 @@ export default function Notes() {
         setNotes={setNotes}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
+        addNewNote={addNewNote}
       />
       <ScrollView style={styles.tasksContainer}>
         {/* Map over the notes and create a Note component for each note */}
         {notes.map((note) => (
-          <Note
-            key={note["id"]}
-            title={note["title"]}
-            content={note["content"]}
-          />
+          <Note key={note.id} title={note.title} content={note.content} />
         ))}
       </ScrollView>
       <Button

@@ -1,11 +1,5 @@
 import { useState, useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  Modal,
-  TextInput,
-  Text,
-} from "react-native";
+import { View, StyleSheet, Modal, TextInput, Text } from "react-native";
 import { Button } from "react-native-paper";
 import COLORS from "../../constants/colors";
 
@@ -14,6 +8,7 @@ export default function AddNote({
   setNotes,
   modalVisible,
   setModalVisible,
+  addNewNote,
 }) {
   const [noteTitle, setNoteTitle] = useState(""); // Add a state variable for the note title
   const [noteContent, setNoteContent] = useState(""); // Add a state variable for the note content
@@ -21,6 +16,7 @@ export default function AddNote({
 
   // Function to add a new note
   const addNote = () => {
+    addNewNote({ title: noteTitle, content: noteContent, id: newId });
     setNotes([
       ...notes,
       {
