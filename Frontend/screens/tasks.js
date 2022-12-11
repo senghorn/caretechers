@@ -1,18 +1,39 @@
-import { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Button } from 'react-native-paper';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 
-const connectToBackend = async () => {
-  const result = await fetch('http://ec2-54-153-120-183.us-west-1.compute.amazonaws.com:3000/tasks/group/1');
-  const data = await result.text();
-  console.log(data);
+const connectToBackend = async (selected, setRenderedTasks, setLoading) => {
+  try {
+    const result = await fetch('http://BACKEND:3000/tasks/group/1');
+    let tasks = await result.json();
+    if (selected === 'every') {
+      tasks = tasks.filter((task) => task.recurring_type === 'everytime');
+    } else {
+      tasks = tasks.filter((task) => task.recurring_type !== 'everytime');
+    }
+    const renderedTasks = tasks.map((task) => (
+      <Task title={task.description} key={task.id} reccurence={task.recurring_type} selected={selected} />
+    ));
+
+    setRenderedTasks(renderedTasks);
+    setLoading(false);
+  } catch (error) {
+    console.log(error.message);
+  }
 };
 
 export default function Tasks() {
   const [selected, setSelected] = useState('every');
-  connectToBackend();
+  const [renderedTasks, setRenderedTasks] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    connectToBackend(selected, setRenderedTasks, setLoading);
+  }, [selected]);
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -20,12 +41,7 @@ export default function Tasks() {
         <Header title="Scheduled" id="scheduled" selected={selected} setSelected={setSelected} />
       </View>
       <ScrollView style={styles.tasksContainer}>
-        <Task title="Take out trash" />
-        <Task title="Clean dishes" />
-        <Task title="Fetch mail" />
-        <Task title="Give mom medicine" />
-        <Task title="Check pantry" />
-        <Task title="Check thermostat" />
+        {loading ? <ActivityIndicator size="large" color="#2196f3" style={styles.loader} /> : renderedTasks}
       </ScrollView>
       <Button
         mode="contained"
@@ -64,5 +80,8 @@ const styles = StyleSheet.create({
   },
   createButtonText: {
     fontSize: 14,
+  },
+  loader: {
+    marginTop: 96,
   },
 });
