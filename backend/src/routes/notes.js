@@ -31,4 +31,9 @@ router.patch('/:noteId', [
 	sharedMiddleware.sendResult
 ]);
 
+router.delete('/:noteId', [
+	notesMiddleware.deleteNote,
+	sharedMiddleware.sendNoResult
+]);
+
 module.exports = router;
