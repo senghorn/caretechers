@@ -19,4 +19,9 @@ router.post('/group/:groupId', [
 	sharedMiddleware.sendNoResult
 ]);
 
+router.delete('/:taskId', [
+	tasksMiddleware.deleteTask,
+	sharedMiddleware.sendNoResult
+]);
+
 module.exports = router;

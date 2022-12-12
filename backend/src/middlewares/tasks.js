@@ -14,6 +14,12 @@ module.exports.getTasksByGroup = asyncHandler(async (req, _res, next) => {
 	next();
 });
 
+module.exports.deleteTask = asyncHandler(async (req, _res, next) => {
+	const query = sql`DELETE FROM TaskMeta WHERE id = ${req.params.taskId};`;
+	await db.query(query);
+	next();
+});
+
 // *** THIS MIDDLEWARE WILL BE USED LATER FOR COMPLICATED RECURRENCE PATTERNS ***
 // module.exports.sortTasksByType = asyncHandler(async (req, _res, next) => {
 // 	let sortedTasks = {
@@ -144,3 +150,5 @@ module.exports.createNewTask = asyncHandler(async (req, _res, next) => {
 		next();
 	}
 });
+
+
