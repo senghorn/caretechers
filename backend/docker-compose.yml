@@ -1,0 +1,14 @@
+version: "3"
+services:
+  carecoord-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - ./:/usr/app
+    container_name: carecoord-api
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    command: npm start

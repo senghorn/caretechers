@@ -29,3 +29,5 @@ Install dependencies by entering the following command in your terminal:
 To start the development server, just type the singular command in your terminal below
 
 `npm start`
+
+Alternatively, you can run `make start` to run the backend server in a docker container.
