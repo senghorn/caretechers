@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native';
 
 export default function Task({ title }) {
+  if (!title) return null;
   return (
     <View style={styles.taskContainer}>
       <Text style={styles.taskText}>{title}</Text>
