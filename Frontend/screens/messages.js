@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 64,
+    paddingTop: 40,
   },
   textInput: {
     height: 40,

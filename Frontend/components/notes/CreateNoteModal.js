@@ -2,21 +2,46 @@ import { useState, useRef } from "react";
 import { View, StyleSheet, Modal, TextInput, Text } from "react-native";
 import { Button } from "react-native-paper";
 import COLORS from "../../constants/colors";
+import config from "../../constants/config";
 
-export default function AddNote({
+// Sends the new added note to backend
+const sendNewNote = async (newNote) => {
+  try {
+    let connection_string =
+      "http://" + config.backend_server + "/notes/group/1";
+    const result = await fetch(connection_string, {
+      method: "POST",
+      body: JSON.stringify(newNote),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // TODO: After the backend responses, add new note to display
+    // const data = await result.json();
+    // setNotes(data);
+
+  } catch (error) {
+    console.log("Send new note error!");
+    console.log(error.message);
+  }
+};
+
+export default function CreateNoteModal({
   notes,
   setNotes,
   modalVisible,
   setModalVisible,
-  addNewNote,
 }) {
   const [noteTitle, setNoteTitle] = useState(""); // Add a state variable for the note title
   const [noteContent, setNoteContent] = useState(""); // Add a state variable for the note content
-  const [newId, setNewId] = useState(10); // TODO: switch up this new ID generator
+  const [newId, setNewId] = useState(10000); 
 
   // Function to add a new note
   const addNote = () => {
-    addNewNote({ title: noteTitle, content: noteContent, id: newId });
+    sendNewNote({ title: noteTitle, content: noteContent });
+    
+    // TODO: Set note with the backend response's ID instead
     setNotes([
       ...notes,
       {
@@ -25,6 +50,7 @@ export default function AddNote({
         id: newId,
       },
     ]);
+
     setNewId(newId + 1); // Generate new id
     setNoteTitle(""); // Clear the note title field
     setNoteContent(""); // Clear the note content field
