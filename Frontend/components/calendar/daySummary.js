@@ -1,9 +1,11 @@
-import { isEqual, startOfDay } from 'date-fns';
+import { isEqual, isWednesday, startOfDay } from 'date-fns';
+import { useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
 export default function DaySummary({ date, volunteer = false }) {
-  if (volunteer) {
+  const [isVolunteer, setIsVolunteer] = useState(isWednesday(date));
+  if (isVolunteer) {
     return (
       <View style={styles.buttonContainer}>
         <Button
@@ -11,7 +13,7 @@ export default function DaySummary({ date, volunteer = false }) {
           uppercase={false}
           color="#fff"
           icon="plus-circle-outline"
-          onPress={() => console.log('Volunteer to Visit')}
+          onPress={() => setIsVolunteer(false)}
           style={styles.volunteerButton}
           contentStyle={styles.volunteerButtonContent}
           labelStyle={styles.volunteerButtonText}

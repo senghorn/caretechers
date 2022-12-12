@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, Modal, Text } from 'react-native';
 import { Button } from 'react-native-paper';
+import CreateTaskModal from '../components/tasks/createTaskModal';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 
 const connectToBackend = async (selected, setRenderedTasks, setLoading) => {
   try {
-    const result = await fetch('http://BACKEND:3000/tasks/group/1');
+    const result = await fetch('http://ec2-54-153-120-183.us-west-1.compute.amazonaws.com:3000/tasks/group/1');
     let tasks = await result.json();
     if (selected === 'every') {
       tasks = tasks.filter((task) => task.recurring_type === 'everytime');
@@ -28,10 +29,15 @@ export default function Tasks() {
   const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [createTaskModalVisible, setCreateTaskModalVisible] = useState(false);
 
-  useEffect(() => {
+  const refresh = () => {
     setLoading(true);
     connectToBackend(selected, setRenderedTasks, setLoading);
+  };
+
+  useEffect(() => {
+    refresh();
   }, [selected]);
 
   return (
@@ -40,6 +46,7 @@ export default function Tasks() {
         <Header title="Every Visit" id="every" selected={selected} setSelected={setSelected} />
         <Header title="Scheduled" id="scheduled" selected={selected} setSelected={setSelected} />
       </View>
+      <CreateTaskModal visible={createTaskModalVisible} setVisible={setCreateTaskModalVisible} refresh={refresh} />
       <ScrollView style={styles.tasksContainer}>
         {loading ? <ActivityIndicator size="large" color="#2196f3" style={styles.loader} /> : renderedTasks}
       </ScrollView>
@@ -48,7 +55,7 @@ export default function Tasks() {
         uppercase={false}
         color="#2196f3"
         icon="checkbox-marked-circle-plus-outline"
-        onPress={() => console.log('Create new task')}
+        onPress={() => setCreateTaskModalVisible(true)}
         style={styles.createButton}
         labelStyle={styles.createButtonText}
       >
