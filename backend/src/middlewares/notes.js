@@ -73,3 +73,9 @@ module.exports.updateNote = asyncHandler(async (req, _res, next) => {
 	await db.query(query);
 	next();
 });
+
+module.exports.deleteNote = asyncHandler(async (req, _res, next) => {
+	let query = sql`DELETE FROM Notes WHERE id = ${req.params.noteId};`;
+	await db.query(query);
+	next();
+});
