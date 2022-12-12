@@ -4,9 +4,8 @@ import { Button } from "react-native-paper";
 import Note from "../components/notes/note";
 import COLORS from "../constants/colors";
 import Header from "../components/notes/header";
-import AddNote from "../components/notes/addNote";
+import CreateNoteModal from "../components/notes/CreateNoteModal";
 import config from "../constants/config";
-
 
 const fetchNotes = async (setNotes) => {
   try {
@@ -26,14 +25,6 @@ export default function Notes() {
     fetchNotes(setNotes);
   }, []);
 
-  const [newNote, addNewNote] = useState(null);
-  useEffect(() => {
-    if (newNote != null) {
-      // TODO: calls to backend and save the new note
-      console.log(newNote);
-      addNewNote(null);
-    }
-  }, [newNote]);
 
   // Add a state variable to control the visibility of the modal
   const [modalVisible, setModalVisible] = useState(false);
@@ -41,12 +32,11 @@ export default function Notes() {
   return (
     <View style={styles.container}>
       <Header />
-      <AddNote
+      <CreateNoteModal
         notes={notes}
         setNotes={setNotes}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        addNewNote={addNewNote}
       />
       <ScrollView style={styles.tasksContainer}>
         {/* Map over the notes and create a Note component for each note */}
