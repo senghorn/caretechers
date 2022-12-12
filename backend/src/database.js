@@ -11,5 +11,6 @@ module.exports.query = async (query) => {
 	});
 
 	const [result]= await connection.execute(query.sql, query.values);
+	connection.end();
 	return result;
 }
