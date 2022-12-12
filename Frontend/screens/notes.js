@@ -4,7 +4,7 @@ import { Button } from "react-native-paper";
 import Note from "../components/notes/note";
 import COLORS from "../constants/colors";
 import Header from "../components/notes/header";
-import CreateNoteModal from "../components/notes/CreateNoteModal";
+import CreateNoteModal from "../components/notes/createNoteModal";
 import config from "../constants/config";
 
 const fetchNotes = async (setNotes) => {
