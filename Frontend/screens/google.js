@@ -25,11 +25,17 @@ export default function GoogleLogin({ navigation }) {
   React.useEffect(() => {
     if (response?.type === "success") {
       setAccessToken(response.authentication.accessToken);
-      getUserData();
     } else {
       // TODO: Handle unsuccessful login
     }
   }, [response]);
+
+  React.useEffect(() => {
+    if (accessToken != null) {
+      getUserData();
+    }
+  }, [accessToken]);
+
 
   async function getUserData() {
     let userInfoResponse = await fetch(
