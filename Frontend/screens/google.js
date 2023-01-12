@@ -46,8 +46,14 @@ export default function GoogleLogin({ navigation }) {
     );
     userInfoResponse.json().then((data) => {
       setUserInfo(data);
-      console.log(data);
-      navigation.navigate("Home");
+      const exist = false;
+      // TODO: Check if user already exists
+      if (exist) {
+        navigation.navigate("Home");
+      } else {
+        navigation.navigate("RegisterUser" , {user: data});
+      }
+
     });
   }
 
