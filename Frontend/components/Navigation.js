@@ -6,6 +6,7 @@ import RegisterUser from "../screens/register-user";
 import Group from "../screens/group";
 
 const Stack = createNativeStackNavigator();
+
 export default function Navigation() {
   return (
     <Stack.Navigator screenOptions={{}} initialRouteName={"Login"}>

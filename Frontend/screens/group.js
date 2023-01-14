@@ -2,22 +2,21 @@ import {
   SafeAreaView,
   Text,
   TouchableOpacity,
-  TextInput,
   StyleSheet,
   View,
 } from "react-native";
 import COLORS from "../constants/colors";
 import Header from "../components/group/header";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
-const Group = ({navigation}) => {
+const Group = ({ navigation }) => {
   const groups = [
-    { name: "Group 1", id: 1 },
-    { name: "Group 2", id: 2 },
-    { name: "Group 3", id: 3 },
-    { name: "Group 4", id: 4 },
-    { name: "Group 5", id: 5 },
-    { name: "Group 6", id: 6 },
+    { name: "The Caretechers", id: 1 },
+    { name: "Brickbuster", id: 2 },
+    { name: "Chamomile", id: 3 },
+    { name: "Calibaz", id: 4 },
+    { name: "My Phoenix", id: 5 },
+    { name: "Jody Jody", id: 6 },
   ];
 
   const handlePress = (group) => {
@@ -30,16 +29,25 @@ const Group = ({navigation}) => {
       <Header />
       <Text style={styles.subtitle}>Select a group!</Text>
       <View style={styles.groupContainer}>
-        {groups.map((group) => (
+        <View style={styles.groupCase} key="add">
           <TouchableOpacity
-            style={styles.groupList}
-            key={group.id}
-            onPress={() => handlePress(group)}
+            style={styles.addGroup}
+            onPress={() => { console.log("add group clicked"); }}
           >
-            <Text style={styles.groupName}>{group.name}</Text>
+            <Icon name="search-plus" size={30} color="#fff" />
           </TouchableOpacity>
+          <Text style={styles.groupName}>Add Group</Text>
+        </View>
+        {groups.map((group) => (
+          <View style={styles.groupCase} key={group.id}>
+            <TouchableOpacity
+              style={styles.groupList}
+              onPress={() => handlePress(group)}
+            >
+            </TouchableOpacity>
+            <Text style={styles.groupName}>{group.name}</Text>
+          </View>
         ))}
-
       </View>
     </SafeAreaView>
   );
@@ -52,6 +60,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     marginTop: 50,
   },
+
   subtitle: {
     marginTop: 20,
     marginLeft: 15,
@@ -59,9 +68,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   groupContainer: {
-    margin: 15,
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: 'space-around'
+  },
+  icon: {
+    alignSelf: 'flex-end',
+  },
+  addGroup: {
+    backgroundColor: COLORS.coolGray,
+    borderRadius: 40,
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    alignItems: 'center',
   },
   groupList: {
     backgroundColor: COLORS.card,
@@ -70,8 +91,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 80,
     height: 80,
-    marginRight: 10,
-    marginBottom: 10,
     justifyContent: 'center',
     alignSelf: 'center',
   },
@@ -79,5 +98,11 @@ const styles = StyleSheet.create({
     fontWeight: "light",
     fontSize: 15,
     textAlign: "center",
+    width: 80,
+    maxHeight: 40,
+  },
+  groupCase: {
+    margin: 10,
+    alignItems: 'center',
   },
 });
