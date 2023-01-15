@@ -5,9 +5,11 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+import { useState } from "react";
 import COLORS from "../constants/colors";
 import Header from "../components/group/header";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AddGroupModal from "../components/group/AddGroupModal";
 
 const Group = ({ navigation }) => {
   const groups = [
@@ -24,15 +26,19 @@ const Group = ({ navigation }) => {
     navigation.navigate("Home");
   };
 
+  // Add a state variable to control the visibility of the add group modal
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
     <SafeAreaView style={styles.container}>
       <Header />
+      <AddGroupModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
       <Text style={styles.subtitle}>Select a group!</Text>
       <View style={styles.groupContainer}>
         <View style={styles.groupCase} key="add">
           <TouchableOpacity
             style={styles.addGroup}
-            onPress={() => { console.log("add group clicked"); }}
+            onPress={() => setModalVisible(true)}
           >
             <Icon name="search-plus" size={30} color="#fff" />
           </TouchableOpacity>
