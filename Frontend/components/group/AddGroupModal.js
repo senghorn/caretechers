@@ -38,8 +38,19 @@ const AddGroupModal = ({ modalVisible, setModalVisible }) => {
                 <Button
                     mode="contained"
                     uppercase={false}
+                    color="#2196f3"
+                    icon="checkbox-marked-circle-plus-outline"
+                    style={styles.exitButton}
+                    onPress={() => console.log("create new group pressed")}
+                >
+                    Create New Group
+                </Button>
+
+                <Button
+                    mode="contained"
+                    uppercase={false}
                     color={COLORS.danger}
-                    icon="close"
+                    icon="exit-to-app"
                     style={styles.exitButton}
                     onPress={() => setModalVisible(false)}
                 >
@@ -56,7 +67,7 @@ export default AddGroupModal;
 const styles = StyleSheet.create({
     modal: {
         flex: 1,
-        backgroundColor: "rgba(33, 150, 243, 0.9)",
+        backgroundColor: "rgba(33, 150, 243, 0.3)",
     },
     searchBox: {
         marginTop: 30,
