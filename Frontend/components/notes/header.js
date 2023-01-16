@@ -5,6 +5,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import COLORS from "../../constants/colors";
 
 export default function Header() {
+
+  // Sort drop down values
   const data = [
     { label: "Date", value: "1" },
     { label: "Alphabets", value: "2" },
