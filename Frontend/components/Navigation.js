@@ -9,7 +9,7 @@ const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
-    <Stack.Navigator screenOptions={{}} initialRouteName={"Login"}>
+    <Stack.Navigator screenOptions={{}} initialRouteName={"Home"}>
       <Stack.Screen
         name={"Login"}
         component={GoogleLogin}

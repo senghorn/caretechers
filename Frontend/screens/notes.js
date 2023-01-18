@@ -5,6 +5,7 @@ import Note from '../components/notes/note';
 import COLORS from '../constants/colors';
 import Header from '../components/notes/header';
 import CreateNoteModal from '../components/notes/CreateNoteModal';
+import EditRemoveNoteModal from '../components/notes/EditRemoveNoteModal';
 import config from '../constants/config';
 
 const fetchNotes = async (setNotes) => {
@@ -19,22 +20,35 @@ const fetchNotes = async (setNotes) => {
 };
 
 export default function Notes() {
+  // Add a state variable to control the visibility of the modal
+  const [modalVisible, setModalVisible] = useState(false);
   const [notes, setNotes] = useState([]);
+  const [selectedNote, setSelectedNote] = useState(null);
   useEffect(() => {
     fetchNotes(setNotes);
   }, []);
 
-  // Add a state variable to control the visibility of the modal
-  const [modalVisible, setModalVisible] = useState(false);
+  useEffect(() => {
+    if (selectedNote != null) {
+    }
+  }, [selectedNote]);
 
   return (
     <View style={styles.container}>
       <Header />
-      <CreateNoteModal notes={notes} setNotes={setNotes} modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <CreateNoteModal notes={notes} setNotes={setNotes}
+        modalVisible={modalVisible} setModalVisible={setModalVisible}
+        key={"create"} /*Key is required to differentiate two Modal objects*/
+      />
+      <EditRemoveNoteModal
+        notes={notes} setNotes={setNotes}
+        selectedNote={selectedNote} setSelectedNote={setSelectedNote}
+        key={"edit"} /*Key is required to differentiate two Modal objects*/
+      />
       <ScrollView style={styles.tasksContainer}>
         {/* Map over the notes and create a Note component for each note */}
         {notes.map((note) => (
-          <Note key={note.id} title={note.title} content={note.content} />
+          <Note key={note.id} title={note.title} content={note.content} setSelectedNote={setSelectedNote} id={note.id} />
         ))}
       </ScrollView>
       <Button
@@ -44,7 +58,9 @@ export default function Notes() {
         icon="checkbox-marked-circle-plus-outline"
         style={styles.createButton}
         labelStyle={styles.createButtonText}
-        onPress={() => setModalVisible(true)}
+        onPress={() => {
+          setModalVisible(true);
+        }}
       >
         Add New Note
       </Button>
