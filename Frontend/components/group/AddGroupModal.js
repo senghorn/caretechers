@@ -25,7 +25,7 @@ const AddGroupModal = ({ modalVisible, setModalVisible }) => {
                         {groups.map((group) => {
                             return (
                                 <TouchableOpacity onPress={() => alert("Request to join " + group.name + " has been sent.")}
-                                    key={group.key}
+                                    key={group.id}
                                     style={styles.groupDisplay}>
                                     <Text style={styles.groupName}>{group.name}</Text>
                                 </TouchableOpacity>
