@@ -5,6 +5,7 @@ import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect } from "react";
 import COLORS from "../constants/colors";
 import TopBar from "../components/topBar";
+import socket from "../components/messages/socket";
 
 const users = [
   {
@@ -43,6 +44,16 @@ const uuidv4 = () => {
 };
 
 export default function Messages() {
+  socket.auth = { username: "Senghorn" };
+  socket.connect();
+  socket.on("connect_error", (err) => {
+    console.log(err.message);
+    if (err.message === "invalid username") {
+      console.log("failed to connect to message server");
+    }
+  });
+
+
   const [messages, setMessages] = useState([]);
 
   // Getting user permission to access photo gallery
@@ -112,6 +123,8 @@ export default function Messages() {
   }, []);
 
   const onSend = useCallback((messages = []) => {
+    console.log("sent")
+    socket.emit("chat", messages);
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, messages)
     );

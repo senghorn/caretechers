@@ -56,7 +56,7 @@ export default function EditRemoveNoteModal({
         <Modal visible={modalVisible} transparent={true} animationType="slide">
             <View style={styles.modal}>
                 <View style={styles.container}>
-                    <Text style={styles.title}>Remove</Text>
+                    <Text style={styles.title}>Edit Note</Text>
                     <TextInput
                         style={styles.input}
                         value={noteTitle}
