@@ -44,6 +44,7 @@ const uuidv4 = () => {
 };
 
 export default function Messages() {
+
   socket.auth = { username: "Senghorn" };
   socket.connect();
   socket.on("connect_error", (err) => {
@@ -51,6 +52,10 @@ export default function Messages() {
     if (err.message === "invalid username") {
       console.log("failed to connect to message server");
     }
+  });
+
+  socket.on("message", msg => {
+    console.log("received: ", msg);
   });
 
 
