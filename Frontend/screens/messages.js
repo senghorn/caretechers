@@ -45,23 +45,37 @@ const uuidv4 = () => {
 
 export default function Messages() {
 
-  socket.auth = { username: "Senghorn" };
-  socket.connect();
-  socket.on("connect_error", (err) => {
-    console.log(err.message);
-    if (err.message === "invalid username") {
-      console.log("failed to connect to message server");
-    }
-  });
-  
-  // Handles new message event, this gets triggered when other
-  // user withtin the same group sends a message
-  socket.on("message", (msg) => {
-    console.log("received: ", msg, socket.id);
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, msg)
-    );
-  });
+  useEffect(() => {
+    socket.auth = { username: "Senghorn" };
+    socket.connect();
+    socket.on("connect_error", (err) => {
+      console.log(err.message);
+      if (err.message === "invalid username") {
+        console.log("failed to connect to message server");
+      }
+    });
+
+    socket.on("message", (msg) => {
+      console.log("received: ", msg, socket.id);
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, msg)
+      );
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.log(reason);
+      socket.disconnect();
+      if (reason === "io server disconnect") {
+
+      }
+    });
+
+    // Network clean up: This will clean up any necessary connections with server
+    return () => {
+      socket.disconnect();
+      console.log("cleaning up");
+    };
+  }, []);
 
   const [messages, setMessages] = useState([]);
 

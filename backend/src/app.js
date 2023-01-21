@@ -41,19 +41,23 @@ const { Server } = require("socket.io");
 const httpServer = createServer(app);
 const io = new Server(httpServer, { /* options */ });
 
+// TODO: Get the correct group name
+const groupName = "Group1";
 io.on("connect", (socket) => {
-	console.log("client connected!");
-
-	// TODO: Get the correct group name
-	const groupName = "Group1";
 	socket.join(groupName);
+	console.log("client connected!",  io.of("/").sockets.size);
 	socket.on("chat", (message) => {
-    console.log("sending to client");
 		io.to(groupName).emit("message", message);
 	});
 
 	socket.on("disconnect", (reason) => {
-		// ...
+		socket.leave(groupName);
+		socket.disconnect(true);
+		console.log("user disconnected", socket.rooms);
+	});
+
+	socket.on("disconnecting", (reason) => {
+		console.log("user disconnecting", reason);
 	});
 
 });
