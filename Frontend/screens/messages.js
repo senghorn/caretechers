@@ -53,11 +53,15 @@ export default function Messages() {
       console.log("failed to connect to message server");
     }
   });
-
-  socket.on("message", msg => {
-    console.log("received: ", msg);
+  
+  // Handles new message event, this gets triggered when other
+  // user withtin the same group sends a message
+  socket.on("message", (msg) => {
+    console.log("received: ", msg, socket.id);
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, msg)
+    );
   });
-
 
   const [messages, setMessages] = useState([]);
 
@@ -130,9 +134,9 @@ export default function Messages() {
   const onSend = useCallback((messages = []) => {
     console.log("sent")
     socket.emit("chat", messages);
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages)
-    );
+    // setMessages((previousMessages) =>
+    //   GiftedChat.append(previousMessages, messages)
+    // );
   }, []);
 
   // Message render bubble

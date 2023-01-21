@@ -42,13 +42,14 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, { /* options */ });
 
 io.on("connect", (socket) => {
-	console.log("client connected!", socket);
+	console.log("client connected!");
 
 	// TODO: Get the correct group name
 	const groupName = "Group1";
 	socket.join(groupName);
 	socket.on("chat", (message) => {
-		io.to(groupName).emit(message);
+    console.log("sending to client");
+		io.to(groupName).emit("message", message);
 	});
 
 	socket.on("disconnect", (reason) => {
@@ -70,4 +71,4 @@ io.use((socket, next) => {
 	next();
 });
 
-// -------- ------------------------------
+// ---------------------------------------
