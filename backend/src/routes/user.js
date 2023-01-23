@@ -1,17 +1,18 @@
 const express = require('express')
 
-const usersMiddleware = require('../middlewares/users');
+const userMiddleware = require('../middlewares/user');
 const sharedMiddleware = require('../middlewares/shared');
 
 const router = express.Router();
 
-router.get('/group/',[
+router.get('/',[
 	sharedMiddleware.sendResult
 ]);
 
-router.post('/user/', [
-
+router.post('/', [
+	userMiddleware.verifyCreateUserBody,
+	userMiddleware.createNewUser,
 	sharedMiddleware.sendNoResult
 ]);
 
-module.exports = router; 
+module.exports = router;
