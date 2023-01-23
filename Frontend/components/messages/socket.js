@@ -1,6 +1,8 @@
 import { io } from "socket.io-client";
+import config from "../../constants/config";
 
-const URL = "http://192.168.0.43:3001";
+const URL = config.backend_messaging;
+
 const socket = io(URL, {
     reconnectionDelayMax: 10000,
     auth: {
