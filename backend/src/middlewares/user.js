@@ -37,3 +37,30 @@ module.exports.getUserByID = asyncHandler(async (req, _res, next) => {
 	req.result = await db.query(query);
 	next();
 });
+
+module.exports.verifyUserExists = asyncHandler(async(req, _res, next) => {
+	const query = sql`SELECT * FROM Users WHERE email = ${req.params.userId};`;
+	const [result] = await db.query(query);
+	if(!result) {
+		return next(newError('This user does not exist', 404));
+	}
+	next();
+});
+
+module.exports.addUserToGroup = asyncHandler(async(req, _res, next) => {
+	if (!req.body.groupId || typeof req.body.groupId !== 'number') {
+		return next(newError('This groupId is invalid!', 400));
+	}
+
+	let query = sql`SELECT * FROM \`Groups\` G
+						WHERE id = ${req.body.groupId}`;
+	const [result] = await db.query(query);
+
+	if (!result) {
+		return next(newError('This group does not exist!', 404));
+	}
+
+	query = sql`UPDATE Users SET group_id = ${req.body.groupId} WHERE email = ${req.params.userId};`;
+	await db.query(query);
+	next();
+});
