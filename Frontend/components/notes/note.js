@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import COLORS from '../../constants/colors'
 
-const Note = ({ content, title }) => (
-  <View style={styles.note}>
+const Note = ({ content, title, id, setSelectedNote }) => (
+  <TouchableOpacity style={styles.note} onPress={() => setSelectedNote({ id: id, title: title, content: content })}>
     {/* Add a title for the note */}
-    <Text style={styles.title}>{title}</Text>
+    <Text Text style={styles.title} > {title}</Text >
     {/* Display the note content */}
-    <Text style={styles.content}>{content}</Text>
-  </View>
+    <Text Text style={styles.content} > {content}</Text >
+  </TouchableOpacity >
 );
 
 const styles = StyleSheet.create({

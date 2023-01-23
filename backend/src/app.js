@@ -13,6 +13,7 @@ app.get('/', (req, res) => {
 app.use('/notes', require('./routes/notes'));
 app.use('/messages', require('./routes/messages'));
 app.use('/tasks', require('./routes/tasks'));
+app.use('/user', require('./routes/user'));
 // ------------------
 
 app.use((err, req, res, next) => {
@@ -27,9 +28,6 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
 	console.log(`Example app listening on port ${port}`)
 })
-<<<<<<< Updated upstream
-=======
-
 
 // -------- Messaging Code ------------
 const { createServer } = require("http");
@@ -58,7 +56,6 @@ io.on("connect", (socket) => {
 	});
 });
 
-
 httpServer.listen(3001, () => console.log("Chat server listening on port 3001"));
 
 // Register middleware function that gets called every incoming socket
@@ -70,6 +67,3 @@ io.use((socket, next) => {
 	socket.username = username;
 	next();
 });
-
-// ---------------------------------------
->>>>>>> Stashed changes

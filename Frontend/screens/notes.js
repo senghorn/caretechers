@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Button } from 'react-native-paper';
-import Note from '../components/notes/note';
-import COLORS from '../constants/colors';
-import Header from '../components/notes/header';
-import CreateNoteModal from '../components/notes/CreateNoteModal';
-import config from '../constants/config';
+import { useState, useEffect } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { Button } from "react-native-paper";
+import Note from "../components/notes/note";
+import COLORS from "../constants/colors";
+import Header from "../components/notes/header";
+import CreateNoteModal from "../components/notes/CreateNoteModal";
+import EditRemoveNoteModal from "../components/notes/EditRemoveNoteModal";
+import config from "../constants/config";
 
 const fetchNotes = async (setNotes) => {
   try {
-    let connection_string = 'http://' + config.backend_server + '/notes/group/1';
+    let connection_string =
+      "http://" + config.backend_server + "/notes/group/1";
     const result = await fetch(connection_string);
     const data = await result.json();
     setNotes(data);
@@ -19,22 +21,46 @@ const fetchNotes = async (setNotes) => {
 };
 
 export default function Notes() {
+  // Add a state variable to control the visibility of the modal
+  const [modalVisible, setModalVisible] = useState(false);
   const [notes, setNotes] = useState([]);
+  const [selectedNote, setSelectedNote] = useState(null);
   useEffect(() => {
     fetchNotes(setNotes);
   }, []);
 
-  // Add a state variable to control the visibility of the modal
-  const [modalVisible, setModalVisible] = useState(false);
+  useEffect(() => {
+    if (selectedNote != null) {
+    }
+  }, [selectedNote]);
 
   return (
     <View style={styles.container}>
       <Header />
-      <CreateNoteModal notes={notes} setNotes={setNotes} modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <CreateNoteModal
+        notes={notes}
+        setNotes={setNotes}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        key={"create"} /*Key is required to differentiate two Modal objects*/
+      />
+      <EditRemoveNoteModal
+        notes={notes}
+        setNotes={setNotes}
+        selectedNote={selectedNote}
+        setSelectedNote={setSelectedNote}
+        key={"edit"} /*Key is required to differentiate two Modal objects*/
+      />
       <ScrollView style={styles.tasksContainer}>
         {/* Map over the notes and create a Note component for each note */}
         {notes.map((note) => (
-          <Note key={note.id} title={note.title} content={note.content} />
+          <Note
+            key={note.id}
+            title={note.title}
+            content={note.content}
+            setSelectedNote={setSelectedNote}
+            id={note.id}
+          />
         ))}
       </ScrollView>
       <Button
@@ -44,7 +70,9 @@ export default function Notes() {
         icon="checkbox-marked-circle-plus-outline"
         style={styles.createButton}
         labelStyle={styles.createButtonText}
-        onPress={() => setModalVisible(true)}
+        onPress={() => {
+          setModalVisible(true);
+        }}
       >
         Add New Note
       </Button>
@@ -55,12 +83,12 @@ export default function Notes() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingTop: 40,
   },
   headerContainer: {
-    flexDirection: 'row',
-    flexBasis: 'auto',
+    flexDirection: "row",
+    flexBasis: "auto",
   },
   box: {
     elevation: 0,
@@ -69,14 +97,14 @@ const styles = StyleSheet.create({
   },
   tasksContainer: {
     flex: 1,
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 24,
     marginTop: 16,
   },
   createButton: {
     marginVertical: 32,
-    width: '40%',
-    alignSelf: 'center',
+    width: "40%",
+    alignSelf: "center",
   },
   createButtonText: {
     fontSize: 14,
