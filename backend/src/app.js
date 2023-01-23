@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 app.use('/notes', require('./routes/notes'));
 app.use('/messages', require('./routes/messages'));
 app.use('/tasks', require('./routes/tasks'));
-app.use('/users', require('./routes/users'));
+app.use('/user', require('./routes/user'));
 // ------------------
 
 app.use((err, req, res, next) => {
