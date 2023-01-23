@@ -10,6 +10,12 @@ router.get('/:userId',[
 	sharedMiddleware.sendResult
 ]);
 
+router.post('/:userId/group', [
+	userMiddleware.verifyUserExists,
+	userMiddleware.addUserToGroup,
+	sharedMiddleware.sendNoResult
+]);
+
 router.post('/', [
 	userMiddleware.verifyCreateUserBody,
 	userMiddleware.createNewUser,
