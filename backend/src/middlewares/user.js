@@ -30,3 +30,10 @@ module.exports.createNewUser = asyncHandler(async(req, _res, next) => {
 	await db.query(query);
 	next();
 });
+
+module.exports.getUserByID = asyncHandler(async (req, _res, next) => {
+	const query = sql`SELECT * FROM Users
+					WHERE Users.email = ${req.params.userId};`;
+	req.result = await db.query(query);
+	next();
+});

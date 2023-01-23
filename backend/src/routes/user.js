@@ -5,7 +5,8 @@ const sharedMiddleware = require('../middlewares/shared');
 
 const router = express.Router();
 
-router.get('/',[
+router.get('/:userId',[
+	userMiddleware.getUserByID,
 	sharedMiddleware.sendResult
 ]);
 
