@@ -16,7 +16,7 @@ module.exports.verifyCreateUserBody = asyncHandler(async (req, _res, next) => {
 			phoneNum: {type: 'string'},
 			groupId: {type: 'number'}
 		},
-		required: ['email', 'firstName', 'lastName', 'phoneNum', 'groupId']
+		required: ['email', 'firstName', 'lastName', 'phoneNum']
 	};
 	const validate = ajv.compile(schema);
 	if (!validate(req.body)) {
