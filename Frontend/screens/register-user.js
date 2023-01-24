@@ -9,6 +9,35 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import colors from "../constants/colors";
+import config from "../constants/config";
+const axios = require("axios").default;
+
+const createUser = async (first, last, email, phone) => {
+  try {
+    let connection_string = "http://" + config.backend_server + "/user";
+    await axios
+      .post(connection_string, {
+        email: email,
+        firstName: first,
+        lastName: last,
+        phoneNum: phone,
+        groupId: null,
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+        return false;
+      })
+      .then(function () {
+        // always executed
+        return true;
+      });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 export default function Inputs({ route, navigation }) {
   const { user } = route.params;
@@ -58,7 +87,7 @@ export default function Inputs({ route, navigation }) {
     state["phone"] = text;
   };
 
-  submit = () => {
+  const submit = async () => {
     if (state["first"] == undefined) {
       alert("Please make to enter your first name");
     } else if (state["last"] == undefined) {
@@ -68,6 +97,12 @@ export default function Inputs({ route, navigation }) {
     } else if (state["phone"].length < 12) {
       alert("Phone number is not valid");
     } else {
+      await createUser(
+        state["first"],
+        state["last"],
+        state["phone"],
+        state["phone"]
+      );
       alert(
         "Register info \n" +
           "First name: " +

@@ -50,7 +50,7 @@ io.on("connect", (socket) => {
 	socket.on("chat", (message) => {
 		io.to(groupName).emit("message", message);
 	});
-
+	
 	socket.on("disconnect", (reason) => {
 		socket.leave(groupName);
 		socket.disconnect(true);

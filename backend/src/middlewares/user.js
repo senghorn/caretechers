@@ -34,7 +34,12 @@ module.exports.createNewUser = asyncHandler(async(req, _res, next) => {
 module.exports.getUserByID = asyncHandler(async (req, _res, next) => {
 	const query = sql`SELECT * FROM Users
 					WHERE Users.email = ${req.params.userId};`;
-	req.result = await db.query(query);
+	
+	const [result] = await db.query(query);
+	if(!result){
+		return next(newError('This user does not exist', 404));
+	}
+	req.result = result;
 	next();
 });
 
