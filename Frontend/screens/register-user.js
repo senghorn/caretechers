@@ -12,6 +12,12 @@ import colors from "../constants/colors";
 import config from "../constants/config";
 const axios = require("axios").default;
 
+/**
+ * Sends create new user request to the backend server using the given
+ * first name, last name , email and phone number.
+ * @return True : on success
+ *         False: on error
+ */
 const createUser = async (first, last, email, phone) => {
   try {
     let connection_string = "http://" + config.backend_server + "/user";
@@ -24,7 +30,7 @@ const createUser = async (first, last, email, phone) => {
         groupId: null,
       })
       .then(function (response) {
-        console.log(response);
+        return true;
       })
       .catch(function (error) {
         console.log(error);
@@ -32,7 +38,6 @@ const createUser = async (first, last, email, phone) => {
       })
       .then(function () {
         // always executed
-        return true;
       });
   } catch (error) {
     console.log(error.message);
@@ -44,6 +49,8 @@ export default function Inputs({ route, navigation }) {
   const [state, setState] = useState({});
   const [phoneNumber, setPhoneNumber] = useState("");
 
+  // Formats the text of the phone number to display nicely
+  // E.g., 123-449-4910
   const formatPhoneNumber = (text) => {
     var cleaned = "";
     var match = text.match(/\d/g);
@@ -87,6 +94,7 @@ export default function Inputs({ route, navigation }) {
     state["phone"] = text;
   };
 
+  // Handles create user button being pressed
   const submit = async () => {
     if (state["first"] == undefined) {
       alert("Please make to enter your first name");
@@ -97,14 +105,15 @@ export default function Inputs({ route, navigation }) {
     } else if (state["phone"].length < 12) {
       alert("Phone number is not valid");
     } else {
-      await createUser(
+      const userCreated = await createUser(
         state["first"],
         state["last"],
         state["phone"],
         state["phone"]
       );
-      alert(
-        "Register info \n" +
+      if (userCreated) {
+        alert(
+          "Register info \n" +
           "First name: " +
           state["first"] +
           "\n" +
@@ -117,9 +126,12 @@ export default function Inputs({ route, navigation }) {
           "Email: " +
           state["email"] +
           "\n"
-      );
+        );
+        navigation.navigate("Group");
+      } else {
+        alert("User create unsuccessful.");
+      }
 
-      navigation.navigate("Group");
     }
   };
 
