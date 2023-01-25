@@ -43,10 +43,12 @@ const uuidv4 = () => {
   });
 };
 
-export default function Messages() {
-
+export default function Messages({ route, navigation }) {
+  const { user } = route.params;
+  
+  console.log(user);
   useEffect(() => {
-    socket.auth = { username: "Senghorn" };
+    socket.auth = { email: user["email"] , username : "Senghorn"};
     socket.connect();
     socket.on("connect_error", (err) => {
       console.log(err.message);
@@ -66,7 +68,6 @@ export default function Messages() {
       console.log(reason);
       socket.disconnect();
       if (reason === "io server disconnect") {
-
       }
     });
 
@@ -104,7 +105,7 @@ export default function Messages() {
       createdAt: Date.now(),
       _id: uuidv4(),
       messageType: "image",
-      image: imgValues["uri"]
+      image: imgValues["uri"],
     };
     console.log(imageMessage);
   };
@@ -146,7 +147,7 @@ export default function Messages() {
   }, []);
 
   const onSend = useCallback((messages = []) => {
-    console.log("sent")
+    console.log("sent");
     socket.emit("chat", messages);
     // setMessages((previousMessages) =>
     //   GiftedChat.append(previousMessages, messages)

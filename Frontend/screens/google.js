@@ -16,8 +16,7 @@ const checkExistingUser = async (email) => {
       return true;
     })
     .catch(function (error) {
-      // handle error
-      console.log(email + " does not exist.");
+      console.log("Backend request erorr: ",error);
       return false;
     });
 };
@@ -62,9 +61,10 @@ export default function GoogleLogin({ navigation }) {
       setUserInfo(data);
       const exist = await checkExistingUser(data["email"]);
       if (exist) {
-        navigation.navigate("Home");
+        navigation.navigate("Home", { user: data });
       } else {
-        navigation.navigate("RegisterUser", { user: data });
+        // navigation.navigate("RegisterUser", { user: data });
+        navigation.navigate("Home", { user: data });
       }
     });
   }
