@@ -5,6 +5,7 @@ import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect } from "react";
 import COLORS from "../constants/colors";
 import TopBar from "../components/topBar";
+import socket from "../components/messages/socket";
 
 const users = [
   {
@@ -43,6 +44,39 @@ const uuidv4 = () => {
 };
 
 export default function Messages() {
+
+  useEffect(() => {
+    socket.auth = { username: "Senghorn" };
+    socket.connect();
+    socket.on("connect_error", (err) => {
+      console.log(err.message);
+      if (err.message === "invalid username") {
+        console.log("failed to connect to message server");
+      }
+    });
+
+    socket.on("message", (msg) => {
+      console.log("received: ", msg, socket.id);
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, msg)
+      );
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.log(reason);
+      socket.disconnect();
+      if (reason === "io server disconnect") {
+
+      }
+    });
+
+    // Network clean up: This will clean up any necessary connections with server
+    return () => {
+      socket.disconnect();
+      console.log("cleaning up");
+    };
+  }, []);
+
   const [messages, setMessages] = useState([]);
 
   // Getting user permission to access photo gallery
@@ -112,9 +146,11 @@ export default function Messages() {
   }, []);
 
   const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages)
-    );
+    console.log("sent")
+    socket.emit("chat", messages);
+    // setMessages((previousMessages) =>
+    //   GiftedChat.append(previousMessages, messages)
+    // );
   }, []);
 
   // Message render bubble
