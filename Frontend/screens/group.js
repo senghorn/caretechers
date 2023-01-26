@@ -8,18 +8,12 @@ import {
 import { useState } from "react";
 import COLORS from "../constants/colors";
 import Header from "../components/group/header";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from "react-native-vector-icons/FontAwesome";
 import AddGroupModal from "../components/group/AddGroupModal";
 
+
 const Group = ({ navigation }) => {
-  const groups = [
-    { name: "The Caretechers", id: 1 },
-    { name: "Brickbuster", id: 2 },
-    { name: "Chamomile", id: 3 },
-    { name: "Calibaz", id: 4 },
-    { name: "My Phoenix", id: 5 },
-    { name: "Jody Jody", id: 6 },
-  ];
+  const [groups, setGroups] = useState([]);
 
   const handlePress = (group) => {
     console.log(`Group ${group.name} pressed`);
@@ -32,7 +26,10 @@ const Group = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <Header />
-      <AddGroupModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <AddGroupModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
       <Text style={styles.subtitle}>Select a group!</Text>
       <View style={styles.groupContainer}>
         <View style={styles.groupCase} key="add">
@@ -49,8 +46,7 @@ const Group = ({ navigation }) => {
             <TouchableOpacity
               style={styles.groupList}
               onPress={() => handlePress(group)}
-            >
-            </TouchableOpacity>
+            ></TouchableOpacity>
             <Text style={styles.groupName}>{group.name}</Text>
           </View>
         ))}
@@ -76,19 +72,19 @@ const styles = StyleSheet.create({
   groupContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: 'space-around'
+    justifyContent: "space-around",
   },
   icon: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
   addGroup: {
     backgroundColor: COLORS.coolGray,
     borderRadius: 40,
     width: 80,
     height: 80,
-    justifyContent: 'center',
-    alignSelf: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignSelf: "center",
+    alignItems: "center",
   },
   groupList: {
     backgroundColor: COLORS.card,
@@ -97,8 +93,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 80,
     height: 80,
-    justifyContent: 'center',
-    alignSelf: 'center',
+    justifyContent: "center",
+    alignSelf: "center",
   },
   groupName: {
     fontWeight: "light",
@@ -109,6 +105,6 @@ const styles = StyleSheet.create({
   },
   groupCase: {
     margin: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });

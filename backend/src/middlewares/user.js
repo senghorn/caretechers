@@ -69,3 +69,13 @@ module.exports.addUserToGroup = asyncHandler(async(req, _res, next) => {
 	await db.query(query);
 	next();
 });
+
+module.exports.getUserGroupByID = asyncHandler(async(req, _res, next) => {
+	const query = sql`SELECT group_id FROM Users WHERE email = ${req.params.userId};`;
+	const [result] = await db.query(query);
+	if(!result) {
+		return next(newError('This user does not have a group', 404));
+	}
+	req.result = result;
+	next();
+});

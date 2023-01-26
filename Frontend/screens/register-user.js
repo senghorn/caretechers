@@ -28,22 +28,20 @@ const createUser = async (first, last, email, phone) => {
       groupId: 1,
     };
     let connection_string = "http://" + config.backend_server + "/user";
-    await axios
+    return await axios
       .post(connection_string, data)
       .then(function (response) {
-        console.log(response);  
+        console.log(response);
         return true;
       })
       .catch(function (error) {
         console.log(error);
         return false;
-      })
-      .then(function () {
-        // always executed
       });
   } catch (error) {
-    console.log(error.message);
+    console.log('error',error.message);
   }
+  return false;
 };
 
 export default function Inputs({ route, navigation }) {

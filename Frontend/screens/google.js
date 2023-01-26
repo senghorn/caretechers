@@ -8,8 +8,22 @@ import config from "../constants/config";
 const axios = require("axios").default;
 WebBrowser.maybeCompleteAuthSession();
 
+const getUserGroupByID = async (email) => {
+  let connection_string = "http://" + config.backend_server + "/user/groupId/" + email;
+  return await axios
+    .get(connection_string)
+    .then(function (response) {
+      console.log(response);
+      return true;
+    })
+    .catch(function (error) {
+      return false;
+    });
+};
+
 const checkExistingUser = async (email) => {
-  let connection_string = "http://" + config.backend_server + "/user/" + email;
+  let connection_string =
+    "http://" + config.backend_server + "/user/" + email;
   return await axios
     .get(connection_string)
     .then(function (response) {
@@ -60,11 +74,16 @@ export default function GoogleLogin({ navigation }) {
     await userInfoResponse.json().then(async (data) => {
       setUserInfo(data);
       const exist = await checkExistingUser(data["email"]);
-      console.log(exist);
       if (exist) {
         navigation.navigate("Home", { user: data });
       } else {
-        navigation.navigate("RegisterUser", { user: data });
+        const hasGroup = await getUserGroupByID(data["email"]);
+
+        if (hasGroup) {
+          navigation.navigate("RegisterUser", { user: data });
+        } else {
+          navigation.navigate("Group", { user: data });
+        }
         // navigation.navigate("Home", { user: data });
       }
     });

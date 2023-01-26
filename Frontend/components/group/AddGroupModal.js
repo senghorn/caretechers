@@ -2,7 +2,19 @@ import { useState } from "react";
 import { View, SafeAreaView, StyleSheet, Modal, ScrollView, Text, TouchableOpacity } from "react-native";
 import { Searchbar, Button } from "react-native-paper";
 import COLORS from "../../constants/colors";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import config from "../../constants/config";
+const axios = require("axios").default;
+
+const fetchGroups = async (setGroups) => {
+  try {
+    let connection_string = "http://" + config.backend_server + "/group/15";
+    await axios.get(connection_string).then(function (response) {
+      setGroups(response.data);
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 const AddGroupModal = ({ modalVisible, setModalVisible }) => {
 
@@ -10,7 +22,7 @@ const AddGroupModal = ({ modalVisible, setModalVisible }) => {
     const onChangeSearch = (query) => setSearchQuery(query);
     const [groups, setGroups] = useState([{ name: "Sun Family", id: "sun" }, { name: "Aaron Family", id: "aaron" },
     { name: "Brynnli Family", id: 'brynnli' }, { name: "Ben Family", id: 'ben' }]);
-
+    fetchGroups(setGroups);
     return (
         <Modal visible={modalVisible} transparent={true} animationType="slide" >
             <SafeAreaView style={styles.modal}>
