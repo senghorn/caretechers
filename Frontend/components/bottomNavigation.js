@@ -9,7 +9,6 @@ import Tasks from "../screens/tasks";
 const Tab = createMaterialBottomTabNavigator();
 
 export default function BottomNavigation({ route, navigation }) {
-  console.log(route);
   return (
     <Tab.Navigator>
       <Tab.Screen

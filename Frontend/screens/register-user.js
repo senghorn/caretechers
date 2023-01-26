@@ -20,16 +20,18 @@ const axios = require("axios").default;
  */
 const createUser = async (first, last, email, phone) => {
   try {
+    const data = {
+      email: email,
+      firstName: first,
+      lastName: last,
+      phoneNum: phone,
+      groupId: 1,
+    };
     let connection_string = "http://" + config.backend_server + "/user";
     await axios
-      .post(connection_string, {
-        email: email,
-        firstName: first,
-        lastName: last,
-        phoneNum: phone,
-        groupId: null,
-      })
+      .post(connection_string, data)
       .then(function (response) {
+        console.log(response);  
         return true;
       })
       .catch(function (error) {
@@ -79,17 +81,17 @@ export default function Inputs({ route, navigation }) {
   state["first"] = user["given_name"];
   state["last"] = user["family_name"];
 
-  handleFirstName = (text) => {
+  const handleFirstName = (text) => {
     state["first"] = text;
     setState(state);
   };
 
-  handleLastName = (text) => {
+  const handleLastName = (text) => {
     state["last"] = text;
     setState(state);
   };
 
-  handlePhone = (text) => {
+  const handlePhone = (text) => {
     setPhone(text);
     state["phone"] = text;
   };
@@ -108,30 +110,29 @@ export default function Inputs({ route, navigation }) {
       const userCreated = await createUser(
         state["first"],
         state["last"],
-        state["phone"],
+        state["email"],
         state["phone"]
       );
       if (userCreated) {
         alert(
           "Register info \n" +
-          "First name: " +
-          state["first"] +
-          "\n" +
-          "Last name: " +
-          state["last"] +
-          "\n" +
-          "Phone: " +
-          state["phone"] +
-          "\n" +
-          "Email: " +
-          state["email"] +
-          "\n"
+            "First name: " +
+            state["first"] +
+            "\n" +
+            "Last name: " +
+            state["last"] +
+            "\n" +
+            "Phone: " +
+            state["phone"] +
+            "\n" +
+            "Email: " +
+            state["email"] +
+            "\n"
         );
         navigation.navigate("Group");
       } else {
         alert("User create unsuccessful.");
       }
-
     }
   };
 

@@ -46,7 +46,6 @@ const uuidv4 = () => {
 export default function Messages({ route, navigation }) {
   const { user } = route.params;
   
-  console.log(user);
   useEffect(() => {
     socket.auth = { email: user["email"] , username : "Senghorn"};
     socket.connect();
@@ -58,7 +57,6 @@ export default function Messages({ route, navigation }) {
     });
 
     socket.on("message", (msg) => {
-      console.log("received: ", msg, socket.id);
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, msg)
       );
@@ -147,11 +145,7 @@ export default function Messages({ route, navigation }) {
   }, []);
 
   const onSend = useCallback((messages = []) => {
-    console.log("sent");
     socket.emit("chat", messages);
-    // setMessages((previousMessages) =>
-    //   GiftedChat.append(previousMessages, messages)
-    // );
   }, []);
 
   // Message render bubble

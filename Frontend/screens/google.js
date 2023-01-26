@@ -10,13 +10,13 @@ WebBrowser.maybeCompleteAuthSession();
 
 const checkExistingUser = async (email) => {
   let connection_string = "http://" + config.backend_server + "/user/" + email;
-  await axios
+  return await axios
     .get(connection_string)
     .then(function (response) {
       return true;
     })
     .catch(function (error) {
-      console.log("Backend request erorr: ",error);
+      console.log("Backend request error: ", error);
       return false;
     });
 };
@@ -60,11 +60,12 @@ export default function GoogleLogin({ navigation }) {
     await userInfoResponse.json().then(async (data) => {
       setUserInfo(data);
       const exist = await checkExistingUser(data["email"]);
+      console.log(exist);
       if (exist) {
         navigation.navigate("Home", { user: data });
       } else {
-        // navigation.navigate("RegisterUser", { user: data });
-        navigation.navigate("Home", { user: data });
+        navigation.navigate("RegisterUser", { user: data });
+        // navigation.navigate("Home", { user: data });
       }
     });
   }
