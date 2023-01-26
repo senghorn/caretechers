@@ -9,11 +9,11 @@ const axios = require("axios").default;
 WebBrowser.maybeCompleteAuthSession();
 
 const getUserGroupByID = async (email) => {
-  let connection_string = "http://" + config.backend_server + "/user/groupId/" + email;
+  let connection_string =
+    "http://" + config.backend_server + "/user/groupId/" + email;
   return await axios
     .get(connection_string)
     .then(function (response) {
-      console.log(response);
       return true;
     })
     .catch(function (error) {
@@ -22,8 +22,7 @@ const getUserGroupByID = async (email) => {
 };
 
 const checkExistingUser = async (email) => {
-  let connection_string =
-    "http://" + config.backend_server + "/user/" + email;
+  let connection_string = "http://" + config.backend_server + "/user/" + email;
   return await axios
     .get(connection_string)
     .then(function (response) {
@@ -75,16 +74,14 @@ export default function GoogleLogin({ navigation }) {
       setUserInfo(data);
       const exist = await checkExistingUser(data["email"]);
       if (exist) {
-        navigation.navigate("Home", { user: data });
-      } else {
         const hasGroup = await getUserGroupByID(data["email"]);
-
         if (hasGroup) {
-          navigation.navigate("RegisterUser", { user: data });
+          navigation.navigate("Home", { user: data });
         } else {
           navigation.navigate("Group", { user: data });
         }
-        // navigation.navigate("Home", { user: data });
+      } else {
+        navigation.navigate("RegisterUser", { user: data });
       }
     });
   }

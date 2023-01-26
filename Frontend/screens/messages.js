@@ -45,9 +45,15 @@ const uuidv4 = () => {
 
 export default function Messages({ route, navigation }) {
   const { user } = route.params;
-  
+  const userEmail = user["user"].email;
+  const this_user = {
+    _id: userEmail,
+    name: user["user"].name,
+    avatar: user["user"].profile,
+  };
+
   useEffect(() => {
-    socket.auth = { email: user["email"] , username : "Senghorn"};
+    socket.auth = { email: user["email"], username: "Senghorn" };
     socket.connect();
     socket.on("connect_error", (err) => {
       console.log(err.message);
@@ -154,7 +160,7 @@ export default function Messages({ route, navigation }) {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == 1 ? "right" : "left"}
+        position={message_sender_id == userEmail ? "right" : "left"}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.warning,
@@ -179,7 +185,7 @@ export default function Messages({ route, navigation }) {
         messages={messages}
         renderUsernameOnMessage={true}
         onSend={(messages) => onSend(messages)}
-        user={users[1]}
+        user={this_user}
         textInputStyle={styles.textInput}
         minComposerHeight={40}
         minInputToolbarHeight={60}
