@@ -7,7 +7,7 @@ const axios = require("axios").default;
 
 const fetchGroups = async (setGroups) => {
     try {
-        let connection_string = "http://" + config.backend_server + "/group/15";
+        let connection_string = "http://" + config.backend_server + "/groups/15";
         await axios.get(connection_string).then(function (response) {
             setGroups(response.data);
         });
