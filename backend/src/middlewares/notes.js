@@ -40,7 +40,8 @@ module.exports.createNewNote = asyncHandler(async(req, _res, next) => {
 	} else {
 		query = sql`INSERT INTO Notes(group_id, title, last_edited) VALUES(${req.params.groupId}, ${req.body.title}, ${getUTCDateTime()})`;
 	}
-	await db.query(query);
+	const result = await db.query(query);
+	req.result = {noteId: result.insertId};
 	next();
 });
 

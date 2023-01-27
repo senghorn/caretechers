@@ -27,4 +27,11 @@ router.get("/groupId/:userId", [
   sharedMiddleware.sendResult,
 ]);
 
+router.patch('/:userId', [
+	userMiddleware.verifyCreateUserBody,
+	userMiddleware.editUser,
+	sharedMiddleware.sendNoResult
+]);
+
+
 module.exports = router;

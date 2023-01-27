@@ -26,7 +26,15 @@ module.exports.verifyCreateUserBody = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.createNewUser = asyncHandler(async(req, _res, next) => {
-	const query = sql`INSERT INTO Users VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum}, ${req.body.groupId});`;
+	const query = sql`INSERT INTO Users(email, first_name, last_name, phone_num) VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum});`;
+	await db.query(query);
+	next();
+});
+
+module.exports.editUser = asyncHandler(async(req, _res, next) => {
+	const query = sql`UPDATE Users SET Users.email = ${req.body.email}, Users.first_name = ${req.body.firstName}, 
+	Users.last_name = ${req.body.lastName}, Users.phone_num = ${req.body.phoneNum}, Users.group_id = ${req.body.groupId}
+	WHERE Users.email = ${req.params.userId};`;
 	await db.query(query);
 	next();
 });
