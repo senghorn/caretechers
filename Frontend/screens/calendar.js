@@ -12,13 +12,14 @@ import {
   format,
 } from 'date-fns';
 import { uniqueId } from 'lodash';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Day from '../components/calendar/day';
 import Header from '../components/calendar/header';
 import WeekLabel from '../components/calendar/weekLabel';
 import MonthLabel from '../components/calendar/monthLabel';
 import { FlatList } from 'react-native-bidirectional-infinite-scroll';
+import axios from 'axios';
 
 const createRenderingDataForFlatList = (startDate, endDate) => {
   const numDays = differenceInDays(endDate, startDate);
@@ -55,6 +56,8 @@ function RenderDayFromData({ date, types }) {
 }
 
 export default function Calendar() {
+  // TODO - Need timezone for data fetching
+
   const [currentDate, setCurrentDate] = useState(startOfDay(new Date()));
   const [startDate, setStartDate] = useState(subWeeks(currentDate, 4));
   const [endDate, setEndDate] = useState(addWeeks(currentDate, 4));

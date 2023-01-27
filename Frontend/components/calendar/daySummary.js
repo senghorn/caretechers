@@ -1,10 +1,55 @@
-import { isEqual, isWednesday, startOfDay } from 'date-fns';
-import { useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { isEqual, startOfDay } from 'date-fns';
+import { useEffect, useRef, useState } from 'react';
+import { Text, View, StyleSheet, Animated } from 'react-native';
 import { Button } from 'react-native-paper';
 
-export default function DaySummary({ date, volunteer = false }) {
-  const [isVolunteer, setIsVolunteer] = useState(isWednesday(date));
+const FadeInView = (props) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [fadeAnim]);
+
+  return (
+    <Animated.View // Special animatable View
+      style={{
+        ...props.style,
+        opacity: fadeAnim, // Bind opacity to animated value
+      }}
+    >
+      {props.children}
+    </Animated.View>
+  );
+};
+
+export default function DaySummary({ date, data, isLoading }) {
+  if (isLoading) {
+    return (
+      <FadeInView style={styles.loadingContainer}>
+        <View />
+      </FadeInView>
+    );
+  }
+
+  const [isVolunteer, setIsVolunteer] = useState(data.length === 0 || !data[0].visitor);
+
+  let [visitInfo] = data;
+  if (!visitInfo) {
+    visitInfo = { taskCount: 0 };
+  }
   if (isVolunteer) {
     return (
       <View style={styles.buttonContainer}>
@@ -18,7 +63,7 @@ export default function DaySummary({ date, volunteer = false }) {
           contentStyle={styles.volunteerButtonContent}
           labelStyle={styles.volunteerButtonText}
         >
-          Volunteer to Visit
+          {`Volunteer to Visit (${visitInfo.taskCount} Tasks)`}
         </Button>
       </View>
     );
@@ -29,8 +74,8 @@ export default function DaySummary({ date, volunteer = false }) {
     <View style={isCurrentDay ? styles.currentDayContainer : styles.container}>
       <View style={styles.pictureContainer}></View>
       <View>
-        <Text style={styles.nameText}>John</Text>
-        <Text>7 Tasks</Text>
+        <Text style={styles.nameText}>{visitInfo.first_name}</Text>
+        <Text>{visitInfo.taskCount} Tasks</Text>
       </View>
     </View>
   );
@@ -38,6 +83,14 @@ export default function DaySummary({ date, volunteer = false }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#ededed',
+  },
+  loadingContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
