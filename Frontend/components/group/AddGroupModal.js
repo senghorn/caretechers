@@ -6,22 +6,21 @@ import config from "../../constants/config";
 const axios = require("axios").default;
 
 const fetchGroups = async (setGroups) => {
-  try {
-    let connection_string = "http://" + config.backend_server + "/group/15";
-    await axios.get(connection_string).then(function (response) {
-      setGroups(response.data);
-    });
-  } catch (error) {
-    console.log(error.message);
-  }
+    try {
+        let connection_string = "http://" + config.backend_server + "/group/15";
+        await axios.get(connection_string).then(function (response) {
+            setGroups(response.data);
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
 };
 
-const AddGroupModal = ({ modalVisible, setModalVisible }) => {
+const AddGroupModal = ({ modalVisible, setModalVisible, setGroupSelected }) => {
 
     const [searchQuery, setSearchQuery] = useState("");
     const onChangeSearch = (query) => setSearchQuery(query);
-    const [groups, setGroups] = useState([{ name: "Sun Family", id: "sun" }, { name: "Aaron Family", id: "aaron" },
-    { name: "Brynnli Family", id: 'brynnli' }, { name: "Ben Family", id: 'ben' }]);
+    const [groups, setGroups] = useState([]);
     fetchGroups(setGroups);
     return (
         <Modal visible={modalVisible} transparent={true} animationType="slide" >
@@ -36,9 +35,10 @@ const AddGroupModal = ({ modalVisible, setModalVisible }) => {
                     <ScrollView>
                         {groups.map((group) => {
                             return (
-                                <TouchableOpacity onPress={() => alert("Request to join " + group.name + " has been sent.")}
+                                <TouchableOpacity onPress={() => { setGroupSelected(group); setModalVisible(false); }}
                                     key={group.id}
-                                    style={styles.groupDisplay}>
+                                    style={styles.groupDisplay}
+                                >
                                     <Text style={styles.groupName}>{group.name}</Text>
                                 </TouchableOpacity>
                             )
@@ -48,6 +48,7 @@ const AddGroupModal = ({ modalVisible, setModalVisible }) => {
 
 
                 <Button
+                    key={"newGroup"}
                     mode="contained"
                     uppercase={false}
                     color="#2196f3"
@@ -59,6 +60,7 @@ const AddGroupModal = ({ modalVisible, setModalVisible }) => {
                 </Button>
 
                 <Button
+                    key={"exit"}
                     mode="contained"
                     uppercase={false}
                     color={COLORS.danger}

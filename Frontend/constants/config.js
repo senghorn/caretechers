@@ -1,4 +1,4 @@
 export default {
-  backend_server: '10.18.13.13:3000', // Update config when testing.
-  backend_messaging:'http://10.18.13.13:3001'
+  backend_server: '192.168.0.43:3000', // Update config when testing.
+  backend_messaging:'http://192.168.0.43:3001'
 };

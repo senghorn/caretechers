@@ -9,40 +9,6 @@ import {
 } from "react-native";
 import { Divider } from "react-native-paper";
 import colors from "../constants/colors";
-import config from "../constants/config";
-const axios = require("axios").default;
-
-/**
- * Sends create new user request to the backend server using the given
- * first name, last name , email and phone number.
- * @return True : on success
- *         False: on error
- */
-const createUser = async (first, last, email, phone) => {
-  try {
-    const data = {
-      email: email,
-      firstName: first,
-      lastName: last,
-      phoneNum: phone,
-      groupId: 1,
-    };
-    let connection_string = "http://" + config.backend_server + "/user";
-    return await axios
-      .post(connection_string, data)
-      .then(function (response) {
-        console.log(response);
-        return true;
-      })
-      .catch(function (error) {
-        console.log(error);
-        return false;
-      });
-  } catch (error) {
-    console.log('error',error.message);
-  }
-  return false;
-};
 
 export default function Inputs({ route, navigation }) {
   const { user } = route.params;
@@ -78,6 +44,7 @@ export default function Inputs({ route, navigation }) {
   state["email"] = user["email"];
   state["first"] = user["given_name"];
   state["last"] = user["family_name"];
+  state["picture"] = user["picture"];
 
   const handleFirstName = (text) => {
     state["first"] = text;
@@ -104,33 +71,9 @@ export default function Inputs({ route, navigation }) {
       alert("Please make to enter your phone number");
     } else if (state["phone"].length < 12) {
       alert("Phone number is not valid");
-    } else {
-      const userCreated = await createUser(
-        state["first"],
-        state["last"],
-        state["email"],
-        state["phone"]
-      );
-      if (userCreated) {
-        alert(
-          "Register info \n" +
-            "First name: " +
-            state["first"] +
-            "\n" +
-            "Last name: " +
-            state["last"] +
-            "\n" +
-            "Phone: " +
-            state["phone"] +
-            "\n" +
-            "Email: " +
-            state["email"] +
-            "\n"
-        );
-        navigation.navigate("Group");
-      } else {
-        alert("User create unsuccessful.");
-      }
+    }
+    else {
+      navigation.navigate("Group",{ user: state });
     }
   };
 
@@ -168,9 +111,8 @@ export default function Inputs({ route, navigation }) {
         maxLength={12}
         onChangeText={(text) => formatPhoneNumber(text)}
       />
-
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
-        <Text style={styles.submitButtonText}> Register </Text>
+        <Text style={styles.submitButtonText}> Join Caring Group </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -208,14 +150,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   submitButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.pink,
     padding: 10,
     margin: 15,
-    height: 40,
-    width: 100,
+    marginTop: 30,
+    height: 50,
+    width: "50%",
     alignSelf: "center",
     borderRadius: 20,
     alignContent: "center",
+    justifyContent: 'center'
   },
   submitButtonText: {
     color: "white",

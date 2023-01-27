@@ -49,7 +49,7 @@ export default function Messages({ route, navigation }) {
   const this_user = {
     _id: userEmail,
     name: user["user"].name,
-    avatar: user["user"].profile,
+    avatar: user["user"].picture,
   };
 
   useEffect(() => {
@@ -113,42 +113,6 @@ export default function Messages({ route, navigation }) {
     };
     console.log(imageMessage);
   };
-
-  useEffect(() => {
-    // Seeding the messages for prototype phase
-    setMessages([
-      {
-        _id: 0,
-        text: "Hey all.  Just refilled Mom’s blood pressure medication.  They gave us a 3 month supply, so we should be good on that for a while.",
-        createdAt: new Date("2022-10-07"),
-        user: users[4],
-      },
-      {
-        _id: 1,
-        text: "Cool thanks. I can do the next one.",
-        createdAt: new Date("2022-09-28"),
-        user: users[4],
-      },
-      {
-        _id: 2,
-        text: "Thanks for doing that!",
-        createdAt: new Date("2022-09-28"),
-        user: users[2],
-      },
-      {
-        _id: 3,
-        text: "Good to hear!",
-        createdAt: new Date("2022-09-28"),
-        user: users[3],
-      },
-      {
-        _id: 4,
-        text: "Hey guys! Just checked on Mom. She's doing fine.",
-        createdAt: new Date("2022-09-28"),
-        user: users[1],
-      },
-    ]);
-  }, []);
 
   const onSend = useCallback((messages = []) => {
     socket.emit("chat", messages);
