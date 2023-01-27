@@ -14,6 +14,7 @@ export default function BottomNavigation({ route, navigation }) {
       <Tab.Screen
         name="Notes"
         component={Notes}
+        initialParams={{user: route["params"]}}
         options={{
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="notebook" color={color} size={26} />

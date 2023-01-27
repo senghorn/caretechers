@@ -32,8 +32,7 @@ const createUser = async (first, last, email, phone, group) => {
     return await axios
       .post(connection_string, data)
       .then(function (response) {
-        console.log(response);
-        return false;
+        return true;
       })
       .catch(function (error) {
         console.log(error);
@@ -47,12 +46,13 @@ const createUser = async (first, last, email, phone, group) => {
 
 
 const Group = ({ navigation, route }) => {
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState([]); // Groups the user are in
   const [selectedGroup, setGroupSelected] = useState(null);
   var { user } = route.params;
   const handlePress = (group) => {
     console.log(`Group ${group.name} pressed`);
-    navigation.navigate("Home");
+    user["group"] = group.id;
+    navigation.navigate("Home", { user: user });
   };
   useEffect(() => {
     if (selectedGroup != null) {

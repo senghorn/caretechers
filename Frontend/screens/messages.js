@@ -50,10 +50,11 @@ export default function Messages({ route, navigation }) {
     _id: userEmail,
     name: user["user"].name,
     avatar: user["user"].picture,
+    groupId: user["user"].group
   };
 
   useEffect(() => {
-    socket.auth = { email: user["email"], username: "Senghorn" };
+    socket.auth = { email: user["email"], username: "username placeholder" };
     socket.connect();
     socket.on("connect_error", (err) => {
       console.log(err.message);
@@ -114,7 +115,7 @@ export default function Messages({ route, navigation }) {
     console.log(imageMessage);
   };
 
-  const onSend = useCallback((messages = []) => {
+  const onMessageSend = useCallback((messages = []) => {
     socket.emit("chat", messages);
   }, []);
 
@@ -148,7 +149,7 @@ export default function Messages({ route, navigation }) {
         showUserAvatar={true}
         messages={messages}
         renderUsernameOnMessage={true}
-        onSend={(messages) => onSend(messages)}
+        onSend={(messages) => onMessageSend(messages)}
         user={this_user}
         textInputStyle={styles.textInput}
         minComposerHeight={40}

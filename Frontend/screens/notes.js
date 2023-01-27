@@ -21,7 +21,7 @@ const fetchNotes = async (setNotes) => {
   }
 };
 
-export default function Notes() {
+export default function Notes({route, navigation}) {
   // Add a state variable to control the visibility of the modal
   const [modalVisible, setModalVisible] = useState(false);
   const [notes, setNotes] = useState([]);
