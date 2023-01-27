@@ -42,7 +42,12 @@ module.exports.editUser = asyncHandler(async(req, _res, next) => {
 module.exports.getUserByID = asyncHandler(async (req, _res, next) => {
 	const query = sql`SELECT * FROM Users
 					WHERE Users.email = ${req.params.userId};`;
-	req.result = await db.query(query);
+	
+	const [result] = await db.query(query);
+	if(!result){
+		return next(newError('This user does not exist', 404));
+	}
+	req.result = result;
 	next();
 });
 
@@ -70,5 +75,15 @@ module.exports.addUserToGroup = asyncHandler(async(req, _res, next) => {
 
 	query = sql`UPDATE Users SET group_id = ${req.body.groupId} WHERE email = ${req.params.userId};`;
 	await db.query(query);
+	next();
+});
+
+module.exports.getUserGroupByID = asyncHandler(async(req, _res, next) => {
+	const query = sql`SELECT group_id FROM Users WHERE email = ${req.params.userId};`;
+	const [result] = await db.query(query);
+	if(!result) {
+		return next(newError('This user does not have a group', 404));
+	}
+	req.result = result;
 	next();
 });

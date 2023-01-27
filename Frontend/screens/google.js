@@ -4,8 +4,35 @@ import * as Google from "expo-auth-session/providers/google";
 import { StyleSheet, Text, View, SafeAreaView, Image } from "react-native";
 import COLORS from "../constants/colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-
+import config from "../constants/config";
+const axios = require("axios").default;
 WebBrowser.maybeCompleteAuthSession();
+
+const getUserGroupByID = async (email) => {
+  let connection_string =
+    "http://" + config.backend_server + "/user/groupId/" + email;
+  return await axios
+    .get(connection_string)
+    .then(function (response) {
+      return true;
+    })
+    .catch(function (error) {
+      return false;
+    });
+};
+
+const checkExistingUser = async (email) => {
+  let connection_string = "http://" + config.backend_server + "/user/" + email;
+  return await axios
+    .get(connection_string)
+    .then(function (response) {
+      return true;
+    })
+    .catch(function (error) {
+      console.log("Backend request error: ", error);
+      return false;
+    });
+};
 
 export default function GoogleLogin({ navigation }) {
   const [accessToken, setAccessToken] = React.useState(null);
@@ -36,7 +63,6 @@ export default function GoogleLogin({ navigation }) {
     }
   }, [accessToken]);
 
-
   async function getUserData() {
     let userInfoResponse = await fetch(
       "https://www.googleapis.com/userinfo/v2/me",
@@ -44,16 +70,19 @@ export default function GoogleLogin({ navigation }) {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
-    userInfoResponse.json().then((data) => {
+    await userInfoResponse.json().then(async (data) => {
       setUserInfo(data);
-      const exist = false;
-      // TODO: Check if user already exists
+      const exist = await checkExistingUser(data["email"]);
       if (exist) {
-        navigation.navigate("Home");
+        const hasGroup = await getUserGroupByID(data["email"]);
+        if (hasGroup) {
+          navigation.navigate("Home", { user: data });
+        } else {
+          navigation.navigate("Group", { user: data });
+        }
       } else {
-        navigation.navigate("RegisterUser" , {user: data});
+        navigation.navigate("RegisterUser", { user: data });
       }
-
     });
   }
 

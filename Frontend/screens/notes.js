@@ -7,20 +7,21 @@ import Header from "../components/notes/header";
 import CreateNoteModal from "../components/notes/CreateNoteModal";
 import EditRemoveNoteModal from "../components/notes/EditRemoveNoteModal";
 import config from "../constants/config";
+const axios = require("axios").default;
 
 const fetchNotes = async (setNotes) => {
   try {
     let connection_string =
       "http://" + config.backend_server + "/notes/group/1";
-    const result = await fetch(connection_string);
-    const data = await result.json();
-    setNotes(data);
+    await axios.get(connection_string).then(function (response) {
+      setNotes(response.data);
+    });
   } catch (error) {
     console.log(error.message);
   }
 };
 
-export default function Notes() {
+export default function Notes({route, navigation}) {
   // Add a state variable to control the visibility of the modal
   const [modalVisible, setModalVisible] = useState(false);
   const [notes, setNotes] = useState([]);
