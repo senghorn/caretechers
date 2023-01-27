@@ -1,10 +1,10 @@
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Notes from "../screens/notes";
-import Messages from "../screens/messages";
-import Metrics from "../screens/metrics";
-import Calendar from "../screens/calendar";
-import Tasks from "../screens/tasks";
+import Notes from "../../screens/notes";
+import Messages from "../../screens/messages";
+import Metrics from "../../screens/metrics";
+import Calendar from "../../screens/calendar";
+import Tasks from "../../screens/tasks";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -14,7 +14,7 @@ export default function BottomNavigation({ route, navigation }) {
       <Tab.Screen
         name="Notes"
         component={Notes}
-        initialParams={{user: route["params"]}}
+        initialParams={{ user: route["params"] }}
         options={{
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="notebook" color={color} size={26} />
@@ -24,7 +24,7 @@ export default function BottomNavigation({ route, navigation }) {
       <Tab.Screen
         name="Messages"
         component={Messages}
-        initialParams={{user: route["params"]}}
+        initialParams={{ user: route["params"] }}
         options={{
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons

@@ -7,24 +7,24 @@ const db = require("../database");
 const { newError } = require("../utls");
 
 module.exports.checkIfGroupExists = asyncHandler(async (req, res, next) => {
-  const query = sql`SELECT * FROM \`Groups\` G
+	const query = sql`SELECT * FROM \`Groups\` G
 						WHERE id = ${req.params.groupId}`;
-  const [result] = await db.query(query);
+	const [result] = await db.query(query);
 
-  if (!result) {
-    return next(newError("This group does not exist!", 404));
-  }
+	if (!result) {
+		return next(newError("This group does not exist!", 404));
+	}
 
 	next();
 });
 
-module.exports.verifyGroupBody = asyncHandler(async(req, _res, next) => {
+module.exports.verifyGroupBody = asyncHandler(async (req, _res, next) => {
 	const schema = {
 		type: 'object',
 		properties: {
-		name: { type: 'string' },
-		visitFrequency: { type: 'number' },
-		timeZone: { type: 'string' }
+			name: { type: 'string' },
+			visitFrequency: { type: 'number' },
+			timeZone: { type: 'string' }
 		},
 		required: ['name', 'visitFrequency'],
 	};
@@ -35,7 +35,7 @@ module.exports.verifyGroupBody = asyncHandler(async(req, _res, next) => {
 	next();
 });
 
-module.exports.createNewGroup = asyncHandler(async(req, _res, next) => {
+module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
 	let query;
 	if (req.body.timeZone) {
 		query = sql`INSERT INTO \`Groups\`(name, visit_frequency, timezone) VALUES (${req.body.name}, ${req.body.visitFrequency}, ${req.body.timeZone});`;
@@ -44,6 +44,12 @@ module.exports.createNewGroup = asyncHandler(async(req, _res, next) => {
 	}
 
 	const result = await db.query(query);
-	req.result = {groupId: result.insertId}
+	req.result = { groupId: result.insertId }
+	next();
+});
+
+module.exports.getGroups = asyncHandler(async (req, res, next) => {
+	const query = sql`SELECT * FROM \`Groups\` G LIMIT ${req.params.limit}`;
+	req.result = await db.query(query);
 	next();
 });

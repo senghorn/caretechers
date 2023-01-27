@@ -4,7 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect } from "react";
 import COLORS from "../constants/colors";
-import TopBar from "../components/topBar";
+import TopBar from "../components/messages/top-bar";
 import socket from "../components/messages/socket";
 
 const users = [
