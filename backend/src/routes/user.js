@@ -22,4 +22,11 @@ router.post('/', [
 	sharedMiddleware.sendNoResult
 ]);
 
+router.patch('/:userId', [
+	userMiddleware.verifyCreateUserBody,
+	userMiddleware.editUser,
+	sharedMiddleware.sendNoResult
+]);
+
+
 module.exports = router;

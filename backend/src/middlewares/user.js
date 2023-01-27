@@ -31,6 +31,14 @@ module.exports.createNewUser = asyncHandler(async(req, _res, next) => {
 	next();
 });
 
+module.exports.editUser = asyncHandler(async(req, _res, next) => {
+	const query = sql`UPDATE Users SET Users.email = ${req.body.email}, Users.first_name = ${req.body.firstName}, 
+	Users.last_name = ${req.body.lastName}, Users.phone_num = ${req.body.phoneNum}, Users.group_id = ${req.body.groupId}
+	WHERE Users.email = ${req.params.userId};`;
+	await db.query(query);
+	next();
+});
+
 module.exports.getUserByID = asyncHandler(async (req, _res, next) => {
 	const query = sql`SELECT * FROM Users
 					WHERE Users.email = ${req.params.userId};`;
