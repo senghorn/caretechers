@@ -16,7 +16,7 @@ router.post('/group/:groupId',[
 	groupMiddleware.checkIfGroupExists,
 	notesMiddleware.checkIfNoteIsValid,
 	notesMiddleware.createNewNote,
-	sharedMiddleware.sendNoResult
+	sharedMiddleware.sendResult
 ]);
 
 router.get('/:noteId',[
