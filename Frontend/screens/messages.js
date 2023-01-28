@@ -7,41 +7,6 @@ import COLORS from "../constants/colors";
 import TopBar from "../components/messages/top-bar";
 import socket from "../components/messages/socket";
 
-const users = [
-  {
-    _id: 0,
-    name: "Annonymous",
-    avatar: "https://source.unsplash.com/140x140/?person",
-  },
-  {
-    _id: 1,
-    name: "Brynnli Borrowman",
-    avatar: "https://source.unsplash.com/140x140/?wolf",
-  },
-  {
-    _id: 2,
-    name: "Ben Hatch",
-    avatar: "https://source.unsplash.com/140x140/?racoon",
-  },
-  {
-    _id: 3,
-    name: "Seng Rith",
-    avatar: "https://source.unsplash.com/140x140/?fox",
-  },
-  {
-    _id: 4,
-    name: "Aaron Heo",
-    avatar: "https://source.unsplash.com/140x140/?cat",
-  },
-];
-// For the testing purposes, you should probably use https://github.com/uuidjs/uuid
-const uuidv4 = () => {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = Math.floor(Math.random() * 16);
-    const v = c === "x" ? r : (r % 4) + 8;
-    return v.toString(16);
-  });
-};
 
 export default function Messages({ route, navigation }) {
   const { user } = route.params;
@@ -94,26 +59,7 @@ export default function Messages({ route, navigation }) {
     })();
   }, []);
 
-  // Handles image selection
-  const handleImageSelection = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
 
-    result = result.assets;
-    imgValues = result[0];
-    const imageMessage = {
-      user: user[0],
-      createdAt: Date.now(),
-      _id: uuidv4(),
-      messageType: "image",
-      image: imgValues["uri"],
-    };
-    console.log(imageMessage);
-  };
 
   const onMessageSend = useCallback((messages = []) => {
     socket.emit("chat", messages);
@@ -173,3 +119,63 @@ const styles = StyleSheet.create({
   },
   divider: {},
 });
+
+
+// const users = [
+//   {
+//     _id: 0,
+//     name: "Annonymous",
+//     avatar: "https://source.unsplash.com/140x140/?person",
+//   },
+//   {
+//     _id: 1,
+//     name: "Brynnli Borrowman",
+//     avatar: "https://source.unsplash.com/140x140/?wolf",
+//   },
+//   {
+//     _id: 2,
+//     name: "Ben Hatch",
+//     avatar: "https://source.unsplash.com/140x140/?racoon",
+//   },
+//   {
+//     _id: 3,
+//     name: "Seng Rith",
+//     avatar: "https://source.unsplash.com/140x140/?fox",
+//   },
+//   {
+//     _id: 4,
+//     name: "Aaron Heo",
+//     avatar: "https://source.unsplash.com/140x140/?cat",
+//   },
+// ];
+// // For the testing purposes, you should probably use https://github.com/uuidjs/uuid
+// const uuidv4 = () => {
+//   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+//     const r = Math.floor(Math.random() * 16);
+//     const v = c === "x" ? r : (r % 4) + 8;
+//     return v.toString(16);
+//   });
+// };
+
+
+  // Handles image selection
+  // const handleImageSelection = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   result = result.assets;
+  //   imgValues = result[0];
+  //   const imageMessage = {
+  //     user: user[0],
+  //     createdAt: Date.now(),
+  //     _id: uuidv4(),
+  //     messageType: "image",
+  //     image: imgValues["uri"],
+  //   };
+  //   console.log(imageMessage);
+  // };
+

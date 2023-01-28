@@ -14,23 +14,10 @@ const getUserGroupByID = async (email) => {
   return await axios
     .get(connection_string)
     .then(function (response) {
-      return true;
+      return response;
     })
     .catch(function (error) {
-      return false;
-    });
-};
-
-const checkExistingUser = async (email) => {
-  let connection_string = "http://" + config.backend_server + "/user/" + email;
-  return await axios
-    .get(connection_string)
-    .then(function (response) {
-      return true;
-    })
-    .catch(function (error) {
-      console.log("Backend request error: ", error);
-      return false;
+      return null;
     });
 };
 
@@ -53,7 +40,6 @@ export default function GoogleLogin({ navigation }) {
     if (response?.type === "success") {
       setAccessToken(response.authentication.accessToken);
     } else {
-      // TODO: Handle unsuccessful login
     }
   }, [response]);
 
@@ -72,10 +58,9 @@ export default function GoogleLogin({ navigation }) {
     );
     await userInfoResponse.json().then(async (data) => {
       setUserInfo(data);
-      const exist = await checkExistingUser(data["email"]);
-      if (exist) {
-        const hasGroup = await getUserGroupByID(data["email"]);
-        if (hasGroup) {
+      const user_group = await getUserGroupByID(data["email"]);
+      if (user_group) {
+        if (user_group.data.group_id) {
           navigation.navigate("Home", { user: data });
         } else {
           navigation.navigate("Group", { user: data });
