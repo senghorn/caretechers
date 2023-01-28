@@ -18,7 +18,7 @@ const fetchNotes = async (user, setNotes) => {
       setNotes(response.data);
     });
   } catch (error) {
-    console.log(error.message);
+    console.log("Fetching note error", error.message);
   }
 };
 

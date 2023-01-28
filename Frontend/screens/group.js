@@ -57,7 +57,6 @@ const Group = ({ navigation, route }) => {
   useEffect(() => {
     if (selectedGroup != null) {
       user["group"] = selectedGroup.id;
-      console.log(user);
       const created = createUser(user.first, user.last, user.email, user.phone, selectedGroup.id);
       if (created) {
         navigation.navigate("Home", { user: user });
