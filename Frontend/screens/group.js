@@ -35,7 +35,7 @@ const createUser = async (first, last, email, phone, group) => {
         return true;
       })
       .catch(function (error) {
-        console.log(error);
+        console.log("create group error",error);
         return false;
       });
   } catch (error) {
@@ -56,9 +56,7 @@ const Group = ({ navigation, route }) => {
   };
   useEffect(() => {
     if (selectedGroup != null) {
-      const user_info = { "first": user.first, "last": user.last, "email": user.email, "phone": user.phone, "group": selectedGroup.id };
       user["group"] = selectedGroup.id;
-      console.log(user);
       const created = createUser(user.first, user.last, user.email, user.phone, selectedGroup.id);
       if (created) {
         navigation.navigate("Home", { user: user });

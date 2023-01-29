@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { Button } from "react-native-paper";
 import Note from "../components/notes/note";
@@ -7,28 +7,35 @@ import Header from "../components/notes/header";
 import CreateNoteModal from "../components/notes/CreateNoteModal";
 import EditRemoveNoteModal from "../components/notes/EditRemoveNoteModal";
 import config from "../constants/config";
-const axios = require("axios").default;
+import UserContext from "../data/context/UserContext";
 
-const fetchNotes = async (setNotes) => {
+const axios = require("axios").default;
+const fetchNotes = async (user, setNotes) => {
   try {
     let connection_string =
-      "http://" + config.backend_server + "/notes/group/1";
+      "http://" + config.backend_server + "/notes/group/" + user.group_id;
     await axios.get(connection_string).then(function (response) {
       setNotes(response.data);
     });
   } catch (error) {
-    console.log(error.message);
+    console.log("Fetching note error", error.message);
   }
 };
 
-export default function Notes({route, navigation}) {
+export default function Notes() {
+
+  // Grab user data from UserContext
+  const user = useContext(UserContext);
+
   // Add a state variable to control the visibility of the modal
   const [modalVisible, setModalVisible] = useState(false);
   const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
   useEffect(() => {
-    fetchNotes(setNotes);
-  }, []);
+    if (user != null) {
+      fetchNotes(user, setNotes);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (selectedNote != null) {
