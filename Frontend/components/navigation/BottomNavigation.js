@@ -7,7 +7,7 @@ import Calendar from "../../screens/calendar";
 import Tasks from "../../screens/tasks";
 import { useState, useEffect } from 'react';
 import config from "../../constants/config";
-import UserContext from "../../data/context/UserContext";
+import UserContext from "../../services/context/UserContext";
 
 const axios = require("axios").default;
 

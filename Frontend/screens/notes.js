@@ -7,7 +7,7 @@ import Header from "../components/notes/header";
 import CreateNoteModal from "../components/notes/CreateNoteModal";
 import EditRemoveNoteModal from "../components/notes/EditRemoveNoteModal";
 import config from "../constants/config";
-import UserContext from "../data/context/UserContext";
+import UserContext from "../services/context/UserContext";
 
 const axios = require("axios").default;
 const fetchNotes = async (user, setNotes) => {
