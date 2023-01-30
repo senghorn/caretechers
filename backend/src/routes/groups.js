@@ -6,8 +6,8 @@ const sharedMiddleware = require('../middlewares/shared');
 const router = express.Router();
 
 router.post('/', [
-	groupsMiddleware.verifyGroupBody,
-	groupsMiddleware.createNewGroup,
+	groupMiddleware.verifyGroupBody,
+	groupMiddleware.createNewGroup,
 	sharedMiddleware.sendResult
 ]);
 
