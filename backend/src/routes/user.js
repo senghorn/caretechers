@@ -33,5 +33,11 @@ router.patch('/:userId', [
 	sharedMiddleware.sendNoResult
 ]);
 
+router.delete('/:userId/:groupId', [
+	userMiddleware.removeUserFromGroup,
+	sharedMiddleware.sendNoResult
+]);
+
+
 
 module.exports = router;
