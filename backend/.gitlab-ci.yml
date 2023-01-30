@@ -20,7 +20,6 @@ deploy-prod:
   stage: deploy
   script:
     - |
-      ssh ubuntu@ec2-54-241-210-48.us-west-1.compute.amazonaws.com
       cd caretechers
       git pull
       cd backend
