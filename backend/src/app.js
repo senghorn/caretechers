@@ -16,6 +16,7 @@ app.use('/tasks', require('./routes/tasks'));
 app.use('/visits', require('./routes/visits'));
 app.use('/user', require('./routes/user'));
 app.use('/groups', require('./routes/groups'));
+app.use('/graphs', require('./routes/graphs'));
 // ------------------
 
 app.use((err, req, res, next) => {
