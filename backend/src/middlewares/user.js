@@ -90,3 +90,10 @@ module.exports.getUserGroupByID = asyncHandler(async (req, _res, next) => {
 	req.result = result;
 	next();
 });
+
+// Will have to update when we allow multiple groups
+module.exports.removeUserFromGroup = asyncHandler(async(req, _res, next) => {
+	query = sql`UPDATE Users SET group_id = NULL WHERE email = ${req.params.userId};`;
+	await db.query(query);
+	next();
+    });
