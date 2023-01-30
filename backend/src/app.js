@@ -59,19 +59,16 @@ io.on("connect", (socket) => {
 	socket.on("disconnecting", (reason) => {
 		console.log("user disconnecting", reason);
 	});
-
 });
 
-httpServer.listen(3001, () => console.log('Chat server listening on port 3001'));
+httpServer.listen(3001, () => console.log("Chat server listening on port 3001"));
 
 // Register middleware function that gets called every incoming socket
 io.use((socket, next) => {
-  const username = socket.handshake.auth.username;
-  if (!username) {
-    return next(new Error('invalid username'));
-  }
-  socket.username = username;
-  next();
+	const username = socket.handshake.auth.username;
+	if (!username) {
+		return next(new Error("invalid username"));
+	}
+	socket.username = username;
+	next();
 });
-
-// ---------------------------------------
