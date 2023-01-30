@@ -22,6 +22,8 @@ deploy-prod:
     - |
       git pull origin main
       cd backend
+      echo "$USER"
+      echo "$USER"
       sudo su
       make start
   environment: production
