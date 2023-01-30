@@ -24,6 +24,5 @@ deploy-prod:
       cd backend
       echo "$USER"
       echo "$USER"
-      sudo su
       make start
   environment: production
