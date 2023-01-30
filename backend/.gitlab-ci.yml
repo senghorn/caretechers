@@ -20,7 +20,7 @@ deploy-prod:
   stage: deploy
   script:
     - |
-      git pull
+      git pull origin main
       cd backend
       sudo make start
   environment: production
