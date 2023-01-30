@@ -4,49 +4,22 @@ import * as ImagePicker from "expo-image-picker";
 import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect } from "react";
 import COLORS from "../constants/colors";
-import TopBar from "../components/topBar";
+import TopBar from "../components/messages/top-bar";
 import socket from "../components/messages/socket";
 
-const users = [
-  {
-    _id: 0,
-    name: "Annonymous",
-    avatar: "https://source.unsplash.com/140x140/?person",
-  },
-  {
-    _id: 1,
-    name: "Brynnli Borrowman",
-    avatar: "https://source.unsplash.com/140x140/?wolf",
-  },
-  {
-    _id: 2,
-    name: "Ben Hatch",
-    avatar: "https://source.unsplash.com/140x140/?racoon",
-  },
-  {
-    _id: 3,
-    name: "Seng Rith",
-    avatar: "https://source.unsplash.com/140x140/?fox",
-  },
-  {
-    _id: 4,
-    name: "Aaron Heo",
-    avatar: "https://source.unsplash.com/140x140/?cat",
-  },
-];
-// For the testing purposes, you should probably use https://github.com/uuidjs/uuid
-const uuidv4 = () => {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = Math.floor(Math.random() * 16);
-    const v = c === "x" ? r : (r % 4) + 8;
-    return v.toString(16);
-  });
-};
 
-export default function Messages() {
+export default function Messages({ route, navigation }) {
+  const { user } = route.params;
+  const userEmail = user["user"].email;
+  const this_user = {
+    _id: userEmail,
+    name: user["user"].name,
+    avatar: user["user"].picture,
+    groupId: user["user"].group
+  };
 
   useEffect(() => {
-    socket.auth = { username: "Senghorn" };
+    socket.auth = { email: user["email"], username: "username placeholder" };
     socket.connect();
     socket.on("connect_error", (err) => {
       console.log(err.message);
@@ -56,7 +29,6 @@ export default function Messages() {
     });
 
     socket.on("message", (msg) => {
-      console.log("received: ", msg, socket.id);
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, msg)
       );
@@ -66,7 +38,6 @@ export default function Messages() {
       console.log(reason);
       socket.disconnect();
       if (reason === "io server disconnect") {
-
       }
     });
 
@@ -88,69 +59,10 @@ export default function Messages() {
     })();
   }, []);
 
-  // Handles image selection
-  const handleImageSelection = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
 
-    result = result.assets;
-    imgValues = result[0];
-    const imageMessage = {
-      user: user[0],
-      createdAt: Date.now(),
-      _id: uuidv4(),
-      messageType: "image",
-      image: imgValues["uri"]
-    };
-    console.log(imageMessage);
-  };
 
-  useEffect(() => {
-    // Seeding the messages for prototype phase
-    setMessages([
-      {
-        _id: 0,
-        text: "Hey all.  Just refilled Mom’s blood pressure medication.  They gave us a 3 month supply, so we should be good on that for a while.",
-        createdAt: new Date("2022-10-07"),
-        user: users[4],
-      },
-      {
-        _id: 1,
-        text: "Cool thanks. I can do the next one.",
-        createdAt: new Date("2022-09-28"),
-        user: users[4],
-      },
-      {
-        _id: 2,
-        text: "Thanks for doing that!",
-        createdAt: new Date("2022-09-28"),
-        user: users[2],
-      },
-      {
-        _id: 3,
-        text: "Good to hear!",
-        createdAt: new Date("2022-09-28"),
-        user: users[3],
-      },
-      {
-        _id: 4,
-        text: "Hey guys! Just checked on Mom. She's doing fine.",
-        createdAt: new Date("2022-09-28"),
-        user: users[1],
-      },
-    ]);
-  }, []);
-
-  const onSend = useCallback((messages = []) => {
-    console.log("sent")
+  const onMessageSend = useCallback((messages = []) => {
     socket.emit("chat", messages);
-    // setMessages((previousMessages) =>
-    //   GiftedChat.append(previousMessages, messages)
-    // );
   }, []);
 
   // Message render bubble
@@ -159,7 +71,7 @@ export default function Messages() {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == 1 ? "right" : "left"}
+        position={message_sender_id == userEmail ? "right" : "left"}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.warning,
@@ -183,8 +95,8 @@ export default function Messages() {
         showUserAvatar={true}
         messages={messages}
         renderUsernameOnMessage={true}
-        onSend={(messages) => onSend(messages)}
-        user={users[1]}
+        onSend={(messages) => onMessageSend(messages)}
+        user={this_user}
         textInputStyle={styles.textInput}
         minComposerHeight={40}
         minInputToolbarHeight={60}
@@ -207,3 +119,63 @@ const styles = StyleSheet.create({
   },
   divider: {},
 });
+
+
+// const users = [
+//   {
+//     _id: 0,
+//     name: "Annonymous",
+//     avatar: "https://source.unsplash.com/140x140/?person",
+//   },
+//   {
+//     _id: 1,
+//     name: "Brynnli Borrowman",
+//     avatar: "https://source.unsplash.com/140x140/?wolf",
+//   },
+//   {
+//     _id: 2,
+//     name: "Ben Hatch",
+//     avatar: "https://source.unsplash.com/140x140/?racoon",
+//   },
+//   {
+//     _id: 3,
+//     name: "Seng Rith",
+//     avatar: "https://source.unsplash.com/140x140/?fox",
+//   },
+//   {
+//     _id: 4,
+//     name: "Aaron Heo",
+//     avatar: "https://source.unsplash.com/140x140/?cat",
+//   },
+// ];
+// // For the testing purposes, you should probably use https://github.com/uuidjs/uuid
+// const uuidv4 = () => {
+//   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+//     const r = Math.floor(Math.random() * 16);
+//     const v = c === "x" ? r : (r % 4) + 8;
+//     return v.toString(16);
+//   });
+// };
+
+
+  // Handles image selection
+  // const handleImageSelection = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   result = result.assets;
+  //   imgValues = result[0];
+  //   const imageMessage = {
+  //     user: user[0],
+  //     createdAt: Date.now(),
+  //     _id: uuidv4(),
+  //     messageType: "image",
+  //     image: imgValues["uri"],
+  //   };
+  //   console.log(imageMessage);
+  // };
+

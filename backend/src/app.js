@@ -41,23 +41,24 @@ const io = new Server(httpServer, {
 });
 
 // TODO: Get the correct group name
-const groupName = 'Group1';
-io.on('connect', (socket) => {
-  socket.join(groupName);
-  console.log('client connected!', io.of('/').sockets.size);
-  socket.on('chat', (message) => {
-    io.to(groupName).emit('message', message);
-  });
+const groupName = "Group1";
+io.on("connect", (socket) => {
+	socket.join(groupName);
+	console.log("client connected!",  io.of("/").sockets.size);
+	socket.on("chat", (message) => {
+		io.to(groupName).emit("message", message);
+	});
+	
+	socket.on("disconnect", (reason) => {
+		socket.leave(groupName);
+		socket.disconnect(true);
+		console.log("user disconnected", socket.rooms);
+	});
 
-  socket.on('disconnect', (reason) => {
-    socket.leave(groupName);
-    socket.disconnect(true);
-    console.log('user disconnected', socket.rooms);
-  });
+	socket.on("disconnecting", (reason) => {
+		console.log("user disconnecting", reason);
+	});
 
-  socket.on('disconnecting', (reason) => {
-    console.log('user disconnecting', reason);
-  });
 });
 
 httpServer.listen(3001, () => console.log('Chat server listening on port 3001'));

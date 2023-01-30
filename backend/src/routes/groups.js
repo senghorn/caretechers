@@ -1,6 +1,6 @@
 const express = require('express')
 
-const groupsMiddleware = require('../middlewares/groups');
+const groupMiddleware = require('../middlewares/groups');
 const sharedMiddleware = require('../middlewares/shared');
 
 const router = express.Router();
@@ -8,6 +8,11 @@ const router = express.Router();
 router.post('/', [
 	groupsMiddleware.verifyGroupBody,
 	groupsMiddleware.createNewGroup,
+	sharedMiddleware.sendResult
+]);
+
+router.get('/:limit',[
+	groupMiddleware.getGroups,
 	sharedMiddleware.sendResult
 ]);
 
