@@ -3,6 +3,7 @@ import { View, StyleSheet, Modal, Text } from "react-native";
 import { TextInput } from "react-native-paper";
 import { Button } from "react-native-paper";
 import COLORS from "../../constants/colors";
+import { UpdateNote, RemoveNote } from "../../services/api/notes";
 
 export default function EditRemoveNoteModal({
   notes,
@@ -57,8 +58,8 @@ export default function EditRemoveNoteModal({
   // OnPress callback for remove note button
   const removeNote = () => {
     if (selectedNote != null) {
-      // TODO: send remove note request to server
-
+      // sends remove requst to server
+      RemoveNote(newId);
       // remove the note
       removeNoteFromNotes(newId);
     }
@@ -68,8 +69,8 @@ export default function EditRemoveNoteModal({
 
   // OnPress callback for save edit note button
   const saveEditNote = () => {
-    // TODO: send edit note request to server
-
+    // Sends update note to server
+    UpdateNote({ id: newId, title: noteTitle, content: noteContent });
     // Set the note
     updateNote(newId, noteContent, noteTitle);
 
