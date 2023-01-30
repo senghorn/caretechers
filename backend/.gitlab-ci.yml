@@ -20,7 +20,8 @@ deploy-prod:
   stage: deploy
   script:
     - |
-      cd caretechers
+      ls
+      cd ~/caretechers
       git pull
       cd backend
       sudo make start
