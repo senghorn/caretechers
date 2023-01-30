@@ -15,6 +15,8 @@ export default function Inputs({ route, navigation }) {
   const [state, setState] = useState({});
   const [phoneNumber, setPhoneNumber] = useState("");
 
+  // Formats the text of the phone number to display nicely
+  // E.g., 123-449-4910
   const formatPhoneNumber = (text) => {
     var cleaned = "";
     var match = text.match(/\d/g);
@@ -42,23 +44,25 @@ export default function Inputs({ route, navigation }) {
   state["email"] = user["email"];
   state["first"] = user["given_name"];
   state["last"] = user["family_name"];
+  state["picture"] = user["picture"];
 
-  handleFirstName = (text) => {
+  const handleFirstName = (text) => {
     state["first"] = text;
     setState(state);
   };
 
-  handleLastName = (text) => {
+  const handleLastName = (text) => {
     state["last"] = text;
     setState(state);
   };
 
-  handlePhone = (text) => {
+  const handlePhone = (text) => {
     setPhone(text);
     state["phone"] = text;
   };
 
-  submit = () => {
+  // Handles create user button being pressed
+  const submit = async () => {
     if (state["first"] == undefined) {
       alert("Please make to enter your first name");
     } else if (state["last"] == undefined) {
@@ -67,24 +71,9 @@ export default function Inputs({ route, navigation }) {
       alert("Please make to enter your phone number");
     } else if (state["phone"].length < 12) {
       alert("Phone number is not valid");
-    } else {
-      alert(
-        "Register info \n" +
-          "First name: " +
-          state["first"] +
-          "\n" +
-          "Last name: " +
-          state["last"] +
-          "\n" +
-          "Phone: " +
-          state["phone"] +
-          "\n" +
-          "Email: " +
-          state["email"] +
-          "\n"
-      );
-
-      navigation.navigate("Group");
+    }
+    else {
+      navigation.navigate("Group",{ user: state });
     }
   };
 
@@ -122,9 +111,8 @@ export default function Inputs({ route, navigation }) {
         maxLength={12}
         onChangeText={(text) => formatPhoneNumber(text)}
       />
-
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
-        <Text style={styles.submitButtonText}> Register </Text>
+        <Text style={styles.submitButtonText}> Join Caring Group </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -162,14 +150,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   submitButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.pink,
     padding: 10,
     margin: 15,
-    height: 40,
-    width: 100,
+    marginTop: 30,
+    height: 50,
+    width: "50%",
     alignSelf: "center",
     borderRadius: 20,
     alignContent: "center",
+    justifyContent: 'center'
   },
   submitButtonText: {
     color: "white",
