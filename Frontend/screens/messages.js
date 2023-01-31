@@ -2,24 +2,25 @@ import { View, StyleSheet } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import * as ImagePicker from "expo-image-picker";
 import { Divider } from "react-native-paper";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import COLORS from "../constants/colors";
 import TopBar from "../components/messages/top-bar";
-import socket from "../components/messages/socket";
-
+import createSocket from "../components/messages/socket";
+import UserContext from "../services/context/UserContext";
 
 export default function Messages({ route, navigation }) {
+  // TODO:Need to get rid of this user
   const { user } = route.params;
+  const user_i = useContext(UserContext);
   const userEmail = user["user"].email;
   const this_user = {
     _id: userEmail,
     name: user["user"].name,
     avatar: user["user"].picture,
-    groupId: user["user"].group
+    groupId: user_i.group_id,
   };
-
+  const socket = createSocket(this_user);
   useEffect(() => {
-    socket.auth = { email: user["email"], username: "username placeholder" };
     socket.connect();
     socket.on("connect_error", (err) => {
       console.log(err.message);
@@ -58,8 +59,6 @@ export default function Messages({ route, navigation }) {
       setGalPermission(galleryStatus.status === "granted");
     })();
   }, []);
-
-
 
   const onMessageSend = useCallback((messages = []) => {
     socket.emit("chat", messages);
@@ -120,7 +119,6 @@ const styles = StyleSheet.create({
   divider: {},
 });
 
-
 // const users = [
 //   {
 //     _id: 0,
@@ -157,25 +155,23 @@ const styles = StyleSheet.create({
 //   });
 // };
 
+// Handles image selection
+// const handleImageSelection = async () => {
+//   let result = await ImagePicker.launchImageLibraryAsync({
+//     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+//     allowsEditing: true,
+//     aspect: [4, 3],
+//     quality: 1,
+//   });
 
-  // Handles image selection
-  // const handleImageSelection = async () => {
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //   });
-
-  //   result = result.assets;
-  //   imgValues = result[0];
-  //   const imageMessage = {
-  //     user: user[0],
-  //     createdAt: Date.now(),
-  //     _id: uuidv4(),
-  //     messageType: "image",
-  //     image: imgValues["uri"],
-  //   };
-  //   console.log(imageMessage);
-  // };
-
+//   result = result.assets;
+//   imgValues = result[0];
+//   const imageMessage = {
+//     user: user[0],
+//     createdAt: Date.now(),
+//     _id: uuidv4(),
+//     messageType: "image",
+//     image: imgValues["uri"],
+//   };
+//   console.log(imageMessage);
+// };

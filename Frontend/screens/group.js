@@ -35,7 +35,7 @@ const createUser = async (first, last, email, phone, group) => {
         return true;
       })
       .catch(function (error) {
-        console.log("create group error",error);
+        console.log("create user error",error);
         return false;
       });
   } catch (error) {
