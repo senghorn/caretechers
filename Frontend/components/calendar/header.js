@@ -1,13 +1,18 @@
-import { format } from 'date-fns';
+import { addMonths, format, startOfDay } from 'date-fns';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
-export default function Header({ date, jumpToToday }) {
+export default function Header({ date, setInitDate }) {
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
         <Appbar.Content title={format(date, 'LLLL Y')} titleStyle={styles.titleText} />
-        <Appbar.Action icon="calendar" onPress={() => console.log('jump to today')} />
+        <Appbar.Action
+          icon="calendar"
+          onPress={() => {
+            setInitDate(startOfDay(new Date()));
+          }}
+        />
         <Appbar.Action
           icon="filter"
           onPress={() => {

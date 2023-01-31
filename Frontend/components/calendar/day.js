@@ -2,17 +2,8 @@ import { format, isEqual, startOfDay } from 'date-fns';
 import { StyleSheet, View } from 'react-native';
 import DateDisplay from './dateDisplay';
 import DaySummary from './daySummary';
-import useSWR from 'swr';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
-
-export default function Day({ volunteer, date }) {
-  const dateString = format(date, 'yyyy-MM-dd');
-  const { data, error, isLoading } = useSWR(
-    `http://localhost:3000/visits/group/1?start=${dateString}&end=${dateString}`,
-    fetcher
-  );
-
+export default function Day({ date }) {
   const isCurrentDay = isEqual(date, startOfDay(new Date()));
   return (
     <View>
@@ -25,7 +16,7 @@ export default function Day({ volunteer, date }) {
       <View style={styles.container}>
         <View style={styles.layoutContainer}>
           <DateDisplay date={date} />
-          {<DaySummary isLoading={isLoading} date={date} volunteer={volunteer} data={data} />}
+          <DaySummary date={date} />
         </View>
       </View>
     </View>
