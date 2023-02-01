@@ -23,13 +23,15 @@ export default function BottomNavigation({ route, navigation }) {
 
   useEffect(() => {
     async function fetchData(id, setUser) {
-      let connection_string =  config.backend_server + '/user/groupId/' + id;
+      let connection_string = config.backend_server + '/user/groupId/' + id;
+      console.log(connection_string);
       return await axios
         .get(connection_string)
         .then(function (response) {
           setUser(response.data);
         })
         .catch(function (error) {
+          console.log(error);
           console.log('Fetching user data unsuccessful.');
           return false;
         });

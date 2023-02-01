@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { Checkbox } from 'react-native-paper';
