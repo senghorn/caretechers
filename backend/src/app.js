@@ -44,9 +44,20 @@ io.on("connect", (socket) => {
   const groupName = socket.groupId;
   socket.join(groupName);
 
-  console.log("client connected!", socket.username);
-  socket.on("chat", (message) => {
-    io.to(groupName).emit("message", message);
+  console.log(socket.username, " just connected!");
+  socket.on("chat", (messages) => {
+    io.to(groupName).emit("message", messages);
+    const message_data = messages[0];
+
+    // TODO: Save the message into the database
+    // Construct a message json referencing properties from the message table
+    const message_object = {
+      date_time: message_data.createdAt,
+      content: message_data.text,
+      sender: message_data.user._id,
+      group_id: message_data.user.groupId
+    };
+    
   });
 
   socket.on("disconnect", (reason) => {
@@ -67,8 +78,6 @@ httpServer.listen(3001, () =>
 // Register middleware function that gets called every incoming socket
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
-  console.log(socket.handshake.query.groupId);
-  console.log(username);
   if (!username) {
     return next(new Error("invalid username"));
   }

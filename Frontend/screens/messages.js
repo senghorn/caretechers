@@ -5,6 +5,7 @@ import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect, useContext } from "react";
 import COLORS from "../constants/colors";
 import TopBar from "../components/messages/top-bar";
+import { FetchMessages, FetchUsers } from "../services/api/messages";
 import createSocket from "../components/messages/socket";
 import UserContext from "../services/context/UserContext";
 
@@ -50,7 +51,7 @@ export default function Messages({ route, navigation }) {
   }, []);
 
   const [messages, setMessages] = useState([]);
-
+  const [users, setUsers] = useState(null);
   // Getting user permission to access photo gallery
   const [hasGalPermission, setGalPermission] = useState(null);
   useEffect(() => {
@@ -58,7 +59,15 @@ export default function Messages({ route, navigation }) {
       const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
       setGalPermission(galleryStatus.status === "granted");
     })();
+    FetchUsers(this_user.groupId, setUsers);
+
   }, []);
+
+  useEffect(() => {
+    if (users != null) {
+      FetchMessages(this_user.groupId, null, setMessages, users);
+    }
+  }, [users]);
 
   const onMessageSend = useCallback((messages = []) => {
     socket.emit("chat", messages);
