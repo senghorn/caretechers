@@ -25,3 +25,5 @@ deploy-prod:
       cd backend
       make start
   environment: production
+  only:
+    - merge_requests
