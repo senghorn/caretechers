@@ -25,5 +25,5 @@ deploy-prod:
       cd backend
       make start
   environment: production
-  only:
-    - merge_requests
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
