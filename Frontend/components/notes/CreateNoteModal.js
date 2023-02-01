@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { View, StyleSheet, Modal, Text } from "react-native";
 import { TextInput } from "react-native-paper";
 import { Button } from "react-native-paper";
 import COLORS from "../../constants/colors";
 import { CreateNote } from "../../services/api/notes";
-
+import UserContext
+  from "../../services/context/UserContext";
 export default function CreateNoteModal({
   notes,
   setNotes,
@@ -13,10 +14,10 @@ export default function CreateNoteModal({
 }) {
   const [noteTitle, setNoteTitle] = useState(""); // Add a state variable for the note title
   const [noteContent, setNoteContent] = useState(""); // Add a state variable for the note content
-
+  const user = useContext(UserContext);
   // Function to add a new note
   const addNote = async () => {
-    CreateNote({ title: noteTitle, content: noteContent })
+    CreateNote({ title: noteTitle, content: noteContent }, user.group_id)
       .then(noteId => {
         if (noteId) {
           setNotes([
@@ -30,7 +31,7 @@ export default function CreateNoteModal({
         }
       })
       .catch(error => console.error(error));
-      
+
     setNoteTitle(""); // Clear the note title field
     setNoteContent(""); // Clear the note content field
     setModalVisible(false); // Hide the modal

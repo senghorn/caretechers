@@ -12,4 +12,10 @@ router.get('/:groupId', [
 	sharedMiddleware.sendResult
 ]);
 
+router.get('/users/:groupId', [
+	groupMiddleware.checkIfGroupExists,
+	messagesMiddleware.getUsersInGroup,
+	sharedMiddleware.sendResult
+]);
+
 module.exports = router;

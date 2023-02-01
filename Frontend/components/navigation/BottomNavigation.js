@@ -28,7 +28,6 @@ export default function BottomNavigation({ route, navigation }) {
         .get(connection_string)
         .then(function (response) {
           setUser(response.data);
-          return true;
         })
         .catch(function (error) {
           console.log('Fetching user data unsuccessful.');
