@@ -4,6 +4,8 @@ const app = express();
 const port = 3000;
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('../swagger-output.json')
+const sql = require('sql-template-strings');
+const db = require('./database')
 
 app.use(express.json());
 
@@ -51,18 +53,12 @@ io.on("connect", (socket) => {
   socket.join(groupName);
 
   console.log(socket.username, " just connected!");
-  socket.on("chat", (messages) => {
+  socket.on("chat", async (messages) => {
     io.to(groupName).emit("message", messages);
-    const message_data = messages[0];
+    const messageData = messages[0];
 
-    // TODO: Save the message into the database
-    // Construct a message json referencing properties from the message table
-    const message_object = {
-      date_time: message_data.createdAt,
-      content: message_data.text,
-      sender: message_data.user._id,
-      group_id: message_data.user.groupId
-    };
+    const query = sql`INSERT INTO MESSAGES VALUES(${messageData.user._id}, ${messageData.createdAt}, ${messageData.text}, ${messageData.user.groupId})`;
+    await db.query(query);
     
   });
 
