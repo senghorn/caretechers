@@ -10,12 +10,13 @@ app.get("/", (req, res) => {
 });
 
 // MAIN API ENDPOINTS
-app.use("/notes", require("./routes/notes"));
-app.use("/messages", require("./routes/messages"));
-app.use("/tasks", require("./routes/tasks"));
-app.use("/visits", require("./routes/visits"));
-app.use("/user", require("./routes/user"));
-app.use("/groups", require("./routes/groups"));
+app.use('/notes', require('./routes/notes'));
+app.use('/messages', require('./routes/messages'));
+app.use('/tasks', require('./routes/tasks'));
+app.use('/visits', require('./routes/visits'));
+app.use('/user', require('./routes/user'));
+app.use('/groups', require('./routes/groups'));
+app.use('/graphs', require('./routes/graphs'));
 // ------------------
 
 app.use((err, req, res, next) => {
@@ -85,5 +86,3 @@ io.use((socket, next) => {
   socket.groupId = socket.handshake.query.groupId;
   next();
 });
-
-// ---------------------------------------
