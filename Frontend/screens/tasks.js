@@ -4,15 +4,16 @@ import { Button } from 'react-native-paper';
 import CreateTaskModal from '../components/tasks/createTaskModal';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
+import config from '../constants/config';
 
 const connectToBackend = async (selected, setRenderedTasks, setLoading) => {
   try {
-    const result = await fetch('http://ec2-54-153-120-183.us-west-1.compute.amazonaws.com:3000/tasks/group/1');
+    const result = await fetch(`${config.backend_server}/tasks/group/1`);
     let tasks = await result.json();
     if (selected === 'every') {
-      tasks = tasks.filter((task) => task.recurring_type === 'everytime');
+      tasks = tasks.filter((task) => task.rp_id && task.day_of_week === null);
     } else {
-      tasks = tasks.filter((task) => task.recurring_type !== 'everytime');
+      tasks = tasks.filter((task) => !(task.rp_id && task.day_of_week === null));
     }
     const renderedTasks = tasks.map((task) => (
       <Task title={task.description} key={task.id} reccurence={task.recurring_type} selected={selected} />
