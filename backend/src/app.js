@@ -2,6 +2,8 @@ const express = require('express');
 
 const app = express();
 const port = 3000;
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('../swagger-output.json')
 
 app.use(express.json());
 
@@ -17,6 +19,9 @@ app.use('/visits', require('./routes/visits'));
 app.use('/user', require('./routes/user'));
 app.use('/groups', require('./routes/groups'));
 app.use('/graphs', require('./routes/graphs'));
+
+// API AUTO GENERATION
+app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 // ------------------
 
 app.use((err, req, res, next) => {
