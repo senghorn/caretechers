@@ -7,8 +7,10 @@ const db = require('../database');
 const { newError } = require('../utls');
 
 module.exports.getTasksByGroup = asyncHandler(async (req, _res, next) => {
-  const query = sql`SELECT * FROM TaskMeta TM
-					JOIN RecurringPattern RP on TM.id = RP.task_id
+  const query = sql`SELECT TM.id, TM.group_id, TM.title, TM.description, TM.start_date, TM.end_date, 
+          RP.task_id AS rp_id, RP.separation_count, RP.day_of_week, RP.week_of_month, RP.day_of_month, RP.month_of_year
+          FROM TaskMeta TM
+					LEFT JOIN RecurringPattern RP on TM.id = RP.task_id
 					WHERE TM.group_id = ${req.params.groupId};`;
   req.result = await db.query(query);
   next();
@@ -100,6 +102,38 @@ module.exports.verifyTaskIsValid = (req, _res, next) => {
   next();
 };
 
+module.exports.createNewTask2 = asyncHandler(async (req, _res, next) => {
+  let columns = ['title', 'group_id', 'start_date'];
+  if (req.body.description) {
+    columns.push('description');
+  }
+  if (req.body.endDate) {
+    columns.push('end_date');
+  }
+
+  let query = sql`INSERT INTO TaskMeta(`;
+
+  for (let i = 0; i < columns.length; i++) {
+    if (i === columns.length - 1) {
+      query.append(`${columns[i]}) `);
+      query.append(sql`VALUES(${req.body.title}, ${req.params.groupId}, ${req.body.start_date}`);
+    } else {
+      query.append(`${columns[i]}, `);
+    }
+  }
+
+  if (req.body.description) {
+    query.append(sql`, ${req.body.description}`);
+  }
+  if (req.body.endDate) {
+    query.append(sql`, ${req.body.end_date}`);
+  }
+  query.append(sql`);`);
+
+  const [result] = await db.query(query);
+  console.log(result);
+});
+
 module.exports.createNewTask = asyncHandler(async (req, _res, next) => {
   let columns = ['title', 'group_id', 'start_date', 'is_recurring'];
   if (req.body.description) {
@@ -113,7 +147,7 @@ module.exports.createNewTask = asyncHandler(async (req, _res, next) => {
   for (let i = 0; i < columns.length; i++) {
     if (i === columns.length - 1) {
       query.append(`${columns[i]}) `);
-      query.append(sql`VALUES(${req.body.title}, ${req.params.groupId}, ${req.body.start_date}, ${req.body.is_recurring}`);
+      query.append(sql`VALUES(${req.body.title}, ${req.params.groupId}, ${req.body.start_date}`);
     } else {
       query.append(`${columns[i]}, `);
     }
