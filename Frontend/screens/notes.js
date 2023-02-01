@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { View, StyleSheet, RefreshControl, ScrollView } from "react-native";
 import { Button } from "react-native-paper";
 import Note from "../components/notes/note";
@@ -42,6 +42,19 @@ export default function Notes() {
     }
   }, [selectedNote]);
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      if (user != null) {
+        fetchNotes(user, setNotes);
+      }
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
+
   return (
     <View style={styles.container}>
       <Header />
@@ -59,7 +72,11 @@ export default function Notes() {
         setSelectedNote={setSelectedNote}
         key={"edit"} /*Key is required to differentiate two Modal objects*/
       />
-      <ScrollView style={styles.tasksContainer}>
+      <ScrollView
+        style={styles.tasksContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {/* Map over the notes and create a Note component for each note */}
         {notes.map((note) => (
           <Note
