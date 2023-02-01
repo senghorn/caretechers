@@ -36,10 +36,11 @@ export async function RemoveNote(noteId) {
 }
 
 // Sends the new added note to backend
-export async function CreateNote(newNote) {
+export async function CreateNote(newNote, group_id) {
     try {
+        console.log(group_id);
         let connection_string =
-            "http://" + config.backend_server + "/notes/group/1";
+            "http://" + config.backend_server + "/notes/group/" + group_id;
         const result = await fetch(connection_string, {
             method: "POST",
             body: JSON.stringify(newNote),

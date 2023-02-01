@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, RefreshControl, ScrollView } from "react-native";
 import { Button } from "react-native-paper";
 import Note from "../components/notes/note";
 import COLORS from "../constants/colors";
