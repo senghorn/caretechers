@@ -14,9 +14,10 @@ module.exports.verifyCreateUserBody = asyncHandler(async (req, _res, next) => {
 			firstName: { type: 'string' },
 			lastName: { type: 'string' },
 			phoneNum: { type: 'string' },
-			groupId: { type: 'number' }
+			groupId: { type: 'number' },
+			profilePic: { type: 'string'}
 		},
-		required: ['email', 'firstName', 'lastName', 'phoneNum', 'groupId']
+		required: ['email', 'firstName', 'lastName', 'phoneNum', 'groupId', 'profilePic']
 	};
 	const validate = ajv.compile(schema);
 	if (!validate(req.body)) {
@@ -26,9 +27,9 @@ module.exports.verifyCreateUserBody = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.createNewUser = asyncHandler(async (req, _res, next) => {
-	var query = sql`INSERT INTO Users(email, first_name, last_name, phone_num) VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum});`;
+	var query = sql`INSERT INTO Users(email, first_name, last_name, phone_num, profile_pic) VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum}, ${req.body.profilePic});`;
 	if (req.body.groupId != null) {
-		query = sql`INSERT INTO Users(email, first_name, last_name, phone_num, group_id) VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum},${req.body.groupId});`;
+		query = sql`INSERT INTO Users(email, first_name, last_name, phone_num, group_id, profile_pic) VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum},${req.body.groupId}, ${req.body.profilePic});`;
 	}
 	await db.query(query);
 	next();
@@ -36,7 +37,7 @@ module.exports.createNewUser = asyncHandler(async (req, _res, next) => {
 
 module.exports.editUser = asyncHandler(async (req, _res, next) => {
 	const query = sql`UPDATE Users SET Users.email = ${req.body.email}, Users.first_name = ${req.body.firstName}, 
-	Users.last_name = ${req.body.lastName}, Users.phone_num = ${req.body.phoneNum}, Users.group_id = ${req.body.groupId}
+	Users.last_name = ${req.body.lastName}, Users.phone_num = ${req.body.phoneNum}, Users.group_id = ${req.body.groupId}, Users.profile_pic = ${req.body.profilePic}
 	WHERE Users.email = ${req.params.userId};`;
 	await db.query(query);
 	next();
