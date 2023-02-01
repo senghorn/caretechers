@@ -91,7 +91,7 @@ export default function DaySummary({
       underlayColor="#ededed"
     >
       <View style={styles.innerContainer}>
-        <View style={styles.pictureContainer}></View>
+        <View style={[styles.pictureContainer, !visitInfo.visitor && styles.missedDayColor]} />
         <View style={styles.flexLayout}>
           <Text style={styles.nameText}>{visitInfo.first_name || 'No Visitor'}</Text>
           <Text>
