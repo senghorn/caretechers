@@ -26,4 +26,4 @@ deploy-prod:
       make start
   environment: production
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
