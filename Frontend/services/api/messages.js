@@ -24,7 +24,7 @@ const uuidv4 = () => {
 export async function FetchMessages(group_id, last_message, setMessages, users) {
     if (last_message == null) {
         try {
-            let connection_string = "http://" + config.backend_server + "/messages/" + group_id;
+            let connection_string =  config.backend_server + "/messages/" + group_id;
             return await axios.get(connection_string, {
                 groupId: group_id,
             }).then(response => {
@@ -52,7 +52,7 @@ export async function FetchMessages(group_id, last_message, setMessages, users) 
 
 export async function FetchUsers(group_id, setUsers) {
     try {
-        let connection_string = "http://" + config.backend_server + "/messages/users/" + group_id;
+        let connection_string = config.backend_server + "/messages/users/" + group_id;
         return await axios.get(connection_string, {
             groupId: group_id,
         }).then(response => {

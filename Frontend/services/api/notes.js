@@ -4,7 +4,7 @@ const axios = require("axios").default;
 
 export async function UpdateNote(updated_note) {
     try {
-        let connection_string = "http://" + config.backend_server + "/notes/" + updated_note.id;
+        let connection_string = config.backend_server + "/notes/" + updated_note.id;
         await axios.patch(connection_string, {
             title: updated_note.title,
             content: updated_note.content
@@ -23,7 +23,7 @@ export async function UpdateNote(updated_note) {
 
 export async function RemoveNote(noteId) {
     try {
-        let connection_string = "http://" + config.backend_server + "/notes/";
+        let connection_string = config.backend_server + "/notes/";
         axios.delete(connection_string + noteId)
             .then(response => {
             })
@@ -40,7 +40,7 @@ export async function CreateNote(newNote, group_id) {
     try {
         console.log(group_id);
         let connection_string =
-            "http://" + config.backend_server + "/notes/group/" + group_id;
+            config.backend_server + "/notes/group/" + group_id;
         const result = await fetch(connection_string, {
             method: "POST",
             body: JSON.stringify(newNote),

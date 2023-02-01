@@ -23,7 +23,7 @@ export default function BottomNavigation({ route, navigation }) {
 
   useEffect(() => {
     async function fetchData(id, setUser) {
-      let connection_string = 'http://' + config.backend_server + '/user/groupId/' + id;
+      let connection_string =  config.backend_server + '/user/groupId/' + id;
       return await axios
         .get(connection_string)
         .then(function (response) {

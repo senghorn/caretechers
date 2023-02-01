@@ -28,7 +28,7 @@ const createUser = async (first, last, email, phone, group) => {
       phoneNum: phone,
       groupId: group,
     };
-    let connection_string = "http://" + config.backend_server + "/user";
+    let connection_string = config.backend_server + "/user";
     return await axios
       .post(connection_string, data)
       .then(function (response) {
