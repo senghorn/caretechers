@@ -58,6 +58,7 @@ export default function DaySummary({
     }
   }, [dateToVisitsMap, key, override]);
 
+
   if (isLoading || (!visitInfo && !error)) {
     return (
       <FadeInView style={styles.loadingContainer}>
@@ -68,6 +69,7 @@ export default function DaySummary({
 
   const isCurrentDay = isEqual(date, startOfDay(new Date()));
   const inThePast = isBefore(date, new Date());
+
 
   if (!visitInfo.visitor && (!inThePast || isCurrentDay)) {
     return (

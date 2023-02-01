@@ -13,7 +13,7 @@ const axios = require("axios").default;
 const fetchNotes = async (user, setNotes) => {
   try {
     let connection_string =
-      "http://" + config.backend_server + "/notes/group/" + user.group_id;
+       config.backend_server + "/notes/group/" + user.group_id;
     await axios.get(connection_string).then(function (response) {
       setNotes(response.data);
     });

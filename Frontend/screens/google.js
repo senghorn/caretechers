@@ -10,7 +10,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const getUserGroupByID = async (email) => {
   let connection_string =
-    "http://" + config.backend_server + "/user/groupId/" + email;
+   config.backend_server + "/user/groupId/" + email;
   return await axios
     .get(connection_string)
     .then(function (response) {
