@@ -32,7 +32,7 @@ module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
 		 DATE_FORMAT(tasks.start_date, '%Y-%m-%d') AS startRepeat, DATE_FORMAT(tasks.end_date, '%Y-%m-%d') AS endRepeat,
 		 repeats.task_id as repeatParent
  
-		 FROM (SELECT ${start} + INTERVAL (day) DAY AS the_date FROM Day_Indexes) Days
+		 FROM (SELECT DATE_SUB(${start}, INTERVAL 1 DAY) + INTERVAL (day) DAY AS the_date FROM Day_Indexes) Days
 		 JOIN \`Groups\` gr ON (gr.id = ${groupId})
 		 JOIN TaskMeta valid_tasks ON valid_tasks.group_id = gr.id
  

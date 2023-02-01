@@ -6,10 +6,9 @@ import Metrics from '../screens/metrics';
 import Calendar from '../screens/calendar';
 import Tasks from '../screens/tasks';
 
-
 const Tab = createMaterialBottomTabNavigator();
 
-export default function BottomNavigation() {
+export default function BottomNavigation({ navigation }) {
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -32,6 +31,7 @@ export default function BottomNavigation() {
         options={{
           tabBarIcon: ({ color }) => <MaterialCommunityIcons name="calendar-heart" color={color} size={26} />,
         }}
+        initialParams={{ navigation }}
       />
       <Tab.Screen
         name="Metrics"

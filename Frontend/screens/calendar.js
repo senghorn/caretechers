@@ -5,7 +5,6 @@ import {
   startOfMonth,
   differenceInDays,
   startOfDay,
-  subDays,
   startOfYear,
   endOfYear,
   addMonths,
@@ -17,18 +16,15 @@ import {
 import { uniqueId } from 'lodash';
 import { createContext, useEffect, useRef, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import Day from '../components/calendar/day';
 import Header from '../components/calendar/header';
-import WeekLabel from '../components/calendar/weekLabel';
-import MonthLabel from '../components/calendar/monthLabel';
-import { FlatList } from 'react-native-bidirectional-infinite-scroll';
 import useSWR from 'swr';
+import ScrollableScreen from '../components/calendar/scrollableScreen';
+
+import config from '../constants/config';
 
 const DateToVisitsContext = createContext();
 
-const renderFlatListDay = ({ item }) => <RenderDayFromData date={item.date} types={item.types} />;
-
-export default function Calendar() {
+export default function Calendar({ navigation }) {
   const [initDate, setInitDate] = useState(startOfDay(new Date()));
   const [startDate, setStartDate] = useState(startOfYear(initDate));
   const [endDate, setEndDate] = useState(endOfYear(initDate));
@@ -41,15 +37,21 @@ export default function Calendar() {
   const startDateString = format(subWeeks(startDate, 2), 'yyyy-MM-dd');
   const endDateString = format(addWeeks(endDate, 2), 'yyyy-MM-dd');
 
+  const [resetScreen, setResetScreen] = useState(false);
+
   useEffect(() => {
+    setResetScreen(true);
     setStartDate(startOfYear(initDate));
     setEndDate(endOfYear(initDate));
     setRenderingDataForFlatList(createRenderingDataForFlatList(initDate, addMonths(initDate, 12)));
-    flatListRef.current.scrollToIndex({ animated: false, index: 0 });
   }, [initDate]);
 
+  useEffect(() => {
+    setResetScreen(false);
+  }, [renderingDataForFlatList]);
+
   const { data, error, isLoading } = useSWR(
-    `http://192.168.86.238:3000/visits/group/1?start=${startDateString}&end=${endDateString}`,
+    `${config.backend_server}/visits/group/1?start=${startDateString}&end=${endDateString}`,
     fetcher
   );
 
@@ -58,11 +60,6 @@ export default function Calendar() {
     else if (isLoading) setDateToVisitsMap(undefined);
     else if (error) setDateToVisitsMap('error');
   }, [data, error, isLoading]);
-  const onViewableItemsChanged = ({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      setCurrentDateDisplayed(viewableItems[0].item.date);
-    }
-  };
 
   useEffect(() => {
     if (!isSameYear(currentDateDisplayed, endDate)) {
@@ -74,31 +71,21 @@ export default function Calendar() {
     }
   }, [currentDateDisplayed]);
 
-  const viewabilityConfigCallbackPairs = useRef([{ onViewableItemsChanged }]);
-
-  const flatListRef = useRef();
-
   return (
     <View style={styles.container}>
       <Header date={currentDateDisplayed} setInitDate={setInitDate} />
       <DateToVisitsContext.Provider value={dateToVisitsMap}>
-        <FlatList
-          ref={flatListRef}
-          style={styles.scrollContainer}
-          data={renderingDataForFlatList}
-          renderItem={renderFlatListDay}
-          keyExtractor={(item) => item.id}
-          onEndReachedThreshold={4}
-          onEndReached={() =>
-            updateEndRendering(renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList)
-          }
-          onStartReachedThreshold={4}
-          onStartReached={() =>
-            updateStartRendering(renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList)
-          }
-          showsVerticalScrollIndicator={true}
-          viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-        />
+        {!resetScreen && (
+          <ScrollableScreen
+            renderingDataForFlatList={renderingDataForFlatList}
+            setRenderingDataForFlatList={setRenderingDataForFlatList}
+            createRenderingDataForFlatList={createRenderingDataForFlatList}
+            setCurrentDateDisplayed={setCurrentDateDisplayed}
+            resetScreen={resetScreen}
+            setResetScreen={setResetScreen}
+            navigation={navigation}
+          />
+        )}
       </DateToVisitsContext.Provider>
     </View>
   );
@@ -151,36 +138,4 @@ const createRenderingDataForFlatList = (startDate, endDate) => {
   }
 
   return renderingDataForFlatList;
-};
-
-function RenderDayFromData({ date, types }) {
-  return (
-    <View>
-      {types.includes('month') && <MonthLabel date={date} />}
-      {types.includes('week') && <WeekLabel date={date} />}
-      {types.includes('day') && <Day date={date} />}
-    </View>
-  );
-}
-
-const updateStartRendering = (renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList) => {
-  return new Promise((resolve) => {
-    const firstDate = renderingDataForFlatList[0].date;
-    const newFirstDate = subDays(firstDate, 14);
-    const newDays = createRenderingDataForFlatList(newFirstDate, subDays(firstDate, 1));
-    const renderingData = [...newDays, ...renderingDataForFlatList];
-    setRenderingDataForFlatList(renderingData);
-    resolve();
-  });
-};
-
-const updateEndRendering = (renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList) => {
-  return new Promise((resolve) => {
-    const lastDate = renderingDataForFlatList[renderingDataForFlatList.length - 1].date;
-    const newLastDate = addDays(lastDate, 14);
-    const newDays = createRenderingDataForFlatList(addDays(lastDate, 1), newLastDate);
-    const renderingData = [...renderingDataForFlatList, ...newDays];
-    setRenderingDataForFlatList(renderingData);
-    resolve();
-  });
 };

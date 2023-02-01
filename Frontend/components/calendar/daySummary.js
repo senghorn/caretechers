@@ -1,46 +1,69 @@
 import { format, isBefore, isEqual, startOfDay } from 'date-fns';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, Animated, TouchableHighlight } from 'react-native';
+import { Text, View, StyleSheet, Animated, TouchableHighlight, Touchable } from 'react-native';
 import { DateToVisitsContext } from '../../screens/calendar';
 import { AntDesign } from '@expo/vector-icons';
 
-export default function DaySummary({ date }) {
+export default function DaySummary({
+  date,
+  navigation,
+  override = false,
+  visitInfoOverride = undefined,
+  isLoadingOverride = true,
+  errorOverride = false,
+}) {
   const dateToVisitsMap = useContext(DateToVisitsContext);
   const key = format(date, 'yyyy-MM-dd');
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [visitInfo, setVisitInfo] = useState(undefined);
-  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(isLoadingOverride);
+  const [visitInfo, setVisitInfo] = useState(visitInfoOverride);
+  const [error, setError] = useState(errorOverride);
 
   useEffect(() => {
-    if (dateToVisitsMap === undefined) {
+    if (isLoadingOverride) {
+      setIsLoading(isLoadingOverride);
       setError(false);
-      setIsLoading(true);
-    } else if (dateToVisitsMap == 'error') {
-      setError(true);
+    } else if (errorOverride) {
       setIsLoading(false);
+      setError(errorOverride);
     } else {
       setIsLoading(false);
       setError(false);
-      const visit = dateToVisitsMap[key];
-      if (!visit) {
+      if (!visitInfoOverride) {
         setVisitInfo({ taskCount: 0, visitor: null });
       } else {
-        setVisitInfo(visit);
+        setVisitInfo(visitInfoOverride);
       }
     }
-  }, [dateToVisitsMap, key]);
+  }, [isLoadingOverride, visitInfoOverride, errorOverride]);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!override) {
+      if (dateToVisitsMap === undefined) {
+        setError(false);
+        setIsLoading(true);
+      } else if (dateToVisitsMap == 'error') {
+        setError(true);
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        setError(false);
+        const visit = dateToVisitsMap[key];
+        if (!visit) {
+          setVisitInfo({ taskCount: 0, visitor: null });
+        } else {
+          setVisitInfo(visit);
+        }
+      }
+    }
+  }, [dateToVisitsMap, key, override]);
+
+  if (isLoading || (!visitInfo && !error)) {
     return (
       <FadeInView style={styles.loadingContainer}>
         <View />
       </FadeInView>
     );
-  }
-
-  if (!visitInfo) {
-    setVisitInfo();
   }
 
   const isCurrentDay = isEqual(date, startOfDay(new Date()));
@@ -58,31 +81,42 @@ export default function DaySummary({ date }) {
   }
 
   let colorStyle = styles.futureDayColor;
-  if (visitInfo.visitor) colorStyle = styles.completedDayColor;
+  if (visitInfo.visitor && visitInfo.completedTaskCount === visitInfo.taskCount) colorStyle = styles.completedDayColor;
   else if (isCurrentDay) colorStyle = styles.currentDayColor;
-  else if (!visitInfo.visitor) colorStyle = styles.missedDayColor;
+  else if (!visitInfo.visitor || inThePast) colorStyle = styles.missedDayColor;
   return (
-    <View style={[styles.container, colorStyle]}>
-      <View style={styles.pictureContainer}></View>
-      <View>
-        <Text style={styles.nameText}>{visitInfo.first_name || 'No Visitor'}</Text>
-        <Text>
-          {inThePast
-            ? `${visitInfo.completedTaskCount || 0} / ${visitInfo.taskCount} Tasks Completed`
-            : `${visitInfo.taskCount} Tasks`}
-        </Text>
+    <TouchableHighlight
+      onPress={() => navigation.navigate('Visit', { date })}
+      style={[styles.container, colorStyle]}
+      underlayColor="#ededed"
+    >
+      <View style={styles.innerContainer}>
+        <View style={styles.pictureContainer}></View>
+        <View style={styles.flexLayout}>
+          <Text style={styles.nameText}>{visitInfo.first_name || 'No Visitor'}</Text>
+          <Text>
+            {inThePast
+              ? `${visitInfo.completedTaskCount || 0} / ${visitInfo.taskCount} Tasks Completed`
+              : `${visitInfo.taskCount} Tasks`}
+          </Text>
+        </View>
       </View>
-    </View>
+    </TouchableHighlight>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    padding: 12,
+    borderRadius: 8,
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
+  },
+  innerContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   loadingContainer: {
     flex: 1,

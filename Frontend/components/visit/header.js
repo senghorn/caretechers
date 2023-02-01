@@ -2,23 +2,17 @@ import { format, startOfDay } from 'date-fns';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
-export default function Header({ date, setInitDate }) {
+export default function Header({ date, navigation }) {
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
-        <Appbar.Content title={format(date, 'LLLL Y')} titleStyle={styles.titleText} />
         <Appbar.Action
-          icon="calendar"
+          icon="chevron-left"
           onPress={() => {
-            setInitDate(startOfDay(new Date()));
+            navigation.navigate('Home');
           }}
         />
-        <Appbar.Action
-          icon="filter"
-          onPress={() => {
-            console.log('Filter Dialog Open');
-          }}
-        />
+        <Appbar.Content title={format(date, 'EEEE, LLL do, Y')} titleStyle={styles.titleText} />
       </Appbar.Header>
     </View>
   );
@@ -36,6 +30,6 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontWeight: '500',
-    fontSize: 20,
+    fontSize: 18,
   },
 });
