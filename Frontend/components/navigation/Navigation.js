@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import BottomNavigation from './bottomNavigation';
-import GoogleLogin from '../screens/google';
-import RegisterUser from '../screens/register-user';
-import Group from '../screens/group';
-import Visit from '../screens/visit';
+import BottomNavigation from './BottomNavigation';
+import GoogleLogin from '../../screens/google';
+import RegisterUser from '../../screens/register-user';
+import Group from '../../screens/group';
+import Visit from '../../screens/visit';
 
 const Stack = createNativeStackNavigator();
 
