@@ -1,9 +1,9 @@
-import { isEqual, startOfDay } from 'date-fns';
+import { format, isEqual, startOfDay } from 'date-fns';
 import { StyleSheet, View } from 'react-native';
 import DateDisplay from './dateDisplay';
 import DaySummary from './daySummary';
 
-export default function Day({ volunteer, date }) {
+export default function Day({ date, navigation }) {
   const isCurrentDay = isEqual(date, startOfDay(new Date()));
   return (
     <View>
@@ -16,7 +16,7 @@ export default function Day({ volunteer, date }) {
       <View style={styles.container}>
         <View style={styles.layoutContainer}>
           <DateDisplay date={date} />
-          <DaySummary date={date} volunteer={volunteer} />
+          <DaySummary date={date} navigation={navigation} />
         </View>
       </View>
     </View>
