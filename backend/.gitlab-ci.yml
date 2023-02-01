@@ -20,6 +20,7 @@ deploy-prod:
   stage: deploy
   script:
     - |
+      whoami
       git checkout main
       git pull origin main
   environment: production
