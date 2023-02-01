@@ -2,10 +2,10 @@ const express = require("express");
 
 const app = express();
 const port = 3000;
-const swaggerUi = require('swagger-ui-express')
-const swaggerFile = require('../swagger-output.json')
-const sql = require('sql-template-strings');
-const db = require('./database')
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("../swagger-output.json");
+const sql = require("sql-template-strings");
+const db = require("./database");
 
 app.use(express.json());
 
@@ -14,16 +14,16 @@ app.get("/", (req, res) => {
 });
 
 // MAIN API ENDPOINTS
-app.use('/notes', require('./routes/notes'));
-app.use('/messages', require('./routes/messages'));
-app.use('/tasks', require('./routes/tasks'));
-app.use('/visits', require('./routes/visits'));
-app.use('/user', require('./routes/user'));
-app.use('/groups', require('./routes/groups'));
-app.use('/graphs', require('./routes/graphs'));
+app.use("/notes", require("./routes/notes"));
+app.use("/messages", require("./routes/messages"));
+app.use("/tasks", require("./routes/tasks"));
+app.use("/visits", require("./routes/visits"));
+app.use("/user", require("./routes/user"));
+app.use("/groups", require("./routes/groups"));
+app.use("/graphs", require("./routes/graphs"));
 
 // API AUTO GENERATION
-app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
+app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 // ------------------
 
 app.use((err, req, res, next) => {
@@ -57,9 +57,9 @@ io.on("connect", (socket) => {
     io.to(groupName).emit("message", messages);
     const messageData = messages[0];
 
-    const query = sql`INSERT INTO MESSAGES VALUES(${messageData.user._id}, ${messageData.createdAt}, ${messageData.text}, ${messageData.user.groupId})`;
+    const query = sql`INSERT INTO Messages VALUES(${messageData.user._id}, ${messageData.createdAt}, ${messageData.text}, ${messageData.user.groupId})`;
     await db.query(query);
-    
+  
   });
 
   socket.on("disconnect", (reason) => {
