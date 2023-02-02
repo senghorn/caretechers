@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from "react";
 import { View, StyleSheet, RefreshControl, ScrollView } from "react-native";
-import { Button } from "react-native-paper";
+import { Button, ActivityIndicator } from "react-native-paper";
 import Note from "../components/notes/note";
 import COLORS from "../constants/colors";
 import Header from "../components/notes/header";
@@ -13,7 +13,7 @@ const axios = require("axios").default;
 const fetchNotes = async (user, setNotes) => {
   try {
     let connection_string =
-       config.backend_server + "/notes/group/" + user.group_id;
+      config.backend_server + "/notes/group/" + user.group_id;
     await axios.get(connection_string).then(function (response) {
       setNotes(response.data);
     });
@@ -29,7 +29,7 @@ export default function Notes() {
 
   // Add a state variable to control the visibility of the modal
   const [modalVisible, setModalVisible] = useState(false);
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(null);
   const [selectedNote, setSelectedNote] = useState(null);
   useEffect(() => {
     if (user != null) {
@@ -54,7 +54,6 @@ export default function Notes() {
     }, 2000);
   }, []);
 
-
   return (
     <View style={styles.container}>
       <Header />
@@ -77,16 +76,21 @@ export default function Notes() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
-        {/* Map over the notes and create a Note component for each note */}
-        {notes.map((note) => (
-          <Note
-            key={note.id}
-            title={note.title}
-            content={note.content}
-            setSelectedNote={setSelectedNote}
-            id={note.id}
-          />
-        ))}
+        {
+          notes == null ?
+            <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
+            :
+            notes.map((note) => (
+              <Note
+                key={note.id}
+                title={note.title}
+                content={note.content}
+                setSelectedNote={setSelectedNote}
+                id={note.id}
+              />
+            ))
+
+        }
       </ScrollView>
       <Button
         mode="contained"

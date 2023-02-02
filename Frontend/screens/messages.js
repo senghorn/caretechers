@@ -1,8 +1,8 @@
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import * as ImagePicker from "expo-image-picker";
-import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect, useContext } from "react";
+import { ActivityIndicator } from "react-native-paper";
 import COLORS from "../constants/colors";
 import TopBar from "../components/messages/top-bar";
 import { FetchMessages, FetchUsers } from "../services/api/messages";
@@ -13,11 +13,11 @@ export default function Messages({ route, navigation }) {
   // TODO:Need to get rid of this user
   const { user } = route.params;
   const [this_user, setThisUser] = useState(null);
-  var socket = null;
+  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
-
   const user_i = useContext(UserContext);
+
   useEffect(() => {
     if (user_i) {
       setThisUser({
@@ -32,7 +32,7 @@ export default function Messages({ route, navigation }) {
   useEffect(() => {
     if (this_user) {
       FetchUsers(this_user.groupId, setUsers);
-      socket = createSocket(this_user);
+      setSocket(createSocket(this_user));
     }
   }, [this_user]);
 
@@ -74,12 +74,10 @@ export default function Messages({ route, navigation }) {
   }, [socket]);
 
   var onMessageSend = useCallback((messages = []) => {
-    // Socket is always null
-    console.log(socket);
     if (socket) {
       socket.emit("chat", messages);
     }
-  }, []);
+  }, [socket]);
 
   // Message render bubble
   const renderBubble = (props) => {
@@ -102,10 +100,10 @@ export default function Messages({ route, navigation }) {
     );
   };
 
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TopBar />
-      <Divider style={styles.divider} />
       <GiftedChat
         renderBubble={renderBubble}
         showUserAvatar={true}
@@ -113,18 +111,14 @@ export default function Messages({ route, navigation }) {
         renderUsernameOnMessage={true}
         onSend={(messages) => onMessageSend(messages)}
         user={this_user}
-        textInputStyle={styles.textInput}
-        minComposerHeight={40}
-        minInputToolbarHeight={60}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 40,
   },
   textInput: {
     height: 40,
@@ -132,8 +126,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.2,
     padding: 10,
     borderRadius: 10,
-  },
-  divider: {},
+  }
 });
 
 // const [hasGalPermission, setGalPermission] = useState(null);
