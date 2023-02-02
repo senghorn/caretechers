@@ -15,7 +15,7 @@ module.exports.getTaskById = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.getTaskRepeats = asyncHandler(async (req, _res, next) => {
-  const query = sql`SELECT RP.*, TM.start_date, TM.end_date FROM RecurringPattern RP JOIN TaskMeta TM ON TM.id=${req.params.taskId} WHERE RP.task_id=${req.params.taskId};`;
+  const query = sql`SELECT TM.start_date, TM.end_date, RP.* FROM TaskMeta TM LEFT JOIN RecurringPattern RP ON RP.task_id = ${req.params.taskId} WHERE TM.id=${req.params.taskId};`;
   req.result = await db.query(query);
   next();
 });
@@ -67,6 +67,23 @@ module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
  
 		 WHERE Days.the_date BETWEEN ${start} AND ${end}
 		 GROUP BY Days.the_date, tasks.id;`;
+
+  req.result = await db.query(query);
+  next();
+});
+
+module.exports.editTask = asyncHandler(async (req, _res, next) => {
+  const query = sql`UPDATE TaskMeta SET title=${req.body.title}, description=${req.body.description}, start_date=${req.body.start_date} WHERE id=${req.params.taskId};`;
+
+  const deleteQuery = sql`DELETE FROM RecurringPattern WHERE task_id = ${req.params.taskId};`;
+  await db.query(deleteQuery);
+  if (req.body.repeat_pattern) {
+    const insertQuery = sql`INSERT INTO RecurringPattern (task_id, separation_count, 
+                     day_of_week, week_of_month, day_of_month, month_of_year, recurring_type) VALUES (${req.params.taskId}, ${req.body.repeat_pattern.separation_count},
+                     ${req.body.repeat_pattern.day_of_week}, ${req.body.repeat_pattern.week_of_month}, ${req.body.repeat_pattern.day_of_month}, ${req.body.repeat_pattern.month_of_year},
+                     ${req.body.repeat_pattern.recurring_type});`;
+    await db.query(insertQuery);
+  }
 
   req.result = await db.query(query);
   next();

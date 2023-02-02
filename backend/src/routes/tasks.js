@@ -22,6 +22,8 @@ router.get('/group/:groupId/range', [
   sharedMiddleware.sendResult,
 ]);
 
+router.put('/:taskId', [tasksMiddleware.editTask, sharedMiddleware.sendResult]);
+
 router.post('/group/:groupId', [
   groupMiddleware.checkIfGroupExists,
   tasksMiddleware.verifyTaskIsValid,

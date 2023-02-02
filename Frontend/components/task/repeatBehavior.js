@@ -2,16 +2,10 @@ import { Fragment } from 'react';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ActivityIndicator, List } from 'react-native-paper';
-import useSWR from 'swr';
-import config from '../../constants/config';
 import RepeatItem from './repeatItem';
-import { format } from 'date-fns';
+import { format, getDate, getDay, getMonth } from 'date-fns';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
-
-export default function RepeatBehavior({ id, editMode, editRepeat, setEditRepeat }) {
-  const { data, isLoading, error } = useSWR(`${config.backend_server}/tasks/${id}/repeats`, fetcher);
-
+export default function RepeatBehavior({ id, data, isLoading, editMode, editRepeatTitle, setEditRepeat, setEditRepeatTitle }) {
   const [expanded, setExpanded] = useState(false);
   const [title, setTitle] = useState('Does not repeat');
 
@@ -22,7 +16,7 @@ export default function RepeatBehavior({ id, editMode, editRepeat, setEditRepeat
       ) : (
         <Fragment>
           <List.Accordion
-            title={editMode ? editRepeat : title}
+            title={editMode ? editRepeatTitle : title}
             style={styles.descriptionBorder}
             left={(props) => <List.Icon {...props} icon={title === 'Does not repeat' ? 'repeat-off' : 'repeat'} />}
             right={editMode ? null : (props) => <Text />}
@@ -38,7 +32,10 @@ export default function RepeatBehavior({ id, editMode, editRepeat, setEditRepeat
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
-              setEditRepeat={setEditRepeat}
+              setEditRepeatTitle={setEditRepeatTitle}
+              setEditRepeat={() => {
+                setEditRepeat(null);
+              }}
               setExpanded={setExpanded}
             />
             <RepeatItem
@@ -46,7 +43,18 @@ export default function RepeatBehavior({ id, editMode, editRepeat, setEditRepeat
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
-              setEditRepeat={setEditRepeat}
+              setEditRepeatTitle={setEditRepeatTitle}
+              setEditRepeat={() => {
+                setEditRepeat({
+                  separation_count: 0,
+                  day_of_week: null,
+                  week_of_month: null,
+                  day_of_month: null,
+                  month_of_year: null,
+                  recurring_type: 'daily',
+                  task_id: id,
+                });
+              }}
               setExpanded={setExpanded}
             />
             <RepeatItem
@@ -54,7 +62,18 @@ export default function RepeatBehavior({ id, editMode, editRepeat, setEditRepeat
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
-              setEditRepeat={setEditRepeat}
+              setEditRepeatTitle={setEditRepeatTitle}
+              setEditRepeat={() => {
+                setEditRepeat({
+                  separation_count: 0,
+                  day_of_week: getDay(new Date(data[0].start_date)),
+                  week_of_month: null,
+                  day_of_month: -1,
+                  month_of_year: null,
+                  recurring_type: 'weekly',
+                  task_id: id,
+                });
+              }}
               setExpanded={setExpanded}
             />
             <RepeatItem
@@ -62,7 +81,19 @@ export default function RepeatBehavior({ id, editMode, editRepeat, setEditRepeat
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
-              setEditRepeat={setEditRepeat}
+              setEditRepeatTitle={setEditRepeatTitle}
+              setEditRepeat={() => {
+                const dateToUse = new Date(data[0].start_date);
+                setEditRepeat({
+                  separation_count: 0,
+                  day_of_week: -1,
+                  week_of_month: null,
+                  day_of_month: getDate(dateToUse),
+                  month_of_year: getMonth(dateToUse),
+                  recurring_type: 'yearly',
+                  task_id: id,
+                });
+              }}
               setExpanded={setExpanded}
             />
             {/* <RepeatItem

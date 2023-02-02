@@ -6,24 +6,9 @@ import CreateTaskModal from '../components/tasks/createTaskModal';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 import config from '../constants/config';
+import useSWR from 'swr';
 
-const connectToBackend = async (selected, setRenderedTasks, setLoading, navigation) => {
-  try {
-    const result = await fetch(`${config.backend_server}/tasks/group/1`);
-    let tasks = await result.json();
-    if (selected === 'every') {
-      tasks = tasks.filter((task) => task.rp_id && task.day_of_week === null);
-    } else {
-      tasks = tasks.filter((task) => !(task.rp_id && task.day_of_week === null));
-    }
-    const renderedTasks = tasks.map((task) => <Task title={task.title} key={task.id} navigation={navigation} id={task.id} />);
-
-    setRenderedTasks(renderedTasks);
-    setLoading(false);
-  } catch (error) {
-    console.log(error.message);
-  }
-};
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Tasks({ navigation }) {
   const [selected, setSelected] = useState('every');
@@ -31,14 +16,25 @@ export default function Tasks({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [createTaskModalVisible, setCreateTaskModalVisible] = useState(false);
 
-  const refresh = () => {
-    setLoading(true);
-    connectToBackend(selected, setRenderedTasks, setLoading, navigation);
+  const renderTasks = (tasks) => {
+    if (selected === 'every') {
+      tasks = tasks.filter((task) => task.rp_id && task.day_of_week === null);
+    } else {
+      tasks = tasks.filter((task) => !(task.rp_id && task.day_of_week === null));
+    }
+    const renderedTasks = tasks.map((task) => <Task title={task.title} key={task.id} navigation={navigation} id={task.id} />);
+    setRenderedTasks(renderedTasks);
   };
 
+  const { data, isLoading, error, mutate } = useSWR(`${config.backend_server}/tasks/group/1`, fetcher);
+
   useEffect(() => {
-    refresh();
-  }, [selected]);
+    if (!isLoading && data) {
+      renderTasks(data);
+    }
+  }, [isLoading, data, error, selected]);
+
+  console.log(data);
 
   return (
     <View style={styles.container}>
@@ -46,9 +42,9 @@ export default function Tasks({ navigation }) {
         <Header title="Every Visit" id="every" selected={selected} setSelected={setSelected} />
         <Header title="Scheduled" id="scheduled" selected={selected} setSelected={setSelected} />
       </View>
-      <CreateTaskModal visible={createTaskModalVisible} setVisible={setCreateTaskModalVisible} refresh={refresh} />
+      <CreateTaskModal visible={createTaskModalVisible} setVisible={setCreateTaskModalVisible} refresh={mutate} />
       <ScrollView style={styles.tasksContainer}>
-        {loading ? <ActivityIndicator size="large" color="#2196f3" style={styles.loader} /> : renderedTasks}
+        {isLoading ? <ActivityIndicator size="large" color="#2196f3" style={styles.loader} /> : renderedTasks}
       </ScrollView>
       <Button
         mode="contained"

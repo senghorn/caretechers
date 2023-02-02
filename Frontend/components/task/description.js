@@ -1,23 +1,19 @@
 import { format } from 'date-fns';
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
-import useSWR from 'swr';
-import config from '../../constants/config';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
-
-export default function Description({ id, editMode, editDescription, setEditDescription, editStartDate, setEditStartDate }) {
-  const { data, isLoading, error } = useSWR(`${config.backend_server}/tasks/group/1/task/${id}`, fetcher);
-
-  useEffect(() => {
-    if (!isLoading && !error && data && data.length > 0) {
-      setEditDescription(data[0].description);
-      setEditStartDate(new Date(data[0].start_date));
-    }
-  }, [data, isLoading, error]);
-
+export default function Description({
+  id,
+  data,
+  isLoading,
+  editMode,
+  editDescription,
+  setEditDescription,
+  editStartDate,
+  setEditStartDate,
+}) {
   return (
     <Fragment>
       <View style={styles.container}>
