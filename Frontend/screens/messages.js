@@ -1,8 +1,8 @@
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import * as ImagePicker from "expo-image-picker";
-import { Divider } from "react-native-paper";
 import React, { useState, useCallback, useEffect, useContext } from "react";
+import { ActivityIndicator } from "react-native-paper";
 import COLORS from "../constants/colors";
 import TopBar from "../components/messages/top-bar";
 import { FetchMessages, FetchUsers } from "../services/api/messages";
@@ -12,66 +12,72 @@ import UserContext from "../services/context/UserContext";
 export default function Messages({ route, navigation }) {
   // TODO:Need to get rid of this user
   const { user } = route.params;
-  const user_i = useContext(UserContext);
-  const userEmail = user["user"].email;
-  const this_user = {
-    _id: userEmail,
-    name: user["user"].name,
-    avatar: user["user"].picture,
-    groupId: user_i.group_id,
-  };
-  const socket = createSocket(this_user);
-  useEffect(() => {
-    socket.connect();
-    socket.on("connect_error", (err) => {
-      console.log(err.message);
-      if (err.message === "invalid username") {
-        console.log("failed to connect to message server");
-      }
-    });
-
-    socket.on("message", (msg) => {
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, msg)
-      );
-    });
-
-    socket.on("disconnect", (reason) => {
-      console.log(reason);
-      socket.disconnect();
-      if (reason === "io server disconnect") {
-      }
-    });
-
-    // Network clean up: This will clean up any necessary connections with server
-    return () => {
-      socket.disconnect();
-      console.log("cleaning up");
-    };
-  }, []);
-
+  const [this_user, setThisUser] = useState(null);
+  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
-  // Getting user permission to access photo gallery
-  const [hasGalPermission, setGalPermission] = useState(null);
-  useEffect(() => {
-    (async () => {
-      const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
-      setGalPermission(galleryStatus.status === "granted");
-    })();
-    FetchUsers(this_user.groupId, setUsers);
-
-  }, []);
+  const user_i = useContext(UserContext);
 
   useEffect(() => {
-    if (users != null) {
+    if (user_i) {
+      setThisUser({
+        _id: user["user"].email,
+        name: user["user"].name,
+        avatar: user["user"].picture,
+        groupId: user_i.group_id,
+      });
+    }
+  }, [user_i]);
+
+  useEffect(() => {
+    if (this_user) {
+      FetchUsers(this_user.groupId, setUsers);
+      setSocket(createSocket(this_user));
+    }
+  }, [this_user]);
+
+  useEffect(() => {
+    if (users != null && this_user != null) {
       FetchMessages(this_user.groupId, null, setMessages, users);
     }
   }, [users]);
 
-  const onMessageSend = useCallback((messages = []) => {
-    socket.emit("chat", messages);
-  }, []);
+  useEffect(() => {
+    if (socket) {
+      socket.connect();
+      socket.on("connect_error", (err) => {
+        console.log(err.message);
+        if (err.message === "invalid username") {
+          console.log("failed to connect to message server");
+        }
+      });
+
+      socket.on("message", (msg) => {
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, msg)
+        );
+      });
+
+      socket.on("disconnect", (reason) => {
+        console.log(reason);
+        socket.disconnect();
+        if (reason === "io server disconnect") {
+        }
+      });
+
+      // Network clean up: This will clean up any necessary connections with server
+      return () => {
+        socket.disconnect();
+        console.log("cleaning up");
+      };
+    }
+  }, [socket]);
+
+  var onMessageSend = useCallback((messages = []) => {
+    if (socket) {
+      socket.emit("chat", messages);
+    }
+  }, [socket]);
 
   // Message render bubble
   const renderBubble = (props) => {
@@ -79,7 +85,7 @@ export default function Messages({ route, navigation }) {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == userEmail ? "right" : "left"}
+        position={message_sender_id == user["user"].email ? "right" : "left"}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.warning,
@@ -94,10 +100,10 @@ export default function Messages({ route, navigation }) {
     );
   };
 
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TopBar />
-      <Divider style={styles.divider} />
       <GiftedChat
         renderBubble={renderBubble}
         showUserAvatar={true}
@@ -105,18 +111,14 @@ export default function Messages({ route, navigation }) {
         renderUsernameOnMessage={true}
         onSend={(messages) => onMessageSend(messages)}
         user={this_user}
-        textInputStyle={styles.textInput}
-        minComposerHeight={40}
-        minInputToolbarHeight={60}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 40,
   },
   textInput: {
     height: 40,
@@ -124,45 +126,14 @@ const styles = StyleSheet.create({
     borderWidth: 0.2,
     padding: 10,
     borderRadius: 10,
-  },
-  divider: {},
+  }
 });
 
-// const users = [
-//   {
-//     _id: 0,
-//     name: "Annonymous",
-//     avatar: "https://source.unsplash.com/140x140/?person",
-//   },
-//   {
-//     _id: 1,
-//     name: "Brynnli Borrowman",
-//     avatar: "https://source.unsplash.com/140x140/?wolf",
-//   },
-//   {
-//     _id: 2,
-//     name: "Ben Hatch",
-//     avatar: "https://source.unsplash.com/140x140/?racoon",
-//   },
-//   {
-//     _id: 3,
-//     name: "Seng Rith",
-//     avatar: "https://source.unsplash.com/140x140/?fox",
-//   },
-//   {
-//     _id: 4,
-//     name: "Aaron Heo",
-//     avatar: "https://source.unsplash.com/140x140/?cat",
-//   },
-// ];
-// // For the testing purposes, you should probably use https://github.com/uuidjs/uuid
-// const uuidv4 = () => {
-//   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-//     const r = Math.floor(Math.random() * 16);
-//     const v = c === "x" ? r : (r % 4) + 8;
-//     return v.toString(16);
-//   });
-// };
+// const [hasGalPermission, setGalPermission] = useState(null);
+//   (async () => {
+//   const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
+//   setGalPermission(galleryStatus.status === "granted");
+// })();
 
 // Handles image selection
 // const handleImageSelection = async () => {
