@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import UserContext from '../services/context/UserContext';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import TasksRefreshContext from '../services/context/TasksRefreshContext';
+import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -19,6 +20,8 @@ export default function Task({ route, navigation }) {
   const [refreshCalendar] = useContext(CalendarRefreshContext);
 
   const [refreshTasks] = useContext(TasksRefreshContext);
+
+  const [refreshVisitTasks] = useContext(VisitTasksRefreshContext);
 
   const user = useContext(UserContext);
 
@@ -149,6 +152,7 @@ export default function Task({ route, navigation }) {
                 taskMutate,
                 repeatMutate,
                 refreshTasks,
+                refreshVisitTasks,
                 refreshCalendar,
                 navigation
               );
@@ -176,6 +180,7 @@ const saveTask = async (
   taskMutate,
   repeatMutate,
   tasksMutate,
+  refreshVisitTasks,
   refreshCalendar,
   navigation
 ) => {
@@ -198,6 +203,7 @@ const saveTask = async (
     } else {
       await taskMutate();
       await repeatMutate();
+      await refreshVisitTasks();
       setTitleState(body.title);
       setLoading(false);
       setEditMode(false);
