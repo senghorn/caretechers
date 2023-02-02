@@ -19,17 +19,15 @@ export default function Visit({ route, navigation }) {
 
   const [selected, setSelected] = useState('Tasks');
 
+  const tasksURL = `${config.backend_server}/tasks/group/1/range?start=${dateString}&end=${dateString}`;
+
   const {
     data: visits,
     error: visitError,
     isLoading: visitLoading,
   } = useSWR(`${config.backend_server}/visits/group/1?start=${dateString}&end=${dateString}`, fetcher);
 
-  const {
-    data: tasks,
-    error: tasksError,
-    isLoading: tasksLoading,
-  } = useSWR(`${config.backend_server}/tasks/group/1/range?start=${dateString}&end=${dateString}`, fetcher);
+  const { data: tasks, error: tasksError, isLoading: tasksLoading } = useSWR(tasksURL, fetcher);
 
   const visit = visits && visits[0];
 
@@ -62,7 +60,7 @@ export default function Visit({ route, navigation }) {
             style={styles.touchProperties}
           >
             <View style={styles.messageButton}>
-              <AntDesign name="message1" size={20} color="#2196f3" />
+              <AntDesign name="message1" size={20} color="#199b1e" />
               <Text style={styles.messageButtonText}>Message {visit.first_name}</Text>
             </View>
           </TouchableHighlight>
@@ -73,7 +71,7 @@ export default function Visit({ route, navigation }) {
         <View style={{ width: 48 }} />
         <SectionSelector text="Notes" selected={selected} setSelected={setSelected} />
       </View>
-      <Tasks tasks={tasks} isLoading={tasksLoading} error={tasksError} />
+      <Tasks tasks={tasks} tasksURL={tasksURL} date={date} navigation={navigation} isLoading={tasksLoading} error={tasksError} />
     </View>
   );
 }

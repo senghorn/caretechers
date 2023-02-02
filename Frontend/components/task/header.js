@@ -2,14 +2,18 @@ import { Fragment } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Appbar, TextInput } from 'react-native-paper';
 
-export default function Header({ title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
+export default function Header({ title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons, backTo }) {
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
         <Appbar.Action
           icon="chevron-left"
           onPress={() => {
-            navigation.navigate('Home');
+            if (backTo) {
+              navigation.navigate('Visit', { date: backTo });
+            } else {
+              navigation.navigate('Home');
+            }
           }}
         />
         {editMode ? (

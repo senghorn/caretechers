@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Task({ route, navigation }) {
-  const { title, id, mutateString } = route.params;
+  const { title, id, mutateString, backTo } = route.params;
 
   const { mutate } = useSWRConfig();
 
@@ -73,6 +73,7 @@ export default function Task({ route, navigation }) {
     <View style={styles.container}>
       <Header
         navigation={navigation}
+        backTo={backTo}
         hideButtons={id === 'new'}
         title={titleState}
         editMode={editMode}
@@ -113,7 +114,7 @@ export default function Task({ route, navigation }) {
             color="red"
             style={styles.cancelbutton}
             onPress={() => {
-              if (id === 'new') navigation.navigate('Home');
+              if (id === 'new') navigation.navigate(backTo || 'Home');
               else setEditMode(false);
             }}
           >

@@ -2,17 +2,17 @@ import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { Fragment } from 'react';
 
-export default function Task({ title, id, navigation, mutateString }) {
+export default function Task({ title, id, navigation, mutateString, showIcon, backTo }) {
   if (!title) return null;
   return (
     <TouchableHighlight
       style={styles.taskContainer}
       underlayColor="#e3f2fd"
-      onPress={() => navigation.navigate('Task', { title, id, mutateString })}
+      onPress={() => navigation.navigate('Task', { title, id, mutateString, backTo })}
     >
       <Fragment>
         <View style={styles.taskTitleContainer}>
-          <AntDesign name="checkcircleo" size={16} color="black" />
+          {showIcon && <AntDesign name="checkcircleo" size={16} color="black" />}
           <Text style={styles.taskText}>{title}</Text>
         </View>
         <AntDesign name="infocirlceo" size={16} color="#2196f3" />
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    marginTop: 8,
+    marginVertical: 4,
     flex: 0,
     flexDirection: 'row',
     alignItems: 'center',
