@@ -12,65 +12,73 @@ import UserContext from "../services/context/UserContext";
 export default function Messages({ route, navigation }) {
   // TODO:Need to get rid of this user
   const { user } = route.params;
-  const user_i = useContext(UserContext);
-  const userEmail = user["user"].email;
-  const this_user = {
-    _id: userEmail,
-    name: user["user"].name,
-    avatar: user["user"].picture,
-    groupId: user_i.group_id,
-  };
-  const socket = createSocket(this_user);
-  useEffect(() => {
-    socket.connect();
-    socket.on("connect_error", (err) => {
-      console.log(err.message);
-      if (err.message === "invalid username") {
-        console.log("failed to connect to message server");
-      }
-    });
-
-    socket.on("message", (msg) => {
-      setMessages((previousMessages) =>
-        GiftedChat.append(previousMessages, msg)
-      );
-    });
-
-    socket.on("disconnect", (reason) => {
-      console.log(reason);
-      socket.disconnect();
-      if (reason === "io server disconnect") {
-      }
-    });
-
-    // Network clean up: This will clean up any necessary connections with server
-    return () => {
-      socket.disconnect();
-      console.log("cleaning up");
-    };
-  }, []);
-
+  const [this_user, setThisUser] = useState(null);
+  var socket = null;
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
-  // Getting user permission to access photo gallery
-  const [hasGalPermission, setGalPermission] = useState(null);
-  useEffect(() => {
-    (async () => {
-      const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
-      setGalPermission(galleryStatus.status === "granted");
-    })();
-    FetchUsers(this_user.groupId, setUsers);
 
-  }, []);
+  const user_i = useContext(UserContext);
+  useEffect(() => {
+    if (user_i) {
+      setThisUser({
+        _id: user["user"].email,
+        name: user["user"].name,
+        avatar: user["user"].picture,
+        groupId: user_i.group_id,
+      });
+    }
+  }, [user_i]);
 
   useEffect(() => {
-    if (users != null) {
+    if (this_user) {
+      FetchUsers(this_user.groupId, setUsers);
+      socket = createSocket(this_user);
+    }
+  }, [this_user]);
+
+  useEffect(() => {
+    if (users != null && this_user != null) {
       FetchMessages(this_user.groupId, null, setMessages, users);
     }
   }, [users]);
 
-  const onMessageSend = useCallback((messages = []) => {
-    socket.emit("chat", messages);
+  useEffect(() => {
+    if (socket) {
+      socket.connect();
+      socket.on("connect_error", (err) => {
+        console.log(err.message);
+        if (err.message === "invalid username") {
+          console.log("failed to connect to message server");
+        }
+      });
+
+      socket.on("message", (msg) => {
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, msg)
+        );
+      });
+
+      socket.on("disconnect", (reason) => {
+        console.log(reason);
+        socket.disconnect();
+        if (reason === "io server disconnect") {
+        }
+      });
+
+      // Network clean up: This will clean up any necessary connections with server
+      return () => {
+        socket.disconnect();
+        console.log("cleaning up");
+      };
+    }
+  }, [socket]);
+
+  var onMessageSend = useCallback((messages = []) => {
+    // Socket is always null
+    console.log(socket);
+    if (socket) {
+      socket.emit("chat", messages);
+    }
   }, []);
 
   // Message render bubble
@@ -79,7 +87,7 @@ export default function Messages({ route, navigation }) {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == userEmail ? "right" : "left"}
+        position={message_sender_id == user["user"].email ? "right" : "left"}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.warning,
@@ -128,41 +136,11 @@ const styles = StyleSheet.create({
   divider: {},
 });
 
-// const users = [
-//   {
-//     _id: 0,
-//     name: "Annonymous",
-//     avatar: "https://source.unsplash.com/140x140/?person",
-//   },
-//   {
-//     _id: 1,
-//     name: "Brynnli Borrowman",
-//     avatar: "https://source.unsplash.com/140x140/?wolf",
-//   },
-//   {
-//     _id: 2,
-//     name: "Ben Hatch",
-//     avatar: "https://source.unsplash.com/140x140/?racoon",
-//   },
-//   {
-//     _id: 3,
-//     name: "Seng Rith",
-//     avatar: "https://source.unsplash.com/140x140/?fox",
-//   },
-//   {
-//     _id: 4,
-//     name: "Aaron Heo",
-//     avatar: "https://source.unsplash.com/140x140/?cat",
-//   },
-// ];
-// // For the testing purposes, you should probably use https://github.com/uuidjs/uuid
-// const uuidv4 = () => {
-//   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-//     const r = Math.floor(Math.random() * 16);
-//     const v = c === "x" ? r : (r % 4) + 8;
-//     return v.toString(16);
-//   });
-// };
+// const [hasGalPermission, setGalPermission] = useState(null);
+//   (async () => {
+//   const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
+//   setGalPermission(galleryStatus.status === "granted");
+// })();
 
 // Handles image selection
 // const handleImageSelection = async () => {
