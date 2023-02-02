@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { Button } from 'react-native-paper';
-import CreateTaskModal from '../components/tasks/createTaskModal';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 import config from '../constants/config';
 import useSWR from 'swr';
+import UserContext from '../services/context/UserContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Tasks({ navigation }) {
   const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
-  const [createTaskModalVisible, setCreateTaskModalVisible] = useState(false);
 
-  const tasksURL = `${config.backend_server}/tasks/group/1`;
+  const user = useContext(UserContext);
+
+  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}`;
 
   const { data, isLoading, error, mutate } = useSWR(tasksURL, fetcher);
 
@@ -43,7 +44,6 @@ export default function Tasks({ navigation }) {
         <Header title="Every Visit" id="every" selected={selected} setSelected={setSelected} />
         <Header title="Scheduled" id="scheduled" selected={selected} setSelected={setSelected} />
       </View>
-      <CreateTaskModal visible={createTaskModalVisible} setVisible={setCreateTaskModalVisible} refresh={mutate} />
       <ScrollView style={styles.tasksContainer}>
         {isLoading ? <ActivityIndicator size="large" color="#2196f3" style={styles.loader} /> : renderedTasks}
       </ScrollView>

@@ -20,9 +20,9 @@ export default function Visit({ route, navigation }) {
 
   const [selected, setSelected] = useState('Tasks');
 
-  const tasksURL = `${config.backend_server}/tasks/group/1/range?start=${dateString}&end=${dateString}`;
-
   const user = useContext(UserContext);
+
+  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
 
   const {
     data: visits,
