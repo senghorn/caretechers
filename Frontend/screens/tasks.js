@@ -13,8 +13,11 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 export default function Tasks({ navigation }) {
   const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [createTaskModalVisible, setCreateTaskModalVisible] = useState(false);
+
+  const tasksURL = `${config.backend_server}/tasks/group/1`;
+
+  const { data, isLoading, error, mutate } = useSWR(tasksURL, fetcher);
 
   const renderTasks = (tasks) => {
     if (selected === 'every') {
@@ -22,19 +25,17 @@ export default function Tasks({ navigation }) {
     } else {
       tasks = tasks.filter((task) => !(task.rp_id && task.day_of_week === null));
     }
-    const renderedTasks = tasks.map((task) => <Task title={task.title} key={task.id} navigation={navigation} id={task.id} />);
+    const renderedTasks = tasks.map((task) => (
+      <Task title={task.title} key={task.id} navigation={navigation} id={task.id} mutateString={tasksURL} />
+    ));
     setRenderedTasks(renderedTasks);
   };
-
-  const { data, isLoading, error, mutate } = useSWR(`${config.backend_server}/tasks/group/1`, fetcher);
 
   useEffect(() => {
     if (!isLoading && data) {
       renderTasks(data);
     }
   }, [isLoading, data, error, selected]);
-
-  console.log(data);
 
   return (
     <View style={styles.container}>

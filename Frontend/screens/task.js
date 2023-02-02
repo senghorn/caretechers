@@ -5,12 +5,18 @@ import Description from '../components/task/description';
 import Header from '../components/task/header';
 import RepeatBehavior from '../components/task/repeatBehavior';
 import config from '../constants/config';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Task({ route, navigation }) {
-  const { title, id } = route.params;
+  const { title, id, mutateString } = route.params;
+
+  const { mutate } = useSWRConfig();
+
+  const tasksMutate = () => {
+    mutate(mutateString);
+  };
 
   const [titleState, setTitleState] = useState(title);
 
@@ -121,9 +127,7 @@ export default function Task({ route, navigation }) {
                 repeat_pattern: editRepeat,
               };
 
-              console.log(body);
-
-              await editTask(id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate);
+              await editTask(id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate, tasksMutate);
             }}
           >
             Save Task
@@ -138,7 +142,7 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-const editTask = async (id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate) => {
+const editTask = async (id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate, tasksMutate) => {
   setLoading(true);
   try {
     await fetch(`${config.backend_server}/tasks/${id}`, {
@@ -149,11 +153,12 @@ const editTask = async (id, body, setLoading, setEditMode, setTitleState, taskMu
   } catch (error) {
     console.log(error);
   } finally {
+    await taskMutate();
+    await repeatMutate();
     setTitleState(body.title);
     setLoading(false);
     setEditMode(false);
-    taskMutate();
-    repeatMutate();
+    tasksMutate();
   }
 };
 
