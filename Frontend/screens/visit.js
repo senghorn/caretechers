@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert, ScrollView } from 'react-native';
 import Header from '../components/visit/header';
 import useSWR from 'swr';
 import { format } from 'date-fns';
@@ -71,12 +71,42 @@ export default function Visit({ route, navigation }) {
         <View style={{ width: 48 }} />
         <SectionSelector text="Notes" selected={selected} setSelected={setSelected} />
       </View>
-      <Tasks tasks={tasks} tasksURL={tasksURL} date={date} navigation={navigation} isLoading={tasksLoading} error={tasksError} />
+      {selected === 'Tasks' && (
+        <Tasks
+          tasks={tasks}
+          tasksURL={tasksURL}
+          date={date}
+          navigation={navigation}
+          isLoading={tasksLoading}
+          error={tasksError}
+        />
+      )}
+      {selected === 'Notes' && (
+        <ScrollView style={styles.visitNotesContainer}>
+          <Text style={styles.visitNotes}>{visit.visit_notes}</Text>
+        </ScrollView>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: 'red',
+    marginBottom: 40,
+  },
+  visitNotesContainer: {
+    backgroundColor: '#ededed',
+    marginHorizontal: 16,
+    marginTop: 10,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 40,
+  },
+  visitNotes: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
   sectionSelectContainer: {
     flex: 0,
     flexDirection: 'row',
@@ -87,7 +117,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     flexDirection: 'column',
-    marginBottom: 40,
   },
   daySummaryContainer: {
     height: 72,

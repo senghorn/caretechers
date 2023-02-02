@@ -9,7 +9,7 @@ module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
   // TO-DO: validate variables
 
   const query = sql`SELECT DATE_FORMAT(Days.the_date, '%Y-%m-%d') AS date, COUNT(tasks.id) as taskCount, COUNT(past_tasks.id) AS completedTaskCount,
-      visits.id AS visitId, visits.visitor, IFNULL(visits.completed, 0) AS visitCompleted, users.first_name, users.last_name, users.phone_num AS phone,
+      visits.id AS visitId, visits.visitor, visits.visit_notes, IFNULL(visits.completed, 0) AS visitCompleted, users.first_name, users.last_name, users.phone_num AS phone,
       tasks.group_id as groupId, gr.name AS groupName, gr.timezone as timeZone
 
       FROM (SELECT DATE_SUB(${start}, INTERVAL 1 DAY) + INTERVAL (day) DAY AS the_date FROM Day_Indexes) Days
