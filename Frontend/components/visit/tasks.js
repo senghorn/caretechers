@@ -1,7 +1,6 @@
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { Checkbox } from 'react-native-paper';
-import config from '../../constants/config';
 import Task from '../tasks/task';
 
 export default function Tasks({ tasks, date, isLoading, error, navigation, tasksURL }) {
@@ -41,6 +40,7 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: 'row',
     alignItems: 'center',
+    paddingRight: 8,
   },
   container: {
     flex: 1,

@@ -2,13 +2,23 @@ const sql = require('sql-template-strings');
 const db = require('../database');
 const asyncHandler = require('express-async-handler');
 
-module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
+module.exports.createVisit = asyncHandler(async (req, _res, next) => {
+  const { groupId } = req.params;
+  const { date, userEmail } = req.body;
+
+  const query = sql`INSERT INTO Visits (date, visitor, group_id) VALUES (${date}, ${userEmail}, ${groupId});`;
+
+  req.result = await db.query(query);
+  next();
+});
+
+module.exports.getVisitsByDateRange = asyncHandler(async (req, _res, next) => {
   const { groupId } = req.params;
   const { start, end } = req.query;
 
   // TO-DO: validate variables
 
-  const query = sql`SELECT DATE_FORMAT(Days.the_date, '%Y-%m-%d') AS date, COUNT(tasks.id) as taskCount, COUNT(past_tasks.id) AS completedTaskCount,
+  const query = sql`SELECT DATE_FORMAT(Days.the_date, '%Y-%m-%d') AS date, COUNT(tasks.id) as taskCount, COUNT(completed_tasks.id) AS completedTaskCount,
       visits.id AS visitId, visits.visitor, visits.visit_notes, IFNULL(visits.completed, 0) AS visitCompleted, users.first_name, users.last_name, users.phone_num AS phone,
       tasks.group_id as groupId, gr.name AS groupName, gr.timezone as timeZone
 
@@ -26,7 +36,7 @@ module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
 
       LEFT JOIN TaskMeta tasks ON tasks.id = valid_tasks.id AND (tasks.id = repeats.task_id OR DATE(tasks.start_date) = Days.the_date)
       LEFT JOIN Visits visits ON visits.date = Days.the_date
-      LEFT JOIN Tasks past_tasks ON past_tasks.meta_id = tasks.id AND past_tasks.occurence_date = Days.the_date
+      LEFT JOIN Tasks completed_tasks ON completed_tasks.meta_id = tasks.id AND completed_tasks.occurence_date = Days.the_date AND completed_tasks.completed = 1
       LEFT JOIN Users users ON users.email = visits.visitor
 
       WHERE Days.the_date BETWEEN ${start} AND ${end}

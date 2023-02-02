@@ -6,9 +6,11 @@ const sharedMiddleware = require('../middlewares/shared');
 
 const router = Router();
 
+router.post('/group/:groupId', [groupMiddleware.checkIfGroupExists, visitsMiddleware.createVisit, sharedMiddleware.sendResult]);
+
 router.get('/group/:groupId', [
   groupMiddleware.checkIfGroupExists,
-  visitsMiddleware.getTasksByDateRange,
+  visitsMiddleware.getVisitsByDateRange,
   sharedMiddleware.sendResult,
 ]);
 
