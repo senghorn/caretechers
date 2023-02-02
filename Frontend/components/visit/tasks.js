@@ -14,13 +14,13 @@ export default function Tasks({ tasks, date, isLoading, navigation }) {
   return <ScrollView style={styles.container}>{renderedTasks}</ScrollView>;
 }
 
-function TaskWrapper({ task, navigation, date }) {
+function TaskWrapper({ task, navigation }) {
   return (
     <View style={styles.checkboxContainer}>
       <View>
         <Checkbox.Android status={task.taskCompleted ? 'checked' : 'unchecked'} color="#199b1e" />
       </View>
-      <Task backTo={date} showIcon={false} title={task.title} key={task.id} navigation={navigation} id={task.id} />
+      <Task showIcon={false} title={task.title} key={task.id} navigation={navigation} id={task.id} />
     </View>
   );
 }

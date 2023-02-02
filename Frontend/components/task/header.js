@@ -6,7 +6,7 @@ import CalendarRefreshContext from '../../services/context/CalendarRefreshContex
 import TasksRefreshContext from '../../services/context/TasksRefreshContext';
 import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
 
-export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons, backTo }) {
+export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
   const [refreshTasks] = useContext(TasksRefreshContext);
   const [refreshVisitTasks] = useContext(VisitTasksRefreshContext);
   const [refreshCalendar] = useContext(CalendarRefreshContext);
@@ -16,11 +16,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
         <Appbar.Action
           icon="chevron-left"
           onPress={() => {
-            if (backTo) {
-              navigation.navigate('Visit', { date: backTo });
-            } else {
-              navigation.navigate('Home');
-            }
+            navigation.goBack();
           }}
         />
         {editMode ? (
@@ -61,11 +57,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
                       text: 'Confirm',
                       onPress: async () => {
                         await deleteTask(id, refreshTasks, refreshVisitTasks, refreshCalendar);
-                        if (backTo) {
-                          navigation.navigate('Visit', { date: backTo });
-                        } else {
-                          navigation.navigate('Home');
-                        }
+                        navigation.goBack();
                       },
                       style: 'destructive',
                     },

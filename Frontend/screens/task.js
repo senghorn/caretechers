@@ -15,7 +15,7 @@ import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshConte
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Task({ route, navigation }) {
-  const { title, id, backTo } = route.params;
+  const { title, id } = route.params;
 
   const [refreshCalendar] = useContext(CalendarRefreshContext);
 
@@ -80,7 +80,6 @@ export default function Task({ route, navigation }) {
       <Header
         id={id}
         navigation={navigation}
-        backTo={backTo}
         hideButtons={id === 'new'}
         title={titleState}
         editMode={editMode}
@@ -121,7 +120,7 @@ export default function Task({ route, navigation }) {
             color="red"
             style={styles.cancelbutton}
             onPress={() => {
-              if (id === 'new') navigation.navigate(backTo || 'Home');
+              if (id === 'new') navigation.goBack();
               else setEditMode(false);
             }}
           >
