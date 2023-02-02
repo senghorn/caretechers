@@ -17,32 +17,43 @@ export default function Description({ id, editMode }) {
         <Text style={styles.header}>Description</Text>
         {isLoading ? (
           <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
-        ) : editMode ? (
-          <TextInput
-            multiline={true}
-            numberOfLines={4}
-            style={styles.descriptionBorder}
-            label=""
-            value={data[0].description}
-            onChangeText={(text) => {}}
-            selectionColor="#2196f3"
-            underlineColor="#2196f3"
-            activeUnderlineColor="#2196f3"
-          />
         ) : (
-          <View style={styles.descriptionBorderLocked}>
-            <Text style={styles.description}>{data[0].description}</Text>
-          </View>
+          <Fragment>
+            <DescriptionField editMode={editMode} isLoading={isLoading} data={data} />
+            <Text style={styles.header}>Schedule</Text>
+            <View style={styles.selectDateContainer}>
+              <Text style={styles.takesPlaceText}>Starts {!editMode && format(new Date(data[0].start_date), 'MMMM do, y')}</Text>
+              {editMode && (
+                <DateTimePicker testID="dateTimePicker" value={new Date()} mode={'date'} is24Hour={true} onChange={() => {}} />
+              )}
+            </View>
+          </Fragment>
         )}
-        <Text style={styles.header}>Schedule</Text>
-        <View style={styles.selectDateContainer}>
-          <Text style={styles.takesPlaceText}>Starts {format(new Date(data[0].start_date), 'MMMM do, y')}</Text>
-          {editMode && (
-            <DateTimePicker testID="dateTimePicker" value={new Date()} mode={'date'} is24Hour={true} onChange={() => {}} />
-          )}
-        </View>
       </View>
     </Fragment>
+  );
+}
+
+function DescriptionField({ editMode, data }) {
+  if (editMode) {
+    return (
+      <TextInput
+        multiline={true}
+        numberOfLines={4}
+        style={styles.descriptionBorder}
+        label=""
+        value={data[0].description}
+        onChangeText={(text) => {}}
+        selectionColor="#2196f3"
+        underlineColor="#2196f3"
+        activeUnderlineColor="#2196f3"
+      />
+    );
+  }
+  return (
+    <View style={styles.descriptionBorderLocked}>
+      <Text style={styles.description}>{data && data[0].description}</Text>
+    </View>
   );
 }
 

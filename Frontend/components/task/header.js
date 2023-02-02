@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { Appbar, TextInput } from 'react-native-paper';
 
 export default function Header({ title, navigation, editMode, setEditMode }) {
@@ -18,14 +18,33 @@ export default function Header({ title, navigation, editMode, setEditMode }) {
         )}
         <Appbar.Action
           icon="pencil-box-multiple"
+          color="#1664a1"
           onPress={() => {
-            navigation.navigate('Home');
+            setEditMode(!editMode);
           }}
         />
         <Appbar.Action
           icon="delete-empty"
+          color="#D11A2A"
           onPress={() => {
-            navigation.navigate('Home');
+            Alert.alert(
+              'Are you sure you want to delete this task?',
+              '', // <- this part is optional, you can pass an empty string
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Confirm',
+                  onPress: () => Alert.alert('Confirm Pressed'),
+                  style: 'destructive',
+                },
+              ],
+              {
+                cancelable: true,
+              }
+            );
           }}
         />
       </Appbar.Header>
