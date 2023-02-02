@@ -75,6 +75,7 @@ export default function BottomNavigation({ route, navigation }) {
         <Tab.Screen
           name="Tasks"
           component={Tasks}
+          navigation={navigation}
           options={{
             tabBarIcon: ({ color }) => <MaterialCommunityIcons name="checkbox-multiple-marked" color={color} size={26} />,
           }}

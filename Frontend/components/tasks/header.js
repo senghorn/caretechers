@@ -17,17 +17,11 @@ export default function Header({ title, id, selected, setSelected }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    paddingTop: 64,
-  },
   header: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '500',
     marginHorizontal: 8,
-    borderRadius: '100%',
+    borderRadius: 8,
   },
   headerContainer: {
     flexDirection: 'row',

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, Modal, Text } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { Button } from 'react-native-paper';
 import CreateTaskModal from '../components/tasks/createTaskModal';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
 import config from '../constants/config';
 
-const connectToBackend = async (selected, setRenderedTasks, setLoading) => {
+const connectToBackend = async (selected, setRenderedTasks, setLoading, navigation) => {
   try {
     const result = await fetch(`${config.backend_server}/tasks/group/1`);
     let tasks = await result.json();
@@ -15,9 +16,7 @@ const connectToBackend = async (selected, setRenderedTasks, setLoading) => {
     } else {
       tasks = tasks.filter((task) => !(task.rp_id && task.day_of_week === null));
     }
-    const renderedTasks = tasks.map((task) => (
-      <Task title={task.description} key={task.id} reccurence={task.recurring_type} selected={selected} />
-    ));
+    const renderedTasks = tasks.map((task) => <Task title={task.title} key={task.id} navigation={navigation} id={task.id} />);
 
     setRenderedTasks(renderedTasks);
     setLoading(false);
@@ -26,7 +25,7 @@ const connectToBackend = async (selected, setRenderedTasks, setLoading) => {
   }
 };
 
-export default function Tasks() {
+export default function Tasks({ navigation }) {
   const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +33,7 @@ export default function Tasks() {
 
   const refresh = () => {
     setLoading(true);
-    connectToBackend(selected, setRenderedTasks, setLoading);
+    connectToBackend(selected, setRenderedTasks, setLoading, navigation);
   };
 
   useEffect(() => {
