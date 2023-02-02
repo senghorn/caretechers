@@ -6,9 +6,25 @@ const sql = require('sql-template-strings');
 const db = require('../database');
 const { newError } = require('../utls');
 
+module.exports.getTaskById = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT TM.title, TM.description, TM.start_date, TM.end_date
+                    FROM TaskMeta TM
+                    WHERE TM.id=${req.params.taskId} AND TM.group_id = ${req.params.groupId};`;
+  req.result = await db.query(query);
+  next();
+});
+
+module.exports.getTaskRepeats = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT TM.start_date, TM.end_date, RP.* FROM TaskMeta TM LEFT JOIN RecurringPattern RP ON RP.task_id = ${req.params.taskId} WHERE TM.id=${req.params.taskId};`;
+  req.result = await db.query(query);
+  next();
+});
+
 module.exports.getTasksByGroup = asyncHandler(async (req, _res, next) => {
-  const query = sql`SELECT * FROM TaskMeta TM
-					JOIN RecurringPattern RP on TM.id = RP.task_id
+  const query = sql`SELECT TM.id, TM.group_id, TM.title, TM.description, TM.start_date, TM.end_date, 
+          RP.task_id AS rp_id, RP.separation_count, RP.day_of_week, RP.week_of_month, RP.day_of_month, RP.month_of_year
+          FROM TaskMeta TM
+					LEFT JOIN RecurringPattern RP on TM.id = RP.task_id
 					WHERE TM.group_id = ${req.params.groupId};`;
   req.result = await db.query(query);
   next();
@@ -56,6 +72,41 @@ module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
   next();
 });
 
+module.exports.createTask = asyncHandler(async (req, _res, next) => {
+  const query = sql`INSERT INTO TaskMeta (group_id, title, description, start_date) 
+                    VALUES (${req.params.groupId}, ${req.body.title}, ${req.body.description}, ${req.body.start_date});`;
+
+  const result = await db.query(query);
+
+  if (req.body.repeat_pattern) {
+    const insertQuery = sql`INSERT INTO RecurringPattern (task_id, separation_count, 
+                     day_of_week, week_of_month, day_of_month, month_of_year, recurring_type) VALUES (${result.insertId}, ${req.body.repeat_pattern.separation_count},
+                     ${req.body.repeat_pattern.day_of_week}, ${req.body.repeat_pattern.week_of_month}, ${req.body.repeat_pattern.day_of_month}, ${req.body.repeat_pattern.month_of_year},
+                     ${req.body.repeat_pattern.recurring_type});`;
+    await db.query(insertQuery);
+  }
+
+  req.result = result;
+  next();
+});
+
+module.exports.editTask = asyncHandler(async (req, _res, next) => {
+  const query = sql`UPDATE TaskMeta SET title=${req.body.title}, description=${req.body.description}, start_date=${req.body.start_date} WHERE id=${req.params.taskId};`;
+
+  const deleteQuery = sql`DELETE FROM RecurringPattern WHERE task_id = ${req.params.taskId};`;
+  await db.query(deleteQuery);
+  if (req.body.repeat_pattern) {
+    const insertQuery = sql`INSERT INTO RecurringPattern (task_id, separation_count, 
+                     day_of_week, week_of_month, day_of_month, month_of_year, recurring_type) VALUES (${req.params.taskId}, ${req.body.repeat_pattern.separation_count},
+                     ${req.body.repeat_pattern.day_of_week}, ${req.body.repeat_pattern.week_of_month}, ${req.body.repeat_pattern.day_of_month}, ${req.body.repeat_pattern.month_of_year},
+                     ${req.body.repeat_pattern.recurring_type});`;
+    await db.query(insertQuery);
+  }
+
+  req.result = await db.query(query);
+  next();
+});
+
 // *** THIS MIDDLEWARE WILL BE USED LATER FOR COMPLICATED RECURRENCE PATTERNS ***
 // module.exports.sortTasksByType = asyncHandler(async (req, _res, next) => {
 // 	let sortedTasks = {
@@ -91,7 +142,7 @@ module.exports.verifyTaskIsValid = (req, _res, next) => {
       day_of_month: { type: 'integer' },
       month_of_year: { type: 'integer' },
     },
-    required: ['title', 'start_date', 'is_recurring'],
+    required: ['title', 'start_date'],
   };
   const validate = ajv.compile(schema);
   if (!validate(req.body)) {
@@ -99,6 +150,38 @@ module.exports.verifyTaskIsValid = (req, _res, next) => {
   }
   next();
 };
+
+module.exports.createNewTask2 = asyncHandler(async (req, _res, next) => {
+  let columns = ['title', 'group_id', 'start_date'];
+  if (req.body.description) {
+    columns.push('description');
+  }
+  if (req.body.endDate) {
+    columns.push('end_date');
+  }
+
+  let query = sql`INSERT INTO TaskMeta(`;
+
+  for (let i = 0; i < columns.length; i++) {
+    if (i === columns.length - 1) {
+      query.append(`${columns[i]}) `);
+      query.append(sql`VALUES(${req.body.title}, ${req.params.groupId}, ${req.body.start_date}`);
+    } else {
+      query.append(`${columns[i]}, `);
+    }
+  }
+
+  if (req.body.description) {
+    query.append(sql`, ${req.body.description}`);
+  }
+  if (req.body.endDate) {
+    query.append(sql`, ${req.body.end_date}`);
+  }
+  query.append(sql`);`);
+
+  const [result] = await db.query(query);
+  console.log(result);
+});
 
 module.exports.createNewTask = asyncHandler(async (req, _res, next) => {
   let columns = ['title', 'group_id', 'start_date', 'is_recurring'];
@@ -113,7 +196,7 @@ module.exports.createNewTask = asyncHandler(async (req, _res, next) => {
   for (let i = 0; i < columns.length; i++) {
     if (i === columns.length - 1) {
       query.append(`${columns[i]}) `);
-      query.append(sql`VALUES(${req.body.title}, ${req.params.groupId}, ${req.body.start_date}, ${req.body.is_recurring}`);
+      query.append(sql`VALUES(${req.body.title}, ${req.params.groupId}, ${req.body.start_date}`);
     } else {
       query.append(`${columns[i]}, `);
     }

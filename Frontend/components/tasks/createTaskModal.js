@@ -1,6 +1,8 @@
+import { format, startOfDay } from 'date-fns';
 import { useState } from 'react';
 import { Modal, View, Text, StyleSheet } from 'react-native';
 import { Button, Switch, TextInput } from 'react-native-paper';
+import config from '../../constants/config';
 
 export default function CreateTaskModal({ visible, setVisible, refresh }) {
   const [taskName, setTaskName] = useState('');
@@ -71,14 +73,14 @@ const createTask = async (title, everyVisit, setLoading) => {
   const newTask = {
     title,
     description: title,
-    start_date: '2023-1-31',
-    is_recurring: true,
+    start_date: format(startOfDay(new Date()), 'yyyy-MM-dd'),
+    is_recurring: false,
     recurring_type: everyVisit ? 'everytime' : 'monthly',
     day_of_week: 135,
   };
 
   try {
-    await fetch('http://ec2-54-153-120-183.us-west-1.compute.amazonaws.com:3000/tasks/group/1', {
+    await fetch(`${config.backend_server}/tasks/group/1`, {
       method: 'POST',
       headers,
       body: JSON.stringify(newTask),
