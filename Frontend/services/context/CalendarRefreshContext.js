@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-// User context
+// Calendar refresh context
 const CalendarRefreshContext = createContext();
 
 export default CalendarRefreshContext;

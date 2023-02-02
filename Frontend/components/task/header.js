@@ -1,20 +1,11 @@
-import { Fragment } from 'react';
+import { Fragment, useContext } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Appbar, TextInput } from 'react-native-paper';
 import config from '../../constants/config';
+import TasksRefreshContext from '../../services/context/TasksRefreshContext';
 
-export default function Header({
-  id,
-  title,
-  navigation,
-  editMode,
-  setEditMode,
-  editTitle,
-  setEditTitle,
-  hideButtons,
-  backTo,
-  tasksMutate,
-}) {
+export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons, backTo }) {
+  const [refreshTasks] = useContext(TasksRefreshContext);
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
@@ -65,7 +56,7 @@ export default function Header({
                     {
                       text: 'Confirm',
                       onPress: async () => {
-                        await deleteTask(id, tasksMutate);
+                        await deleteTask(id, refreshTasks);
                         if (backTo) {
                           navigation.navigate('Visit', { date: backTo });
                         } else {
