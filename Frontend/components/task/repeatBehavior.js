@@ -9,6 +9,8 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
   const [expanded, setExpanded] = useState(false);
   const [title, setTitle] = useState('Does not repeat');
 
+  const dateToUse = !isLoading && data.length > 0 ? new Date(data[0].start_date) : new Date();
+
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -58,7 +60,7 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
               setExpanded={setExpanded}
             />
             <RepeatItem
-              title={`Weekly on ${format(new Date(data[0].start_date), 'EEEE')}`}
+              title={`Weekly on ${format(dateToUse, 'EEEE')}`}
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
@@ -66,7 +68,7 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
               setEditRepeat={() => {
                 setEditRepeat({
                   separation_count: 0,
-                  day_of_week: getDay(new Date(data[0].start_date)),
+                  day_of_week: getDay(dateToUse),
                   week_of_month: null,
                   day_of_month: -1,
                   month_of_year: null,
@@ -77,13 +79,12 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
               setExpanded={setExpanded}
             />
             <RepeatItem
-              title={`Annually on ${format(new Date(data[0].start_date), 'MMMM qo')}`}
+              title={`Annually on ${format(dateToUse, 'MMMM qo')}`}
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                const dateToUse = new Date(data[0].start_date);
                 setEditRepeat({
                   separation_count: 0,
                   day_of_week: -1,

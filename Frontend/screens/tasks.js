@@ -52,7 +52,7 @@ export default function Tasks({ navigation }) {
         uppercase={false}
         color="#2196f3"
         icon="checkbox-marked-circle-plus-outline"
-        onPress={() => setCreateTaskModalVisible(true)}
+        onPress={() => navigation.navigate('Task', { title: '', id: 'new', mutateString: tasksURL })}
         style={styles.createButton}
         labelStyle={styles.createButtonText}
       >

@@ -1,7 +1,8 @@
+import { Fragment } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Appbar, TextInput } from 'react-native-paper';
 
-export default function Header({ title, navigation, editMode, setEditMode, editTitle, setEditTitle }) {
+export default function Header({ title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
@@ -24,37 +25,41 @@ export default function Header({ title, navigation, editMode, setEditMode, editT
         ) : (
           <Appbar.Content title={title} titleStyle={styles.titleText} />
         )}
-        <Appbar.Action
-          icon="pencil-box-multiple"
-          color="#1664a1"
-          onPress={() => {
-            setEditMode(!editMode);
-          }}
-        />
-        <Appbar.Action
-          icon="delete-empty"
-          color="#D11A2A"
-          onPress={() => {
-            Alert.alert(
-              'Are you sure you want to delete this task?',
-              '', // <- this part is optional, you can pass an empty string
-              [
-                {
-                  text: 'Cancel',
-                  style: 'cancel',
-                },
-                {
-                  text: 'Confirm',
-                  onPress: () => Alert.alert('Confirm Pressed'),
-                  style: 'destructive',
-                },
-              ],
-              {
-                cancelable: true,
-              }
-            );
-          }}
-        />
+        {!hideButtons && (
+          <Fragment>
+            <Appbar.Action
+              icon="pencil-box-multiple"
+              color="#1664a1"
+              onPress={() => {
+                setEditMode(!editMode);
+              }}
+            />
+            <Appbar.Action
+              icon="delete-empty"
+              color="#D11A2A"
+              onPress={() => {
+                Alert.alert(
+                  'Are you sure you want to delete this task?',
+                  '', // <- this part is optional, you can pass an empty string
+                  [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Confirm',
+                      onPress: () => Alert.alert('Confirm Pressed'),
+                      style: 'destructive',
+                    },
+                  ],
+                  {
+                    cancelable: true,
+                  }
+                );
+              }}
+            />
+          </Fragment>
+        )}
       </Appbar.Header>
     </View>
   );
