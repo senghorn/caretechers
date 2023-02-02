@@ -5,10 +5,11 @@ import { format } from 'date-fns';
 import DaySummary from '../components/calendar/daySummary';
 import { AntDesign } from '@expo/vector-icons';
 import SectionSelector from '../components/visit/sectionSelector';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Tasks from '../components/visit/tasks';
 
 import config from '../constants/config';
+import UserContext from '../services/context/UserContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -21,11 +22,13 @@ export default function Visit({ route, navigation }) {
 
   const tasksURL = `${config.backend_server}/tasks/group/1/range?start=${dateString}&end=${dateString}`;
 
+  const user = useContext(UserContext);
+
   const {
     data: visits,
     error: visitError,
     isLoading: visitLoading,
-  } = useSWR(`${config.backend_server}/visits/group/1?start=${dateString}&end=${dateString}`, fetcher);
+  } = useSWR(`${config.backend_server}/visits/group/${user.group_id}?start=${dateString}&end=${dateString}`, fetcher);
 
   const { data: tasks, error: tasksError, isLoading: tasksLoading } = useSWR(tasksURL, fetcher);
 

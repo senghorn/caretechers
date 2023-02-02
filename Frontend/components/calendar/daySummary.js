@@ -132,7 +132,7 @@ const volunteerForVisit = async (date, user) => {
   };
 
   try {
-    await fetch(`${config.backend_server}/visits/group/1`, {
+    await fetch(`${config.backend_server}/visits/group/${user.group_id}`, {
       method: 'POST',
       headers,
       body: JSON.stringify(newVisit),
