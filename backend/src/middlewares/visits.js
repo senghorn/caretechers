@@ -35,7 +35,7 @@ module.exports.getVisitsByDateRange = asyncHandler(async (req, _res, next) => {
       )
 
       LEFT JOIN TaskMeta tasks ON tasks.id = valid_tasks.id AND (tasks.id = repeats.task_id OR DATE(tasks.start_date) = Days.the_date)
-      LEFT JOIN Visits visits ON visits.date = Days.the_date
+      LEFT JOIN Visits visits ON visits.date = Days.the_date AND visits.group_id = ${groupId}
       LEFT JOIN Tasks completed_tasks ON completed_tasks.meta_id = tasks.id AND completed_tasks.occurence_date = Days.the_date AND completed_tasks.completed = 1
       LEFT JOIN Users users ON users.email = visits.visitor
 
