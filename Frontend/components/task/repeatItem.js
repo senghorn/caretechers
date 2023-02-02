@@ -1,13 +1,14 @@
 import { StyleSheet, Text } from 'react-native';
 import { List } from 'react-native-paper';
 
-export default function RepeatItem({ title, setSelected, setExpanded }) {
+export default function RepeatItem({ title, setSelected, setExpanded, editMode, setEditRepeat }) {
   return (
     <List.Item
       title={title}
       onPress={() => {
         setExpanded(false);
-        setSelected(title);
+        if (editMode) setEditRepeat(title);
+        else setSelected(title);
       }}
     />
   );

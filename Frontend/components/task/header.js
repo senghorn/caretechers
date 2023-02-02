@@ -1,7 +1,7 @@
 import { Alert, StyleSheet, View } from 'react-native';
 import { Appbar, TextInput } from 'react-native-paper';
 
-export default function Header({ title, navigation, editMode, setEditMode }) {
+export default function Header({ title, navigation, editMode, setEditMode, editTitle, setEditTitle }) {
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
@@ -12,7 +12,15 @@ export default function Header({ title, navigation, editMode, setEditMode }) {
           }}
         />
         {editMode ? (
-          <TextInput style={styles.titleInput} label="Title" value={title} mode="outlined" />
+          <TextInput
+            style={styles.titleInput}
+            label="Title"
+            value={editTitle}
+            onChangeText={(text) => {
+              setEditTitle(text);
+            }}
+            mode="outlined"
+          />
         ) : (
           <Appbar.Content title={title} titleStyle={styles.titleText} />
         )}
