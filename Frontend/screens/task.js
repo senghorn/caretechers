@@ -72,6 +72,7 @@ export default function Task({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Header
+        id={id}
         navigation={navigation}
         backTo={backTo}
         hideButtons={id === 'new'}
@@ -80,6 +81,7 @@ export default function Task({ route, navigation }) {
         setEditMode={setEditMode}
         editTitle={editTitle}
         setEditTitle={setEditTitle}
+        tasksMutate={tasksMutate}
       />
       <ScrollView style={styles.scrollContainer}>
         <Description

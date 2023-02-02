@@ -1,8 +1,20 @@
 import { Fragment } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Appbar, TextInput } from 'react-native-paper';
+import config from '../../constants/config';
 
-export default function Header({ title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons, backTo }) {
+export default function Header({
+  id,
+  title,
+  navigation,
+  editMode,
+  setEditMode,
+  editTitle,
+  setEditTitle,
+  hideButtons,
+  backTo,
+  tasksMutate,
+}) {
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
@@ -52,7 +64,14 @@ export default function Header({ title, navigation, editMode, setEditMode, editT
                     },
                     {
                       text: 'Confirm',
-                      onPress: () => Alert.alert('Confirm Pressed'),
+                      onPress: async () => {
+                        await deleteTask(id, tasksMutate);
+                        if (backTo) {
+                          navigation.navigate('Visit', { date: backTo });
+                        } else {
+                          navigation.navigate('Home');
+                        }
+                      },
                       style: 'destructive',
                     },
                   ],
@@ -68,6 +87,25 @@ export default function Header({ title, navigation, editMode, setEditMode, editT
     </View>
   );
 }
+
+const headers = {
+  'Content-Type': 'application/json',
+};
+
+const deleteTask = async (id, tasksMutate) => {
+  const url = `${config.backend_server}/tasks/${id}`;
+  const method = 'DELETE';
+  try {
+    await fetch(url, {
+      method: method,
+      headers,
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    tasksMutate();
+  }
+};
 
 const styles = StyleSheet.create({
   outerContainer: {
