@@ -1,5 +1,5 @@
 import { View, StyleSheet } from "react-native";
-import { Text, Searchbar,Divider } from "react-native-paper";
+import { Text, Searchbar } from "react-native-paper";
 import { useState } from "react";
 
 export default function TopBar() {

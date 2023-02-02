@@ -19,7 +19,7 @@ const axios = require("axios").default;
  * @return True : on success
  *         False: on error
  */
-const createUser = async (first, last, email, phone, group) => {
+const createUser = async (first, last, email, phone, group, photo) => {
   try {
     const data = {
       email: email,
@@ -27,6 +27,7 @@ const createUser = async (first, last, email, phone, group) => {
       lastName: last,
       phoneNum: phone,
       groupId: group,
+      profilePic: photo,
     };
     let connection_string = config.backend_server + "/user";
     return await axios
@@ -35,15 +36,14 @@ const createUser = async (first, last, email, phone, group) => {
         return true;
       })
       .catch(function (error) {
-        console.log("create user error",error);
+        console.log("create user error", error);
         return false;
       });
   } catch (error) {
-    console.log('error', error.message);
+    console.log("error", error.message);
   }
   return false;
 };
-
 
 const Group = ({ navigation, route }) => {
   const [groups, setGroups] = useState([]); // Groups the user are in
@@ -57,7 +57,15 @@ const Group = ({ navigation, route }) => {
   useEffect(() => {
     if (selectedGroup != null) {
       user["group"] = selectedGroup.id;
-      const created = createUser(user.first, user.last, user.email, user.phone, selectedGroup.id);
+
+      const created = createUser(
+        user.first,
+        user.last,
+        user.email,
+        user.phone,
+        selectedGroup.id,
+        user.picture
+      );
       if (created) {
         navigation.navigate("Home", { user: user });
       } else {

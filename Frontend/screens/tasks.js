@@ -1,44 +1,41 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, Modal, Text } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { Button } from 'react-native-paper';
 import CreateTaskModal from '../components/tasks/createTaskModal';
 import Header from '../components/tasks/header';
 import Task from '../components/tasks/task';
+import config from '../constants/config';
+import useSWR from 'swr';
 
-const connectToBackend = async (selected, setRenderedTasks, setLoading) => {
-  try {
-    const result = await fetch('http://ec2-54-153-120-183.us-west-1.compute.amazonaws.com:3000/tasks/group/1');
-    let tasks = await result.json();
-    if (selected === 'every') {
-      tasks = tasks.filter((task) => task.recurring_type === 'everytime');
-    } else {
-      tasks = tasks.filter((task) => task.recurring_type !== 'everytime');
-    }
-    const renderedTasks = tasks.map((task) => (
-      <Task title={task.description} key={task.id} reccurence={task.recurring_type} selected={selected} />
-    ));
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-    setRenderedTasks(renderedTasks);
-    setLoading(false);
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-export default function Tasks() {
+export default function Tasks({ navigation }) {
   const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [createTaskModalVisible, setCreateTaskModalVisible] = useState(false);
 
-  const refresh = () => {
-    setLoading(true);
-    connectToBackend(selected, setRenderedTasks, setLoading);
+  const tasksURL = `${config.backend_server}/tasks/group/1`;
+
+  const { data, isLoading, error, mutate } = useSWR(tasksURL, fetcher);
+
+  const renderTasks = (tasks) => {
+    if (selected === 'every') {
+      tasks = tasks.filter((task) => task.rp_id && task.day_of_week === null);
+    } else {
+      tasks = tasks.filter((task) => !(task.rp_id && task.day_of_week === null));
+    }
+    const renderedTasks = tasks.map((task) => (
+      <Task title={task.title} key={task.id} navigation={navigation} id={task.id} mutateString={tasksURL} />
+    ));
+    setRenderedTasks(renderedTasks);
   };
 
   useEffect(() => {
-    refresh();
-  }, [selected]);
+    if (!isLoading && data) {
+      renderTasks(data);
+    }
+  }, [isLoading, data, error, selected]);
 
   return (
     <View style={styles.container}>
@@ -46,16 +43,16 @@ export default function Tasks() {
         <Header title="Every Visit" id="every" selected={selected} setSelected={setSelected} />
         <Header title="Scheduled" id="scheduled" selected={selected} setSelected={setSelected} />
       </View>
-      <CreateTaskModal visible={createTaskModalVisible} setVisible={setCreateTaskModalVisible} refresh={refresh} />
+      <CreateTaskModal visible={createTaskModalVisible} setVisible={setCreateTaskModalVisible} refresh={mutate} />
       <ScrollView style={styles.tasksContainer}>
-        {loading ? <ActivityIndicator size="large" color="#2196f3" style={styles.loader} /> : renderedTasks}
+        {isLoading ? <ActivityIndicator size="large" color="#2196f3" style={styles.loader} /> : renderedTasks}
       </ScrollView>
       <Button
         mode="contained"
         uppercase={false}
         color="#2196f3"
         icon="checkbox-marked-circle-plus-outline"
-        onPress={() => setCreateTaskModalVisible(true)}
+        onPress={() => navigation.navigate('Task', { title: '', id: 'new', mutateString: tasksURL })}
         style={styles.createButton}
         labelStyle={styles.createButtonText}
       >

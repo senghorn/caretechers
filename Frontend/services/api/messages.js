@@ -61,7 +61,7 @@ export async function FetchUsers(group_id, setUsers) {
                 users[user.email] = {
                     _id: user.email,
                     name: user.first_name + " " + user.last_name,
-                    avatar: ""
+                    avatar: user.profile_pic ? user.profile_pic : ""
                 }
             });
 

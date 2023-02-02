@@ -50,10 +50,14 @@ export default function Calendar({ navigation }) {
     setResetScreen(false);
   }, [renderingDataForFlatList]);
 
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     `${config.backend_server}/visits/group/1?start=${startDateString}&end=${endDateString}`,
     fetcher
   );
+
+  useEffect(() => {
+    mutate();
+  }, []);
 
   useEffect(() => {
     if (data) setDateToVisitsMap(getDateToVisitsMap(data));
