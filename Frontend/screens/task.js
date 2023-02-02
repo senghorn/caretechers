@@ -134,9 +134,7 @@ export default function Task({ route, navigation }) {
                 repeat_pattern: editRepeat,
               };
 
-              if (id === 'new') {
-                console.log(body);
-              } else await editTask(id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate, tasksMutate);
+              await saveTask(id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate, tasksMutate, navigation);
             }}
           >
             {id === 'new' ? 'Create Task' : 'Save Task'}
@@ -151,23 +149,29 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-const editTask = async (id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate, tasksMutate) => {
+const saveTask = async (id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate, tasksMutate, navigation) => {
   setLoading(true);
+  const url = id === 'new' ? `${config.backend_server}/tasks/group/1` : `${config.backend_server}/tasks/${id}`;
+  const method = id === 'new' ? 'POST' : 'PUT';
   try {
-    await fetch(`${config.backend_server}/tasks/${id}`, {
-      method: 'PUT',
+    await fetch(url, {
+      method: method,
       headers,
       body: JSON.stringify(body),
     });
   } catch (error) {
     console.log(error);
   } finally {
-    await taskMutate();
-    await repeatMutate();
-    setTitleState(body.title);
-    setLoading(false);
-    setEditMode(false);
     tasksMutate();
+    if (id === 'new') {
+      navigation.navigate('Home');
+    } else {
+      await taskMutate();
+      await repeatMutate();
+      setTitleState(body.title);
+      setLoading(false);
+      setEditMode(false);
+    }
   }
 };
 

@@ -27,7 +27,7 @@ router.put('/:taskId', [tasksMiddleware.editTask, sharedMiddleware.sendResult]);
 router.post('/group/:groupId', [
   groupMiddleware.checkIfGroupExists,
   tasksMiddleware.verifyTaskIsValid,
-  tasksMiddleware.createNewTask2,
+  tasksMiddleware.createTask,
   sharedMiddleware.sendNoResult,
 ]);
 

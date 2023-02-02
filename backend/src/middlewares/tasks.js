@@ -72,6 +72,24 @@ module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
   next();
 });
 
+module.exports.createTask = asyncHandler(async (req, _res, next) => {
+  const query = sql`INSERT INTO TaskMeta (group_id, title, description, start_date) 
+                    VALUES (${req.params.groupId}, ${req.body.title}, ${req.body.description}, ${req.body.start_date});`;
+
+  const result = await db.query(query);
+
+  if (req.body.repeat_pattern) {
+    const insertQuery = sql`INSERT INTO RecurringPattern (task_id, separation_count, 
+                     day_of_week, week_of_month, day_of_month, month_of_year, recurring_type) VALUES (${result.insertId}, ${req.body.repeat_pattern.separation_count},
+                     ${req.body.repeat_pattern.day_of_week}, ${req.body.repeat_pattern.week_of_month}, ${req.body.repeat_pattern.day_of_month}, ${req.body.repeat_pattern.month_of_year},
+                     ${req.body.repeat_pattern.recurring_type});`;
+    await db.query(insertQuery);
+  }
+
+  req.result = result;
+  next();
+});
+
 module.exports.editTask = asyncHandler(async (req, _res, next) => {
   const query = sql`UPDATE TaskMeta SET title=${req.body.title}, description=${req.body.description}, start_date=${req.body.start_date} WHERE id=${req.params.taskId};`;
 
@@ -124,7 +142,7 @@ module.exports.verifyTaskIsValid = (req, _res, next) => {
       day_of_month: { type: 'integer' },
       month_of_year: { type: 'integer' },
     },
-    required: ['title', 'start_date', 'is_recurring'],
+    required: ['title', 'start_date'],
   };
   const validate = ajv.compile(schema);
   if (!validate(req.body)) {
