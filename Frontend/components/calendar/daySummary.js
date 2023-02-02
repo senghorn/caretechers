@@ -58,7 +58,6 @@ export default function DaySummary({
     }
   }, [dateToVisitsMap, key, override]);
 
-
   if (isLoading || (!visitInfo && !error)) {
     return (
       <FadeInView style={styles.loadingContainer}>
@@ -69,7 +68,6 @@ export default function DaySummary({
 
   const isCurrentDay = isEqual(date, startOfDay(new Date()));
   const inThePast = isBefore(date, new Date());
-
 
   if (!visitInfo.visitor && (!inThePast || isCurrentDay)) {
     return (
@@ -83,7 +81,8 @@ export default function DaySummary({
   }
 
   let colorStyle = styles.futureDayColor;
-  if (visitInfo.visitor && visitInfo.completedTaskCount === visitInfo.taskCount) colorStyle = styles.completedDayColor;
+  if (visitInfo.visitor && visitInfo.completedTaskCount === visitInfo.taskCount && inThePast)
+    colorStyle = styles.completedDayColor;
   else if (isCurrentDay) colorStyle = styles.currentDayColor;
   else if (!visitInfo.visitor || inThePast) colorStyle = styles.missedDayColor;
   return (

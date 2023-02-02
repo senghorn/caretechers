@@ -1,7 +1,7 @@
 import { FlatList } from 'react-native-bidirectional-infinite-scroll';
 
 import { addDays, subDays } from 'date-fns';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Day from './day';
 import WeekLabel from './weekLabel';
@@ -40,7 +40,7 @@ export default function ScrollableScreen({
       onStartReached={() => {
         return updateStartRendering(renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList);
       }}
-      showsVerticalScrollIndicator={true}
+      showsVerticalScrollIndicator={false}
       viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
     />
   );

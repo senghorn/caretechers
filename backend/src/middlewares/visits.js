@@ -14,7 +14,7 @@ module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
 
       FROM (SELECT DATE_SUB(${start}, INTERVAL 1 DAY) + INTERVAL (day) DAY AS the_date FROM Day_Indexes) Days
 		JOIN \`Groups\` gr ON (gr.id = ${groupId})
-		JOIN TaskMeta valid_tasks ON valid_tasks.group_id = gr.id
+		LEFT JOIN TaskMeta valid_tasks ON valid_tasks.group_id = gr.id
 
       LEFT JOIN RecurringPattern repeats ON repeats.task_id = valid_tasks.id 
       AND (DATE(valid_tasks.start_date) <= Days.the_date AND (valid_tasks.end_date IS NULL OR valid_tasks.end_date > Days.the_date))
@@ -24,7 +24,7 @@ module.exports.getTasksByDateRange = asyncHandler(async (req, res, next) => {
          )
       )
 
-      JOIN TaskMeta tasks ON tasks.id = valid_tasks.id AND (tasks.id = repeats.task_id OR DATE(tasks.start_date) = Days.the_date)
+      LEFT JOIN TaskMeta tasks ON tasks.id = valid_tasks.id AND (tasks.id = repeats.task_id OR DATE(tasks.start_date) = Days.the_date)
       LEFT JOIN Visits visits ON visits.date = Days.the_date
       LEFT JOIN Tasks past_tasks ON past_tasks.meta_id = tasks.id AND past_tasks.occurence_date = Days.the_date
       LEFT JOIN Users users ON users.email = visits.visitor
