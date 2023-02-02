@@ -1,4 +1,4 @@
-import UserContext from '../../services/context/UserContext';
+import UserContext from '../context/UserContext';
 
 // Create a component that will provide the context
 export default function UserProvider({ children, user }) {

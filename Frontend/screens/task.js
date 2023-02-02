@@ -8,11 +8,14 @@ import config from '../constants/config';
 import useSWR, { useSWRConfig } from 'swr';
 import { format } from 'date-fns';
 import UserContext from '../services/context/UserContext';
+import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Task({ route, navigation }) {
   const { title, id, mutateString, backTo } = route.params;
+
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
 
   const { mutate } = useSWRConfig();
 
@@ -150,6 +153,7 @@ export default function Task({ route, navigation }) {
                 taskMutate,
                 repeatMutate,
                 tasksMutate,
+                refreshCalendar,
                 navigation
               );
             }}
@@ -176,6 +180,7 @@ const saveTask = async (
   taskMutate,
   repeatMutate,
   tasksMutate,
+  refreshCalendar,
   navigation
 ) => {
   setLoading(true);
@@ -191,6 +196,7 @@ const saveTask = async (
     console.log(error);
   } finally {
     tasksMutate();
+    refreshCalendar();
     if (id === 'new') {
       navigation.navigate('Home');
     } else {
