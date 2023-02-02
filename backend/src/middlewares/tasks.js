@@ -6,6 +6,20 @@ const sql = require('sql-template-strings');
 const db = require('../database');
 const { newError } = require('../utls');
 
+module.exports.getTaskById = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT TM.title, TM.description, TM.start_date, TM.end_date
+                    FROM TaskMeta TM
+                    WHERE TM.id=${req.params.taskId} AND TM.group_id = ${req.params.groupId};`;
+  req.result = await db.query(query);
+  next();
+});
+
+module.exports.getTaskRepeats = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT RP.*, TM.start_date, TM.end_date FROM RecurringPattern RP JOIN TaskMeta TM ON TM.id=${req.params.taskId} WHERE RP.task_id=${req.params.taskId};`;
+  req.result = await db.query(query);
+  next();
+});
+
 module.exports.getTasksByGroup = asyncHandler(async (req, _res, next) => {
   const query = sql`SELECT TM.id, TM.group_id, TM.title, TM.description, TM.start_date, TM.end_date, 
           RP.task_id AS rp_id, RP.separation_count, RP.day_of_week, RP.week_of_month, RP.day_of_month, RP.month_of_year
