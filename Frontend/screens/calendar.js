@@ -14,13 +14,14 @@ import {
   addWeeks,
 } from 'date-fns';
 import { uniqueId } from 'lodash';
-import { createContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Header from '../components/calendar/header';
 import useSWR from 'swr';
 import ScrollableScreen from '../components/calendar/scrollableScreen';
 
 import config from '../constants/config';
+import UserContext from '../services/context/UserContext';
 
 const DateToVisitsContext = createContext();
 
@@ -39,6 +40,8 @@ export default function Calendar({ navigation }) {
 
   const [resetScreen, setResetScreen] = useState(false);
 
+  const user = useContext(UserContext);
+
   useEffect(() => {
     setResetScreen(true);
     setStartDate(startOfYear(initDate));
@@ -51,7 +54,7 @@ export default function Calendar({ navigation }) {
   }, [renderingDataForFlatList]);
 
   const { data, error, isLoading, mutate } = useSWR(
-    `${config.backend_server}/visits/group/1?start=${startDateString}&end=${endDateString}`,
+    `${config.backend_server}/visits/group/${user.group_id}?start=${startDateString}&end=${endDateString}`,
     fetcher
   );
 

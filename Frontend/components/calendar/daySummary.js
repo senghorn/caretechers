@@ -3,6 +3,8 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { Text, View, StyleSheet, Animated, TouchableHighlight, Touchable } from 'react-native';
 import { DateToVisitsContext } from '../../screens/calendar';
 import { AntDesign } from '@expo/vector-icons';
+import UserContext from '../../services/context/UserContext';
+import config from '../../constants/config';
 
 export default function DaySummary({
   date,
@@ -13,6 +15,7 @@ export default function DaySummary({
   errorOverride = false,
 }) {
   const dateToVisitsMap = useContext(DateToVisitsContext);
+  const user = useContext(UserContext);
   const key = format(date, 'yyyy-MM-dd');
 
   const [isLoading, setIsLoading] = useState(isLoadingOverride);
@@ -58,7 +61,6 @@ export default function DaySummary({
     }
   }, [dateToVisitsMap, key, override]);
 
-
   if (isLoading || (!visitInfo && !error)) {
     return (
       <FadeInView style={styles.loadingContainer}>
@@ -70,10 +72,17 @@ export default function DaySummary({
   const isCurrentDay = isEqual(date, startOfDay(new Date()));
   const inThePast = isBefore(date, new Date());
 
-
   if (!visitInfo.visitor && (!inThePast || isCurrentDay)) {
     return (
-      <TouchableHighlight onPress={() => console.log('volunteer')} style={styles.buttonContainer} underlayColor="#ededed">
+      <TouchableHighlight
+        onPress={() => {
+          volunteerForVisit(key, user);
+          setVisitInfo({ ...visitInfo, visitor: user.email, first_name: user.first_name });
+        }}
+        style={styles.buttonContainer}
+        underlayColor="#ededed"
+        disabled={false}
+      >
         <View style={styles.volunteerButton}>
           <AntDesign name="pluscircleo" size={16} color="#2196f3" />
           <Text style={styles.volunteerButtonText}>{`Volunteer to Visit`}</Text>
@@ -83,9 +92,18 @@ export default function DaySummary({
   }
 
   let colorStyle = styles.futureDayColor;
-  if (visitInfo.visitor && visitInfo.completedTaskCount === visitInfo.taskCount) colorStyle = styles.completedDayColor;
+  if (visitInfo.visitor && visitInfo.completedTaskCount === visitInfo.taskCount && inThePast)
+    colorStyle = styles.completedDayColor;
   else if (isCurrentDay) colorStyle = styles.currentDayColor;
   else if (!visitInfo.visitor || inThePast) colorStyle = styles.missedDayColor;
+
+  const completedTasks = visitInfo.completedTaskCount || 0;
+  let taskLabel = visitInfo.taskCount
+    ? inThePast
+      ? `${completedTasks} / ${visitInfo.taskCount} Tasks Completed`
+      : `${visitInfo.taskCount} Tasks`
+    : 'No Tasks';
+
   return (
     <TouchableHighlight
       onPress={() => navigation.navigate('Visit', { date })}
@@ -96,16 +114,35 @@ export default function DaySummary({
         <View style={[styles.pictureContainer, !visitInfo.visitor && styles.missedDayColor]} />
         <View style={styles.flexLayout}>
           <Text style={styles.nameText}>{visitInfo.first_name || 'No Visitor'}</Text>
-          <Text>
-            {inThePast
-              ? `${visitInfo.completedTaskCount || 0} / ${visitInfo.taskCount} Tasks Completed`
-              : `${visitInfo.taskCount} Tasks`}
-          </Text>
+          <Text>{taskLabel}</Text>
         </View>
       </View>
     </TouchableHighlight>
   );
 }
+
+const headers = {
+  'Content-Type': 'application/json',
+};
+
+const volunteerForVisit = async (date, user) => {
+  const newVisit = {
+    date,
+    userEmail: user.email,
+  };
+
+  try {
+    await fetch(`${config.backend_server}/visits/group/${user.group_id}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(newVisit),
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    console.log('finished volunteering');
+  }
+};
 
 const styles = StyleSheet.create({
   container: {

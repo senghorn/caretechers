@@ -1,14 +1,15 @@
-import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert, ScrollView } from 'react-native';
 import Header from '../components/visit/header';
 import useSWR from 'swr';
 import { format } from 'date-fns';
 import DaySummary from '../components/calendar/daySummary';
 import { AntDesign } from '@expo/vector-icons';
 import SectionSelector from '../components/visit/sectionSelector';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Tasks from '../components/visit/tasks';
 
 import config from '../constants/config';
+import UserContext from '../services/context/UserContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -19,13 +20,15 @@ export default function Visit({ route, navigation }) {
 
   const [selected, setSelected] = useState('Tasks');
 
-  const tasksURL = `${config.backend_server}/tasks/group/1/range?start=${dateString}&end=${dateString}`;
+  const user = useContext(UserContext);
+
+  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
 
   const {
     data: visits,
     error: visitError,
     isLoading: visitLoading,
-  } = useSWR(`${config.backend_server}/visits/group/1?start=${dateString}&end=${dateString}`, fetcher);
+  } = useSWR(`${config.backend_server}/visits/group/${user.group_id}?start=${dateString}&end=${dateString}`, fetcher);
 
   const { data: tasks, error: tasksError, isLoading: tasksLoading } = useSWR(tasksURL, fetcher);
 
@@ -71,12 +74,42 @@ export default function Visit({ route, navigation }) {
         <View style={{ width: 48 }} />
         <SectionSelector text="Notes" selected={selected} setSelected={setSelected} />
       </View>
-      <Tasks tasks={tasks} tasksURL={tasksURL} date={date} navigation={navigation} isLoading={tasksLoading} error={tasksError} />
+      {selected === 'Tasks' && (
+        <Tasks
+          tasks={tasks}
+          tasksURL={tasksURL}
+          date={date}
+          navigation={navigation}
+          isLoading={tasksLoading}
+          error={tasksError}
+        />
+      )}
+      {selected === 'Notes' && (
+        <ScrollView style={styles.visitNotesContainer}>
+          <Text style={styles.visitNotes}>{visit.visit_notes}</Text>
+        </ScrollView>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: 'red',
+    marginBottom: 40,
+  },
+  visitNotesContainer: {
+    backgroundColor: '#ededed',
+    marginHorizontal: 16,
+    marginTop: 10,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 40,
+  },
+  visitNotes: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
   sectionSelectContainer: {
     flex: 0,
     flexDirection: 'row',
@@ -87,7 +120,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     flexDirection: 'column',
-    marginBottom: 40,
   },
   daySummaryContainer: {
     height: 72,

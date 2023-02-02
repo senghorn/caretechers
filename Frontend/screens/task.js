@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import Description from '../components/task/description';
@@ -7,6 +7,7 @@ import RepeatBehavior from '../components/task/repeatBehavior';
 import config from '../constants/config';
 import useSWR, { useSWRConfig } from 'swr';
 import { format } from 'date-fns';
+import UserContext from '../services/context/UserContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -18,6 +19,8 @@ export default function Task({ route, navigation }) {
   const tasksMutate = () => {
     mutate(mutateString);
   };
+
+  const user = useContext(UserContext);
 
   const [titleState, setTitleState] = useState(title);
 
@@ -35,7 +38,7 @@ export default function Task({ route, navigation }) {
     isLoading: isTaskLoading,
     error: taskError,
     mutate: taskMutate,
-  } = id ? useSWR(`${config.backend_server}/tasks/group/1/task/${id}`, fetcher) : undefined;
+  } = id ? useSWR(`${config.backend_server}/tasks/group/${user.group_id}/task/${id}`, fetcher) : undefined;
 
   useEffect(() => {
     if (id !== 'new') {
@@ -137,7 +140,18 @@ export default function Task({ route, navigation }) {
                 repeat_pattern: editRepeat,
               };
 
-              await saveTask(id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate, tasksMutate, navigation);
+              await saveTask(
+                id,
+                body,
+                user,
+                setLoading,
+                setEditMode,
+                setTitleState,
+                taskMutate,
+                repeatMutate,
+                tasksMutate,
+                navigation
+              );
             }}
           >
             {id === 'new' ? 'Create Task' : 'Save Task'}
@@ -152,9 +166,20 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-const saveTask = async (id, body, setLoading, setEditMode, setTitleState, taskMutate, repeatMutate, tasksMutate, navigation) => {
+const saveTask = async (
+  id,
+  body,
+  user,
+  setLoading,
+  setEditMode,
+  setTitleState,
+  taskMutate,
+  repeatMutate,
+  tasksMutate,
+  navigation
+) => {
   setLoading(true);
-  const url = id === 'new' ? `${config.backend_server}/tasks/group/1` : `${config.backend_server}/tasks/${id}`;
+  const url = id === 'new' ? `${config.backend_server}/tasks/group/${user.group_id}` : `${config.backend_server}/tasks/${id}`;
   const method = id === 'new' ? 'POST' : 'PUT';
   try {
     await fetch(url, {
