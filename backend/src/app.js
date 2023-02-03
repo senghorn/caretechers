@@ -1,5 +1,3 @@
-// THIS IS A TEST
-
 const express = require("express");
 
 const app = express();
