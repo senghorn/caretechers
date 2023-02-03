@@ -4,6 +4,13 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+const getDateFromDateString = (dateString) => {
+  const year = dateString.substring(0, 4);
+  const month = dateString.substring(5, 7);
+  const day = dateString.substring(8, 10);
+  return new Date(year, Number(month) - 1, day);
+};
+
 export default function Description({
   id,
   data,
@@ -31,11 +38,13 @@ export default function Description({
             />
             <Text style={styles.header}>Schedule</Text>
             <View style={styles.selectDateContainer}>
-              <Text style={styles.takesPlaceText}>Starts {!editMode && format(new Date(data[0].start_date), 'MMMM do, y')}</Text>
+              <Text style={styles.takesPlaceText}>
+                Starts {!editMode && format(getDateFromDateString(data[0].start_date), 'MMMM do, y')}
+              </Text>
               {editMode && (
                 <DateTimePicker
                   testID="dateTimePicker"
-                  value={editMode ? editStartDate : data[0].start_date}
+                  value={editMode ? editStartDate : getDateFromDateString(data[0].start_date)}
                   onChange={(event, date) => setEditStartDate(date)}
                   mode={'date'}
                   display="default"
