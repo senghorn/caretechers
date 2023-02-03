@@ -22,6 +22,7 @@ import ScrollableScreen from '../components/calendar/scrollableScreen';
 
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
+import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 
 const DateToVisitsContext = createContext();
 
@@ -42,6 +43,8 @@ export default function Calendar({ navigation }) {
 
   const user = useContext(UserContext);
 
+  const [, setRefreshCalendar] = useContext(CalendarRefreshContext);
+
   useEffect(() => {
     setResetScreen(true);
     setStartDate(startOfYear(initDate));
@@ -59,8 +62,8 @@ export default function Calendar({ navigation }) {
   );
 
   useEffect(() => {
-    mutate();
-  }, []);
+    setRefreshCalendar(() => mutate);
+  }, [mutate]);
 
   useEffect(() => {
     if (data) setDateToVisitsMap(getDateToVisitsMap(data));

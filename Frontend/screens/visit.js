@@ -5,11 +5,13 @@ import { format } from 'date-fns';
 import DaySummary from '../components/calendar/daySummary';
 import { AntDesign } from '@expo/vector-icons';
 import SectionSelector from '../components/visit/sectionSelector';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Tasks from '../components/visit/tasks';
 
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
+import TasksRefreshContext from '../services/context/TasksRefreshContext';
+import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -22,6 +24,8 @@ export default function Visit({ route, navigation }) {
 
   const user = useContext(UserContext);
 
+  const [, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
+
   const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
 
   const {
@@ -30,7 +34,11 @@ export default function Visit({ route, navigation }) {
     isLoading: visitLoading,
   } = useSWR(`${config.backend_server}/visits/group/${user.group_id}?start=${dateString}&end=${dateString}`, fetcher);
 
-  const { data: tasks, error: tasksError, isLoading: tasksLoading } = useSWR(tasksURL, fetcher);
+  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate } = useSWR(tasksURL, fetcher);
+
+  useEffect(() => {
+    setRefreshVisitTasks(() => mutate);
+  }, [mutate]);
 
   const visit = visits && visits[0];
 

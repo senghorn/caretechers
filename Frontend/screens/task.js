@@ -5,20 +5,23 @@ import Description from '../components/task/description';
 import Header from '../components/task/header';
 import RepeatBehavior from '../components/task/repeatBehavior';
 import config from '../constants/config';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 import { format } from 'date-fns';
 import UserContext from '../services/context/UserContext';
+import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
+import TasksRefreshContext from '../services/context/TasksRefreshContext';
+import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Task({ route, navigation }) {
-  const { title, id, mutateString, backTo } = route.params;
+  const { title, id } = route.params;
 
-  const { mutate } = useSWRConfig();
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
 
-  const tasksMutate = () => {
-    mutate(mutateString);
-  };
+  const [refreshTasks] = useContext(TasksRefreshContext);
+
+  const [refreshVisitTasks] = useContext(VisitTasksRefreshContext);
 
   const user = useContext(UserContext);
 
@@ -77,14 +80,12 @@ export default function Task({ route, navigation }) {
       <Header
         id={id}
         navigation={navigation}
-        backTo={backTo}
         hideButtons={id === 'new'}
         title={titleState}
         editMode={editMode}
         setEditMode={setEditMode}
         editTitle={editTitle}
         setEditTitle={setEditTitle}
-        tasksMutate={tasksMutate}
       />
       <ScrollView style={styles.scrollContainer}>
         <Description
@@ -119,7 +120,7 @@ export default function Task({ route, navigation }) {
             color="red"
             style={styles.cancelbutton}
             onPress={() => {
-              if (id === 'new') navigation.navigate(backTo || 'Home');
+              if (id === 'new') navigation.goBack();
               else setEditMode(false);
             }}
           >
@@ -149,7 +150,9 @@ export default function Task({ route, navigation }) {
                 setTitleState,
                 taskMutate,
                 repeatMutate,
-                tasksMutate,
+                refreshTasks,
+                refreshVisitTasks,
+                refreshCalendar,
                 navigation
               );
             }}
@@ -176,6 +179,8 @@ const saveTask = async (
   taskMutate,
   repeatMutate,
   tasksMutate,
+  refreshVisitTasks,
+  refreshCalendar,
   navigation
 ) => {
   setLoading(true);
@@ -191,11 +196,13 @@ const saveTask = async (
     console.log(error);
   } finally {
     tasksMutate();
+    refreshCalendar();
     if (id === 'new') {
       navigation.navigate('Home');
     } else {
       await taskMutate();
       await repeatMutate();
+      await refreshVisitTasks();
       setTitleState(body.title);
       setLoading(false);
       setEditMode(false);

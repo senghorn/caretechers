@@ -5,9 +5,8 @@ import Messages from '../../screens/messages';
 import Metrics from '../../screens/metrics';
 import Calendar from '../../screens/calendar';
 import Tasks from '../../screens/tasks';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import config from '../../constants/config';
-import UserProvider from './UserProvider';
 
 const axios = require('axios').default;
 

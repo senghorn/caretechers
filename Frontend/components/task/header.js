@@ -1,31 +1,22 @@
-import { Fragment } from 'react';
+import { Fragment, useContext } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Appbar, TextInput } from 'react-native-paper';
 import config from '../../constants/config';
+import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
+import TasksRefreshContext from '../../services/context/TasksRefreshContext';
+import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
 
-export default function Header({
-  id,
-  title,
-  navigation,
-  editMode,
-  setEditMode,
-  editTitle,
-  setEditTitle,
-  hideButtons,
-  backTo,
-  tasksMutate,
-}) {
+export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
+  const [refreshTasks] = useContext(TasksRefreshContext);
+  const [refreshVisitTasks] = useContext(VisitTasksRefreshContext);
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
         <Appbar.Action
           icon="chevron-left"
           onPress={() => {
-            if (backTo) {
-              navigation.navigate('Visit', { date: backTo });
-            } else {
-              navigation.navigate('Home');
-            }
+            navigation.goBack();
           }}
         />
         {editMode ? (
@@ -65,12 +56,8 @@ export default function Header({
                     {
                       text: 'Confirm',
                       onPress: async () => {
-                        await deleteTask(id, tasksMutate);
-                        if (backTo) {
-                          navigation.navigate('Visit', { date: backTo });
-                        } else {
-                          navigation.navigate('Home');
-                        }
+                        await deleteTask(id, refreshTasks, refreshVisitTasks, refreshCalendar);
+                        navigation.goBack();
                       },
                       style: 'destructive',
                     },
@@ -92,7 +79,7 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-const deleteTask = async (id, tasksMutate) => {
+const deleteTask = async (id, tasksMutate, refreshVisitTasks, refreshCalendar) => {
   const url = `${config.backend_server}/tasks/${id}`;
   const method = 'DELETE';
   try {
@@ -104,6 +91,8 @@ const deleteTask = async (id, tasksMutate) => {
     console.log(error);
   } finally {
     tasksMutate();
+    refreshVisitTasks();
+    refreshCalendar();
   }
 };
 

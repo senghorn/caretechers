@@ -7,6 +7,7 @@ import Task from '../components/tasks/task';
 import config from '../constants/config';
 import useSWR from 'swr';
 import UserContext from '../services/context/UserContext';
+import TasksRefreshContext from '../services/context/TasksRefreshContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -18,7 +19,13 @@ export default function Tasks({ navigation }) {
 
   const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}`;
 
+  const [, setRefreshTasks] = useContext(TasksRefreshContext);
+
   const { data, isLoading, error, mutate } = useSWR(tasksURL, fetcher);
+
+  useEffect(() => {
+    setRefreshTasks(() => mutate);
+  }, [mutate]);
 
   const renderTasks = (tasks) => {
     if (selected === 'every') {
@@ -26,9 +33,7 @@ export default function Tasks({ navigation }) {
     } else {
       tasks = tasks.filter((task) => !(task.rp_id && task.day_of_week === null));
     }
-    const renderedTasks = tasks.map((task) => (
-      <Task title={task.title} key={task.id} navigation={navigation} id={task.id} mutateString={tasksURL} />
-    ));
+    const renderedTasks = tasks.map((task) => <Task title={task.title} key={task.id} navigation={navigation} id={task.id} />);
     setRenderedTasks(renderedTasks);
   };
 
@@ -52,7 +57,7 @@ export default function Tasks({ navigation }) {
         uppercase={false}
         color="#2196f3"
         icon="checkbox-marked-circle-plus-outline"
-        onPress={() => navigation.navigate('Task', { title: '', id: 'new', mutateString: tasksURL })}
+        onPress={() => navigation.navigate('Task', { title: '', id: 'new' })}
         style={styles.createButton}
         labelStyle={styles.createButtonText}
       >

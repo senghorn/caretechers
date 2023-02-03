@@ -6,24 +6,44 @@ import Group from '../../screens/group';
 import Visit from '../../screens/visit';
 import Task from '../../screens/task';
 import { useState } from 'react';
-import UserProvider from './UserProvider';
+import UserProvider from '../../services/providers/UserProvider';
+import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
+import TasksRefreshContext from '../../services/context/TasksRefreshContext';
+import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
+
+const initRefreshCalendar = () => {
+  console.log('calendar refresh not set');
+};
+
+const initRefreshTasks = () => {
+  console.log('tasks refresh not set');
+};
 
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
+  const [refreshCalendar, setRefreshCalendar] = useState(() => initRefreshCalendar);
+  const [refreshTasks, setRefreshTasks] = useState(() => initRefreshTasks);
+  const [refreshVisitTasks, setRefreshVisitTasks] = useState(() => initRefreshTasks);
   return (
     <UserProvider user={user}>
-      <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
-        <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
-        <Stack.Screen name={'Home'} options={{ headerShown: false }}>
-          {(props) => <BottomNavigation {...props} setUser={setUser} />}
-        </Stack.Screen>
-        <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
-        <Stack.Screen name={'Group'} component={Group} options={{ headerShown: false }} />
-        <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
-        <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
-      </Stack.Navigator>
+      <CalendarRefreshContext.Provider value={[refreshCalendar, setRefreshCalendar]}>
+        <TasksRefreshContext.Provider value={[refreshTasks, setRefreshTasks]}>
+          <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>
+            <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
+              <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
+              <Stack.Screen name={'Home'} options={{ headerShown: false }}>
+                {(props) => <BottomNavigation {...props} setUser={setUser} />}
+              </Stack.Screen>
+              <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
+              <Stack.Screen name={'Group'} component={Group} options={{ headerShown: false }} />
+              <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
+              <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
+            </Stack.Navigator>
+          </VisitTasksRefreshContext.Provider>
+        </TasksRefreshContext.Provider>
+      </CalendarRefreshContext.Provider>
     </UserProvider>
   );
 }
