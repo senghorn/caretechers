@@ -1,16 +1,15 @@
-import React from "react";
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
-import { StyleSheet, Text, View, SafeAreaView, Image } from "react-native";
-import COLORS from "../constants/colors";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import config from "../constants/config";
-const axios = require("axios").default;
+import React from 'react';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
+import COLORS from '../constants/colors';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import config from '../constants/config';
+const axios = require('axios').default;
 WebBrowser.maybeCompleteAuthSession();
 
 const getUserGroupByID = async (email) => {
-  let connection_string =
-   config.backend_server + "/user/groupId/" + email;
+  let connection_string = config.backend_server + '/user/groupId/' + email;
   return await axios
     .get(connection_string)
     .then(function (response) {
@@ -26,18 +25,14 @@ export default function GoogleLogin({ navigation }) {
   const [userInfo, setUserInfo] = React.useState(null);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId:
-      "899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com",
-    iosClientId:
-      "899499604143-5oqn70f2r4uu7lp1mbajpkv15ks3p368.apps.googleusercontent.com",
-    androidClientId:
-      "899499604143-q5b803tsomq5k9tu0vv0fjb0ap1551gm.apps.googleusercontent.com",
-    webClientId:
-      "899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com",
+    expoClientId: '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
+    iosClientId: '899499604143-5oqn70f2r4uu7lp1mbajpkv15ks3p368.apps.googleusercontent.com',
+    androidClientId: '899499604143-q5b803tsomq5k9tu0vv0fjb0ap1551gm.apps.googleusercontent.com',
+    webClientId: '899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com',
   });
 
   React.useEffect(() => {
-    if (response?.type === "success") {
+    if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
     } else {
     }
@@ -50,23 +45,20 @@ export default function GoogleLogin({ navigation }) {
   }, [accessToken]);
 
   async function getUserData() {
-    let userInfoResponse = await fetch(
-      "https://www.googleapis.com/userinfo/v2/me",
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
+    let userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
     await userInfoResponse.json().then(async (data) => {
       setUserInfo(data);
-      const user_group = await getUserGroupByID(data["email"]);
+      const user_group = await getUserGroupByID(data['email']);
       if (user_group) {
         if (user_group.data.group_id) {
-          navigation.navigate("Home", { user: data });
+          navigation.navigate('Home', { user: data });
         } else {
-          navigation.navigate("Group", { user: data });
+          navigation.navigate('Group', { user: data });
         }
       } else {
-        navigation.navigate("RegisterUser", { user: data });
+        navigation.navigate('RegisterUser', { user: data });
       }
     });
   }
@@ -82,10 +74,7 @@ export default function GoogleLogin({ navigation }) {
             <Text style={styles.subWelcomeText}>Let's get started.</Text>
           </View>
           <View style={styles.row}>
-            <Image
-              style={styles.image}
-              source={require("../assets/caretaker.png")}
-            />
+            <Image style={styles.image} source={require('../assets/caretaker.png')} />
           </View>
           <FontAwesome.Button
             name="google"
@@ -100,9 +89,7 @@ export default function GoogleLogin({ navigation }) {
           </FontAwesome.Button>
         </View>
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Proudly presented by the Caretechers
-          </Text>
+          <Text style={styles.footerText}>Proudly presented by the Caretechers</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -112,21 +99,21 @@ export default function GoogleLogin({ navigation }) {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 16,
     backgroundColor: COLORS.bgColor,
   },
   container: {
     padding: 15,
-    width: "100%",
-    position: "relative",
+    width: '100%',
+    position: 'relative',
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   welcomeText: {
     fontSize: 28,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: COLORS.white,
     opacity: 1,
   },
@@ -146,10 +133,10 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   loginBtn: {
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "50%",
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '50%',
     height: 55,
     color: COLORS.dark,
     borderRadius: 10,
@@ -159,41 +146,41 @@ const styles = StyleSheet.create({
   loginText: {
     color: COLORS.gray,
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginLeft: 30,
   },
   // footer
   footer: {
-    position: "relative",
+    position: 'relative',
     bottom: -100,
-    textAlign: "center",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   footerText: {
     color: COLORS.white,
   },
   signupBtn: {
     color: COLORS.primary,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   // utils
   wFull: {
-    width: "100%",
+    width: '100%',
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   mr7: {
     marginRight: 7,
   },
   image: {
     marginBottom: 40,
-    width: "100%",
+    width: '100%',
     height: 380,
-    resizeMode: "stretch",
+    resizeMode: 'stretch',
     borderRadius: 10,
   },
   icon: {

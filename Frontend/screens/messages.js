@@ -1,13 +1,13 @@
-import { StyleSheet, SafeAreaView } from "react-native";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
-import * as ImagePicker from "expo-image-picker";
-import React, { useState, useCallback, useEffect, useContext } from "react";
-import { ActivityIndicator } from "react-native-paper";
-import COLORS from "../constants/colors";
-import TopBar from "../components/messages/top-bar";
-import { FetchMessages, FetchUsers } from "../services/api/messages";
-import createSocket from "../components/messages/socket";
-import UserContext from "../services/context/UserContext";
+import { StyleSheet, SafeAreaView } from 'react-native';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
+import { ActivityIndicator } from 'react-native-paper';
+import COLORS from '../constants/colors';
+import TopBar from '../components/messages/top-bar';
+import { FetchMessages, FetchUsers } from '../services/api/messages';
+import createSocket from '../components/messages/socket';
+import UserContext from '../services/context/UserContext';
 
 export default function Messages({ route, navigation }) {
   // TODO:Need to get rid of this user
@@ -19,11 +19,11 @@ export default function Messages({ route, navigation }) {
   const user_i = useContext(UserContext);
 
   useEffect(() => {
-    if (user_i) {
+    if (user_i && !(Object.keys(user).length === 0)) {
       setThisUser({
-        _id: user["user"].email,
-        name: user["user"].name,
-        avatar: user["user"].picture,
+        _id: user['user'].email,
+        name: user['user'].name,
+        avatar: user['user'].picture,
         groupId: user_i.group_id,
       });
     }
@@ -45,39 +45,40 @@ export default function Messages({ route, navigation }) {
   useEffect(() => {
     if (socket) {
       socket.connect();
-      socket.on("connect_error", (err) => {
+      socket.on('connect_error', (err) => {
         console.log(err.message);
-        if (err.message === "invalid username") {
-          console.log("failed to connect to message server");
+        if (err.message === 'invalid username') {
+          console.log('failed to connect to message server');
         }
       });
 
-      socket.on("message", (msg) => {
-        setMessages((previousMessages) =>
-          GiftedChat.append(previousMessages, msg)
-        );
+      socket.on('message', (msg) => {
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, msg));
       });
 
-      socket.on("disconnect", (reason) => {
+      socket.on('disconnect', (reason) => {
         console.log(reason);
         socket.disconnect();
-        if (reason === "io server disconnect") {
+        if (reason === 'io server disconnect') {
         }
       });
 
       // Network clean up: This will clean up any necessary connections with server
       return () => {
         socket.disconnect();
-        console.log("cleaning up");
+        console.log('cleaning up');
       };
     }
   }, [socket]);
 
-  var onMessageSend = useCallback((messages = []) => {
-    if (socket) {
-      socket.emit("chat", messages);
-    }
-  }, [socket]);
+  var onMessageSend = useCallback(
+    (messages = []) => {
+      if (socket) {
+        socket.emit('chat', messages);
+      }
+    },
+    [socket]
+  );
 
   // Message render bubble
   const renderBubble = (props) => {
@@ -85,7 +86,7 @@ export default function Messages({ route, navigation }) {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == user["user"].email ? "right" : "left"}
+        position={message_sender_id == user['user'].email ? 'right' : 'left'}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.warning,
@@ -99,7 +100,6 @@ export default function Messages({ route, navigation }) {
       />
     );
   };
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -118,7 +118,7 @@ export default function Messages({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   textInput: {
     height: 40,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.2,
     padding: 10,
     borderRadius: 10,
-  }
+  },
 });
 
 // const [hasGalPermission, setGalPermission] = useState(null);
