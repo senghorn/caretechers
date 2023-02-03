@@ -14,6 +14,13 @@ import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshConte
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
+const getDateFromDateString = (dateString) => {
+  const year = dateString.substring(0, 4);
+  const month = dateString.substring(5, 7);
+  const day = dateString.substring(8, 10);
+  return new Date(year, Number(month) - 1, day);
+};
+
 export default function Task({ route, navigation }) {
   const { title, id } = route.params;
 
@@ -48,7 +55,7 @@ export default function Task({ route, navigation }) {
       if (!isTaskLoading && !taskError && taskData && taskData.length > 0) {
         setTitleState(taskData[0].title);
         setEditDescription(taskData[0].description);
-        setEditStartDate(new Date(taskData[0].start_date));
+        setEditStartDate(getDateFromDateString(taskData[0].start_date));
       }
     }
   }, [id, taskData, isTaskLoading, taskError]);
