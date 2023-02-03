@@ -10,7 +10,7 @@ const db = require("./database");
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.status(200).send("Healthcheck successful!!!");
+  res.status(200).send("Healthcheck successful :)");
 });
 
 // MAIN API ENDPOINTS
