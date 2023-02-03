@@ -15,18 +15,14 @@ const Tab = createMaterialBottomTabNavigator();
 export default function BottomNavigation({ route, navigation, setUser }) {
   useEffect(() => {
     async function fetchData(id, setUser) {
-      let connection_string = config.backend_server + '/user/groupId/' + id;
-      console.log(connection_string);
-      return await axios
-        .get(connection_string)
-        .then(function (response) {
-          setUser(response.data);
-        })
-        .catch(function (error) {
-          console.log(error);
-          console.log('Fetching user data unsuccessful.');
-          return false;
-        });
+      try {
+        let connection_string = config.backend_server + '/user/groupId/' + id;
+        const response = await axios.get(connection_string);
+        setUser(response.data);
+      } catch (error) {
+        console.log(error);
+        console.log('Fetching user data unsuccessful.');
+      }
     }
     if (route && route.params && route.params.user) fetchData(route.params.user.email, setUser);
   }, [route.params]);

@@ -4,11 +4,13 @@ import { Appbar, TextInput } from 'react-native-paper';
 import config from '../../constants/config';
 import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
 import TasksRefreshContext from '../../services/context/TasksRefreshContext';
+import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
 
 export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
   const [refreshTasks] = useContext(TasksRefreshContext);
   const [refreshVisitTasks] = useContext(VisitTasksRefreshContext);
+  const [refreshVisit] = useContext(VisitRefreshContext);
   const [refreshCalendar] = useContext(CalendarRefreshContext);
   return (
     <View style={styles.outerContainer}>
@@ -56,7 +58,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
                     {
                       text: 'Confirm',
                       onPress: async () => {
-                        await deleteTask(id, refreshTasks, refreshVisitTasks, refreshCalendar);
+                        await deleteTask(id, refreshTasks, refreshVisit, refreshVisitTasks, refreshCalendar);
                         navigation.goBack();
                       },
                       style: 'destructive',
@@ -79,7 +81,7 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-const deleteTask = async (id, tasksMutate, refreshVisitTasks, refreshCalendar) => {
+const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refreshCalendar) => {
   const url = `${config.backend_server}/tasks/${id}`;
   const method = 'DELETE';
   try {
@@ -91,6 +93,7 @@ const deleteTask = async (id, tasksMutate, refreshVisitTasks, refreshCalendar) =
     console.log(error);
   } finally {
     tasksMutate();
+    refreshVisit();
     refreshVisitTasks();
     refreshCalendar();
   }

@@ -10,8 +10,8 @@ import Tasks from '../components/visit/tasks';
 
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
-import TasksRefreshContext from '../services/context/TasksRefreshContext';
 import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
+import VisitRefreshContext from '../services/context/VisitRefreshContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -25,6 +25,7 @@ export default function Visit({ route, navigation }) {
   const user = useContext(UserContext);
 
   const [, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
+  const [, setRefreshVisit] = useContext(VisitRefreshContext);
 
   const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
 
@@ -32,13 +33,18 @@ export default function Visit({ route, navigation }) {
     data: visits,
     error: visitError,
     isLoading: visitLoading,
+    mutate: visitMutate,
   } = useSWR(`${config.backend_server}/visits/group/${user.group_id}?start=${dateString}&end=${dateString}`, fetcher);
 
-  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate } = useSWR(tasksURL, fetcher);
+  useEffect(() => {
+    setRefreshVisit(() => visitMutate);
+  }, [visitMutate]);
+
+  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR(tasksURL, fetcher);
 
   useEffect(() => {
-    setRefreshVisitTasks(() => mutate);
-  }, [mutate]);
+    setRefreshVisitTasks(() => taskMutate);
+  }, [taskMutate]);
 
   const visit = visits && visits[0];
 
