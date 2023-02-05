@@ -439,6 +439,24 @@
           }
         }
       }
+    },
+    "/{graphId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "graphId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
     }
   }
 }
