@@ -8,6 +8,7 @@ import CreateNoteModal from '../components/notes/CreateNoteModal';
 import EditRemoveNoteModal from '../components/notes/EditRemoveNoteModal';
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
+import useSWR from 'swr';
 
 const axios = require('axios').default;
 const fetchNotes = async (user, setNotes) => {
@@ -21,36 +22,40 @@ const fetchNotes = async (user, setNotes) => {
   }
 };
 
-export default function Notes() {
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+export default function Notes({ navigation }) {
   // Grab user data from UserContext
   const user = useContext(UserContext);
+
+  const { data, isLoading, error, mutate } = useSWR(config.backend_server + '/notes/group/' + user.group_id, fetcher);
+
+  useEffect(() => {
+    if (user != null && !(Object.keys(user).length === 0) && !isLoading && data) {
+      setNotes(data);
+    }
+  }, [user, data, isLoading]);
 
   // Add a state variable to control the visibility of the modal
   const [modalVisible, setModalVisible] = useState(false);
   const [notes, setNotes] = useState(null);
   const [selectedNote, setSelectedNote] = useState(null);
-  useEffect(() => {
-    if (user != null && !(Object.keys(user).length === 0)) {
-      fetchNotes(user, setNotes);
-    }
-  }, [user]);
 
   useEffect(() => {
     if (selectedNote != null) {
     }
   }, [selectedNote]);
 
+  // prop
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(async () => {
-      if (user != null && user !== {}) {
-        fetchNotes(user, setNotes);
-      }
+  const onRefresh = useCallback(async () => {
+    if (user != null && user !== {}) {
+      setRefreshing(true);
+      await mutate();
       setRefreshing(false);
-    }, 2000);
-  }, [user]);
+    }
+  }, [user, mutate]);
 
   return (
     <View style={styles.container}>
@@ -70,11 +75,18 @@ export default function Notes() {
         key={'edit'} /*Key is required to differentiate two Modal objects*/
       />
       <ScrollView style={styles.tasksContainer} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        {notes == null ? (
+        {isLoading || notes === null ? (
           <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
         ) : (
           notes.map((note) => (
-            <Note key={note.id} title={note.title} content={note.content} setSelectedNote={setSelectedNote} id={note.id} />
+            <Note
+              key={note.id}
+              title={note.title}
+              content={note.content}
+              setSelectedNote={setSelectedNote}
+              id={note.id}
+              navigation={navigation}
+            />
           ))
         )}
       </ScrollView>

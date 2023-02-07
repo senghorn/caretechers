@@ -11,6 +11,7 @@ import CalendarRefreshContext from '../../services/context/CalendarRefreshContex
 import TasksRefreshContext from '../../services/context/TasksRefreshContext';
 import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
 import VisitRefreshContext from '../../services/context/VisitRefreshContext';
+import Note from '../../screens/note';
 
 const initRefreshCalendar = () => {
   console.log('calendar refresh not set');
@@ -47,6 +48,7 @@ export default function Navigation() {
                 <Stack.Screen name={'Group'} component={Group} options={{ headerShown: false }} />
                 <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
                 <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
+                <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
               </Stack.Navigator>
             </VisitTasksRefreshContext.Provider>
           </VisitRefreshContext.Provider>
