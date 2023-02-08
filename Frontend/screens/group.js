@@ -1,166 +1,90 @@
-import {
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  View,
-} from "react-native";
-import { useEffect, useState } from "react";
-import COLORS from "../constants/colors";
-import Header from "../components/group/header";
-import Icon from "react-native-vector-icons/FontAwesome";
-import AddGroupModal from "../components/group/AddGroupModal";
-import config from "../constants/config";
-const axios = require("axios").default;
+import { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { TextInput, Text, Button, Appbar } from 'react-native-paper';
+import colors from '../constants/colors';
 
-/**
- * Sends create new user request to the backend server using the given
- * first name, last name , email and phone number.
- * @return True : on success
- *         False: on error
- */
-const createUser = async (first, last, email, phone, group, photo) => {
-  try {
-    const data = {
-      email: email,
-      firstName: first,
-      lastName: last,
-      phoneNum: phone,
-      groupId: group,
-      profilePic: photo,
-    };
-    let connection_string = config.backend_server + "/user";
-    return await axios
-      .post(connection_string, data)
-      .then(function (response) {
-        return true;
-      })
-      .catch(function (error) {
-        console.log("create user error", error);
-        return false;
-      });
-  } catch (error) {
-    console.log("error", error.message);
-  }
-  return false;
-};
+export default function Group({ navigation, route }) {
+  const { user } = route.params;
+  const [groupName, setGroupName] = useState('');
 
-const Group = ({ navigation, route }) => {
-  const [groups, setGroups] = useState([]); // Groups the user are in
-  const [selectedGroup, setGroupSelected] = useState(null);
-  var { user } = route.params;
-  const handlePress = (group) => {
-    console.log(`Group ${group.name} pressed`);
-    user["group"] = group.id;
-    navigation.navigate("Home", { user: user });
-  };
   useEffect(() => {
-    if (selectedGroup != null) {
-      user["group"] = selectedGroup.id;
-
-      const created = createUser(
-        user.first,
-        user.last,
-        user.email,
-        user.phone,
-        selectedGroup.id,
-        user.picture
-      );
-      if (created) {
-        navigation.navigate("Home", { user: user });
-      } else {
-      }
+    if (user != null) {
+      setGroupName(user.first + ' ' + user.last + ' Family');
     }
-  }, [selectedGroup]);
-
-  // Add a state variable to control the visibility of the add group modal
-  const [modalVisible, setModalVisible] = useState(false);
+  }, [user]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header />
-      <AddGroupModal
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-        setGroupSelected={setGroupSelected}
-      />
-      <Text style={styles.subtitle}>Select a group!</Text>
-      <View style={styles.groupContainer}>
-        <View style={styles.groupCase} key="add">
-          <TouchableOpacity
-            style={styles.addGroup}
-            onPress={() => {
-              setModalVisible(true);
-            }}
-          >
-            <Icon name="search-plus" size={30} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.groupName}>Add Group</Text>
-        </View>
-        {groups.map((group) => (
-          <View style={styles.groupCase} key={group.id}>
-            <TouchableOpacity
-              style={styles.groupList}
-              onPress={() => handlePress(group)}
-            ></TouchableOpacity>
-            <Text style={styles.groupName}>{group.name}</Text>
-          </View>
-        ))}
+      <Appbar.Header style={styles.appbar}>
+        <Appbar.Action
+          icon='chevron-left'
+          onPress={() => {
+            navigation.navigate('Group', { user });
+          }}
+        />
+        <Appbar.Content title='Create Your Group' />
+      </Appbar.Header>
+      <View style={styles.description}>
+        <Text style={styles.text}>
+          Your group is where you and your family coordinate caretaking.
+        </Text>
+        <Text style={styles.text}>Make yours and start coordinating.</Text>
       </View>
+
+      <View style={styles.form}>
+        <TextInput
+          right={<TextInput.Icon icon='home-heart' />}
+          value={groupName}
+          onChangeText={(text) => setGroupName(text)}
+          label={'Group Name'}
+          activeUnderlineColor='lightblue'
+          underlineColor='lightblue'
+        />
+      </View>
+      <Text style={styles.text}>
+        By creating a group, you agree do our Community Guidelines.
+      </Text>
+      <Button
+        icon='check-all'
+        mode='contained'
+        onPress={() => createGroup(groupName, user)}
+        style={styles.createButton}
+        color='lightblue'
+      >
+        Create Group
+      </Button>
     </SafeAreaView>
   );
+}
+
+const createGroup = (groupName, user) => {
+  console.log('Creating group ', groupName);
 };
 
-export default Group;
-
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 20,
-    marginTop: 50,
+  container: {},
+  appbar: {
+    backgroundColor: colors.lightBlue,
   },
-
-  subtitle: {
+  form: {
     marginTop: 20,
-    marginLeft: 15,
-    fontWeight: "100",
-    fontSize: 20,
+    marginBottom: 20,
   },
-  groupContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
+  title: {
+    padding: 20,
+    fontSize: 16,
+    alignSelf: 'center',
+    fontWeight: 'bold',
   },
-  icon: {
-    alignSelf: "flex-end",
+  text: {
+    alignSelf: 'center',
+    fontSize: 10,
   },
-  addGroup: {
-    backgroundColor: COLORS.coolGray,
-    borderRadius: 40,
-    width: 80,
-    height: 80,
-    justifyContent: "center",
-    alignSelf: "center",
-    alignItems: "center",
-  },
-  groupList: {
-    backgroundColor: COLORS.card,
-    borderRadius: 40,
-    padding: 10,
-    borderWidth: 1,
-    width: 80,
-    height: 80,
-    justifyContent: "center",
-    alignSelf: "center",
-  },
-  groupName: {
-    fontWeight: "light",
-    fontSize: 15,
-    textAlign: "center",
-    width: 80,
-    maxHeight: 40,
-  },
-  groupCase: {
+  createButton: {
+    marginTop: 10,
     margin: 10,
-    alignItems: "center",
+  },
+  description: {
+    marginTop: 20,
   },
 });

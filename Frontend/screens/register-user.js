@@ -1,12 +1,29 @@
-import { useState } from 'react';
-import { SafeAreaView, Text, TouchableOpacity, TextInput, StyleSheet, View } from 'react-native';
+import { useState, useEffect } from 'react';
+import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { TextInput } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
 import colors from '../constants/colors';
 
 export default function Inputs({ route, navigation }) {
   const { user } = route.params;
-  const [state, setState] = useState({});
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneMissing, setPhoneMissing] = useState(false);
+  const [nameMissing, setNameMissing] = useState(true);
+  const [email, setEmail] = useState(null);
+  const [userName, setUserName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [missLastName, setMissLastName] = useState(true);
+
+  useEffect(() => {
+    if (user != undefined) {
+      setUserName(user['given_name']);
+      setLastName(user['family_name']);
+      setEmail(user['email']);
+
+      setMissLastName(false);
+      setNameMissing(false);
+    }
+  }, [user]);
 
   // Formats the text of the phone number to display nicely
   // E.g., 123-449-4910
@@ -20,83 +37,95 @@ export default function Inputs({ route, navigation }) {
       }
     }
     if (cleaned.length >= 7) {
-      cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3, 6) + '-' + cleaned.slice(6);
+      cleaned =
+        cleaned.slice(0, 3) +
+        '-' +
+        cleaned.slice(3, 6) +
+        '-' +
+        cleaned.slice(6);
     } else if (cleaned.length > 3) {
       cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
     }
     setPhoneNumber(cleaned);
-    state['phone'] = cleaned;
-    setState(state);
+
+    setPhoneMissing(false);
   };
 
-  state['email'] = user['email'];
-  state['first'] = user['given_name'];
-  state['last'] = user['family_name'];
-  state['picture'] = user['picture'];
-
-  const handleFirstName = (text) => {
-    state['first'] = text;
-    setState(state);
+  const handleNameChange = (text) => {
+    setUserName(text);
+    setNameMissing(false);
   };
 
-  const handleLastName = (text) => {
-    state['last'] = text;
-    setState(state);
-  };
-
-  const handlePhone = (text) => {
-    setPhone(text);
-    state['phone'] = text;
+  const handleLastNameChange = (text) => {
+    setLastName(text);
+    setMissLastName(false);
   };
 
   // Handles create user button being pressed
   const submit = async () => {
-    if (state['first'] == undefined) {
-      alert('Please make to enter your first name');
-    } else if (state['last'] == undefined) {
-      alert('Please make to enter your last name');
-    } else if (state['phone'] == undefined) {
-      alert('Please make to enter your phone number');
-    } else if (state['phone'].length < 12) {
-      alert('Phone number is not valid');
+    if (userName == undefined || userName == '') {
+      setNameMissing(true);
+    } else if (lastName == undefined || lastName == '') {
+      setMissLastName(true);
+    } else if (phoneNumber.length < 12) {
+      setPhoneMissing(true);
     } else {
-      navigation.navigate('Group', { user: state });
+      navigation.navigate('Group', {
+        user: {
+          email: email,
+          last: userName,
+          first: lastName,
+          picture: user['picture'],
+          phone: phoneNumber,
+        },
+      });
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Register with CareCoord!</Text>
-      <Text style={styles.subtext}>Please fill up the information below</Text>
+      <Text style={styles.title}>Register User</Text>
       <Divider />
-
-      <Text style={styles.input}>Email: {state['email']}</Text>
-
-      <View style={styles.nameRow}>
-        <TextInput
-          style={styles.lastName}
-          underlineColorAndroid="transparent"
-          placeholder={state['first']}
-          onChangeText={handleFirstName}
-        />
-        <TextInput
-          style={styles.firstName}
-          underlineColorAndroid="transparent"
-          placeholder={state['last']}
-          onChangeText={handleLastName}
-        />
-      </View>
-
       <TextInput
-        style={styles.phone}
-        underlineColorAndroid="transparent"
-        placeholder="Enter Phone Number"
-        display={'12344'}
-        autoCapitalize="none"
-        keyboardType="number-pad"
+        right={<TextInput.Icon icon='email' />}
+        style={styles.input}
+        value={user['email']}
+        label={'Email'}
+        disabled
+        // mode={'outlined'}
+      />
+      <TextInput
+        right={<TextInput.Icon icon='account' />}
+        style={styles.input}
+        label={'First Name'}
+        value={userName}
+        onChangeText={handleNameChange}
+        autoCorrect={false}
+        error={nameMissing}
+        underlineColor='lightblue'
+        activeUnderlineColor='lightblue'
+      />
+      <TextInput
+        right={<TextInput.Icon icon='account' />}
+        style={styles.input}
+        label={'Last Name'}
+        value={lastName}
+        onChangeText={handleLastNameChange}
+        autoCorrect={false}
+        error={missLastName}
+        underlineColor='lightblue'
+        activeUnderlineColor='lightblue'
+      />
+      <TextInput
+        right={<TextInput.Icon icon='phone' />}
+        style={styles.input}
+        label={'Phone Number'}
+        keyboardType='number-pad'
         value={phoneNumber}
-        maxLength={12}
         onChangeText={(text) => formatPhoneNumber(text)}
+        error={phoneMissing}
+        underlineColor='lightblue'
+        activeUnderlineColor='lightblue'
       />
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
         <Text style={styles.submitButtonText}> Join Caring Group </Text>
@@ -110,51 +139,30 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     marginTop: 50,
   },
-  nameRow: {
-    margin: 12,
-    flexDirection: 'row',
-    borderWidth: 1,
-  },
-  firstName: {
-    height: 40,
-    padding: 10,
-    flex: 1,
-  },
-  lastName: {
-    height: 40,
-    padding: 10,
-    flex: 1,
-  },
   input: {
-    height: 40,
     margin: 12,
-    padding: 10,
-  },
-  phone: {
-    height: 40,
-    margin: 12,
-    padding: 10,
-    borderWidth: 1,
   },
   submitButton: {
-    backgroundColor: colors.pink,
+    backgroundColor: colors.lightBlue,
     padding: 10,
     margin: 15,
     marginTop: 30,
-    height: 50,
     width: '50%',
     alignSelf: 'center',
     borderRadius: 20,
     alignContent: 'center',
     justifyContent: 'center',
+    height: '15%',
+    marginBottom: '3%',
   },
   submitButtonText: {
     color: 'white',
+    fontSize: 16,
     alignSelf: 'center',
   },
   title: {
-    fontWeight: '500',
-    fontSize: 20,
+    fontWeight: 'bold',
+    fontSize: 26,
     margin: 15,
   },
   subtext: {

@@ -5,20 +5,10 @@ import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
 import COLORS from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import config from '../constants/config';
+
 const axios = require('axios').default;
 WebBrowser.maybeCompleteAuthSession();
 
-const getUserGroupByID = async (email) => {
-  let connection_string = config.backend_server + '/user/groupId/' + email;
-  return await axios
-    .get(connection_string)
-    .then(function (response) {
-      return response;
-    })
-    .catch(function (error) {
-      return null;
-    });
-};
 
 export default function GoogleLogin({ navigation }) {
   const [accessToken, setAccessToken] = React.useState(null);
@@ -95,6 +85,18 @@ export default function GoogleLogin({ navigation }) {
     </SafeAreaView>
   );
 }
+
+const getUserGroupByID = async (email) => {
+  let connection_string = config.backend_server + '/user/groupId/' + email;
+  return await axios
+    .get(connection_string)
+    .then(function (response) {
+      return response;
+    })
+    .catch(function (error) {
+      return null;
+    });
+};
 
 const styles = StyleSheet.create({
   main: {

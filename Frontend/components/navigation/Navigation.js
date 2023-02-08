@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomNavigation from './BottomNavigation';
 import GoogleLogin from '../../screens/google';
 import RegisterUser from '../../screens/register-user';
+import Groups from '../../screens/groups';
 import Group from '../../screens/group';
 import Visit from '../../screens/visit';
 import Task from '../../screens/task';
@@ -45,7 +46,8 @@ export default function Navigation() {
                   {(props) => <BottomNavigation {...props} setUser={setUser} />}
                 </Stack.Screen>
                 <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
-                <Stack.Screen name={'Group'} component={Group} options={{ headerShown: false }} />
+                <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false }} />
+                <Stack.Screen name={'CreateGroup'} component={Group} options={{headerShown: false}} />
                 <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
                 <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
                 <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
