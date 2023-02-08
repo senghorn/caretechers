@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
 import colors from '../constants/colors';
 
 export default function Inputs({ route, navigation }) {
   const { user } = route.params;
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneMissing, setPhoneMissing] = useState(true);
+  const [phoneMissing, setPhoneMissing] = useState(false);
   const [nameMissing, setNameMissing] = useState(true);
   const [email, setEmail] = useState(null);
   const [userName, setUserName] = useState('');
@@ -92,39 +92,40 @@ export default function Inputs({ route, navigation }) {
         value={user['email']}
         label={'Email'}
         disabled
-        mode={'outlined'}
+        // mode={'outlined'}
       />
       <TextInput
         right={<TextInput.Icon icon='account' />}
         style={styles.input}
-        mode={'outlined'}
-        underlineColorAndroid='transparent'
         label={'First Name'}
         value={userName}
         onChangeText={handleNameChange}
         autoCorrect={false}
         error={nameMissing}
+        underlineColor='lightblue'
+        activeUnderlineColor='lightblue'
       />
       <TextInput
         right={<TextInput.Icon icon='account' />}
         style={styles.input}
-        mode={'outlined'}
-        underlineColorAndroid='transparent'
         label={'Last Name'}
         value={lastName}
         onChangeText={handleLastNameChange}
         autoCorrect={false}
         error={missLastName}
+        underlineColor='lightblue'
+        activeUnderlineColor='lightblue'
       />
       <TextInput
         right={<TextInput.Icon icon='phone' />}
         style={styles.input}
         label={'Phone Number'}
-        mode={'outlined'}
         keyboardType='number-pad'
         value={phoneNumber}
         onChangeText={(text) => formatPhoneNumber(text)}
         error={phoneMissing}
+        underlineColor='lightblue'
+        activeUnderlineColor='lightblue'
       />
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
         <Text style={styles.submitButtonText}> Join Caring Group </Text>
@@ -143,7 +144,6 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: colors.babyBlue,
-    fontFamily: 'Georgia',
     padding: 10,
     margin: 15,
     marginTop: 30,

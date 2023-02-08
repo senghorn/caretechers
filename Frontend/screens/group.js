@@ -1,74 +1,67 @@
-import {
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  View,
-} from 'react-native';
-import { TextInput, Text } from 'react-native-paper';
-import { useState, useEffect } from 'react';
-import colors from '../constants/colors';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { TextInput, Text, Button } from 'react-native-paper';
 
 export default function Group({ navigation, route }) {
   const { user } = route.params;
-  const [searchValue, setSearchValue] = useState('');
-  const image = { uri: require('../assets/IMG_5965.png') };
-
-  const searchGroup = () => {
-    console.log('searching for ' + searchValue);
-  };
+  const [groupName, setGroupName] = useState('');
+  useEffect(() => {
+    if (user != null) {
+      setGroupName(user.first + ' ' + user.last + ' Family');
+    }
+  }, [user]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        onPress={() => {
-          console.log('create group pressed');
-        }}
+      <Text style={styles.title}>Create Your Care Group</Text>
+      <Text style={styles.text}>
+        Your group is where you and your family coordinate caretaking.
+      </Text>
+      <Text style={styles.text}>Make yours and start coordinating.</Text>
+      <View style={styles.form}>
+        <TextInput
+          right={<TextInput.Icon icon='home-heart' />}
+          value={groupName}
+          onChangeText={(text) => setGroupName(text)}
+          label={'Group Name'}
+          activeUnderlineColor='lightblue'
+          underlineColor='lightblue'
+        />
+      </View>
+      <Text style={styles.text}>
+        By creating a group, you agree do our Community Guidelines.
+      </Text>
+      <Button
+        icon='check-all'
+        mode='contained'
+        onPress={() => console.log('Pressed')}
+        style={styles.createButton}
+        color='lightblue'
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Create Group</Text>
-        </View>
-      </TouchableOpacity>
-
-      <TextInput
-        label={'Find Group'}
-        style={styles.searchInput}
-        mode={'outlined'}
-        value={searchValue}
-        onChangeText={(text) => {
-          setSearchValue(text);
-        }}
-        onSubmitEditing={searchGroup}
-        activeOutlineColor='lightblue'
-      ></TextInput>
-      <ScrollView></ScrollView>
+        Create Group
+      </Button>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    backgroundColor: colors.babyBlue,
-    alignItems: 'center',
-    padding: 15,
-    borderRadius: 15,
-    margin: 15,
-    flex: 'auto',
+  container: {},
+  form: {
+    marginTop: 20,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  searchInput: {
-    width: '95%',
+    padding: 20,
+    fontSize: 16,
     alignSelf: 'center',
+    fontWeight: 'bold',
   },
-  topItem: {
-    marginTop: 70,
+  text: {
+    alignSelf: 'center',
+    fontSize: 10,
+  },
+  createButton: {
+    marginTop: 10,
+    margin: 10,
   },
 });
