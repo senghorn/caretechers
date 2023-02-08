@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { SafeAreaView, Text, TouchableOpacity, TextInput, StyleSheet, View } from 'react-native';
+import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { TextInput, Button } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
 import colors from '../constants/colors';
 
@@ -10,7 +11,7 @@ export default function Inputs({ route, navigation }) {
 
   // Formats the text of the phone number to display nicely
   // E.g., 123-449-4910
-  const formatPhoneNumber = (text) => {
+  const formatPhoneNumber = text => {
     var cleaned = '';
     var match = text.match(/\d/g);
     if (match) {
@@ -20,7 +21,12 @@ export default function Inputs({ route, navigation }) {
       }
     }
     if (cleaned.length >= 7) {
-      cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3, 6) + '-' + cleaned.slice(6);
+      cleaned =
+        cleaned.slice(0, 3) +
+        '-' +
+        cleaned.slice(3, 6) +
+        '-' +
+        cleaned.slice(6);
     } else if (cleaned.length > 3) {
       cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
     }
@@ -34,17 +40,17 @@ export default function Inputs({ route, navigation }) {
   state['last'] = user['family_name'];
   state['picture'] = user['picture'];
 
-  const handleFirstName = (text) => {
+  const handleFirstName = text => {
     state['first'] = text;
     setState(state);
   };
 
-  const handleLastName = (text) => {
+  const handleLastName = text => {
     state['last'] = text;
     setState(state);
   };
 
-  const handlePhone = (text) => {
+  const handlePhone = text => {
     setPhone(text);
     state['phone'] = text;
   };
@@ -66,37 +72,30 @@ export default function Inputs({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Register with CareCoord!</Text>
-      <Text style={styles.subtext}>Please fill up the information below</Text>
+      <Text style={styles.title}>Register User</Text>
+      {/* <Text style={styles.subtext}>Please fill up the information below</Text> */}
       <Divider />
-
-      <Text style={styles.input}>Email: {state['email']}</Text>
-
-      <View style={styles.nameRow}>
-        <TextInput
-          style={styles.lastName}
-          underlineColorAndroid="transparent"
-          placeholder={state['first']}
-          onChangeText={handleFirstName}
-        />
-        <TextInput
-          style={styles.firstName}
-          underlineColorAndroid="transparent"
-          placeholder={state['last']}
-          onChangeText={handleLastName}
-        />
-      </View>
-
       <TextInput
-        style={styles.phone}
-        underlineColorAndroid="transparent"
-        placeholder="Enter Phone Number"
-        display={'12344'}
-        autoCapitalize="none"
-        keyboardType="number-pad"
+        right={<TextInput.Icon icon='email' />}
+        style={styles.input}
+        value={state['email']}
+        label={'Email'}
+        disabled
+      />
+      <TextInput
+        right={<TextInput.Icon icon='account' />}
+        style={styles.input}
+        underlineColorAndroid='transparent'
+        label={'Full Name'}
+        onChangeText={handleFirstName}
+      />
+      <TextInput
+        right={<TextInput.Icon icon='phone' />}
+        style={styles.input}
+        label={'Phone Number'}
+        keyboardType='number-pad'
         value={phoneNumber}
-        maxLength={12}
-        onChangeText={(text) => formatPhoneNumber(text)}
+        onChangeText={text => formatPhoneNumber(text)}
       />
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
         <Text style={styles.submitButtonText}> Join Caring Group </Text>
@@ -110,51 +109,30 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     marginTop: 50,
   },
-  nameRow: {
-    margin: 12,
-    flexDirection: 'row',
-    borderWidth: 1,
-  },
-  firstName: {
-    height: 40,
-    padding: 10,
-    flex: 1,
-  },
-  lastName: {
-    height: 40,
-    padding: 10,
-    flex: 1,
-  },
   input: {
-    height: 40,
     margin: 12,
-    padding: 10,
-  },
-  phone: {
-    height: 40,
-    margin: 12,
-    padding: 10,
-    borderWidth: 1,
   },
   submitButton: {
-    backgroundColor: colors.pink,
+    backgroundColor: colors.gradientForm,
     padding: 10,
     margin: 15,
     marginTop: 30,
-    height: 50,
     width: '50%',
     alignSelf: 'center',
     borderRadius: 20,
     alignContent: 'center',
     justifyContent: 'center',
+    height: '15%',
+    marginBottom: '3%',
   },
   submitButtonText: {
     color: 'white',
+    fontSize: 16,
     alignSelf: 'center',
   },
   title: {
-    fontWeight: '500',
-    fontSize: 20,
+    fontWeight: 'bold',
+    fontSize: 30,
     margin: 15,
   },
   subtext: {
