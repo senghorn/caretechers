@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
-import { TextInput, Text, Button } from 'react-native-paper';
+import { TextInput, Text, Button, Appbar } from 'react-native-paper';
+import colors from '../constants/colors';
 
 export default function Group({ navigation, route }) {
   const { user } = route.params;
   const [groupName, setGroupName] = useState('');
+
   useEffect(() => {
     if (user != null) {
       setGroupName(user.first + ' ' + user.last + ' Family');
@@ -13,11 +15,22 @@ export default function Group({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Create Your Care Group</Text>
-      <Text style={styles.text}>
-        Your group is where you and your family coordinate caretaking.
-      </Text>
-      <Text style={styles.text}>Make yours and start coordinating.</Text>
+      <Appbar.Header style={styles.appbar}>
+        <Appbar.Action
+          icon='chevron-left'
+          onPress={() => {
+            navigation.navigate('Group', { user });
+          }}
+        />
+        <Appbar.Content title='Create Your Group' />
+      </Appbar.Header>
+      <View style={styles.description}>
+        <Text style={styles.text}>
+          Your group is where you and your family coordinate caretaking.
+        </Text>
+        <Text style={styles.text}>Make yours and start coordinating.</Text>
+      </View>
+
       <View style={styles.form}>
         <TextInput
           right={<TextInput.Icon icon='home-heart' />}
@@ -46,6 +59,9 @@ export default function Group({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: {},
+  appbar: {
+    backgroundColor: colors.lightBlue,
+  },
   form: {
     marginTop: 20,
     marginBottom: 20,
@@ -63,5 +79,8 @@ const styles = StyleSheet.create({
   createButton: {
     marginTop: 10,
     margin: 10,
+  },
+  description: {
+    marginTop: 20,
   },
 });

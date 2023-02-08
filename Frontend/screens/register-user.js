@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     margin: 12,
   },
   submitButton: {
-    backgroundColor: colors.babyBlue,
+    backgroundColor: colors.lightBlue,
     padding: 10,
     margin: 15,
     marginTop: 30,

@@ -75,6 +75,38 @@ const fetchGroups = async (setGroups) => {
   }
 };
 
+/**
+ * Sends create new user request to the backend server using the given
+ * first name, last name , email and phone number.
+ * @return True : on success
+ *         False: on error
+ */
+const createUser = async (first, last, email, phone, group, photo) => {
+  try {
+    const data = {
+      email: email,
+      firstName: first,
+      lastName: last,
+      phoneNum: phone,
+      groupId: group,
+      profilePic: photo,
+    };
+    let connection_string = config.backend_server + '/user';
+    return await axios
+      .post(connection_string, data)
+      .then(function (response) {
+        return true;
+      })
+      .catch(function (error) {
+        console.log('create user error', error);
+        return false;
+      });
+  } catch (error) {
+    console.log('error', error.message);
+  }
+  return false;
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
