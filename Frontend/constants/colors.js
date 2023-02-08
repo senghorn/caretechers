@@ -11,5 +11,6 @@ export default {
     coolGray: '#746C70',
     grayLight: '#ccc',
     black: '#0a0a0a',
-    pink: '#F082AC'
+    pink: '#F082AC',
+    lightGreen: '#74c69d'
   };

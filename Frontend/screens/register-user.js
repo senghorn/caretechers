@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
@@ -6,8 +6,18 @@ import colors from '../constants/colors';
 
 export default function Inputs({ route, navigation }) {
   const { user } = route.params;
-  const [state, setState] = useState({});
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneMissing, setPhoneMissing] = useState(false);
+  const [nameMissing, setNameMissing] = useState(false);
+  const [email, setEmail] = useState(null);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    if (user != undefined) {
+      setUserName(user['name']);
+      setEmail(user['email']);
+    }
+  }, [user]);
 
   // Formats the text of the phone number to display nicely
   // E.g., 123-449-4910
@@ -31,54 +41,43 @@ export default function Inputs({ route, navigation }) {
       cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
     }
     setPhoneNumber(cleaned);
-    state['phone'] = cleaned;
-    setState(state);
+    if (cleaned.length == 12) {
+      setPhoneMissing(false);
+    }
   };
 
-  state['email'] = user['email'];
-  state['first'] = user['given_name'];
-  state['last'] = user['family_name'];
-  state['picture'] = user['picture'];
-
-  const handleFirstName = text => {
-    state['first'] = text;
-    setState(state);
-  };
-
-  const handleLastName = text => {
-    state['last'] = text;
-    setState(state);
-  };
-
-  const handlePhone = text => {
-    setPhone(text);
-    state['phone'] = text;
+  const handleNameChange = text => {
+    setUserName(text);
   };
 
   // Handles create user button being pressed
   const submit = async () => {
-    if (state['first'] == undefined) {
-      alert('Please make to enter your first name');
-    } else if (state['last'] == undefined) {
-      alert('Please make to enter your last name');
-    } else if (state['phone'] == undefined) {
-      alert('Please make to enter your phone number');
-    } else if (state['phone'].length < 12) {
-      alert('Phone number is not valid');
+    if (userName == undefined || userName == '') {
+      setNameMissing(true);
+      return;
+    } else if (phoneNumber.length < 12) {
+      setPhoneMissing(true);
+      return;
     } else {
-      navigation.navigate('Group', { user: state });
+      navigation.navigate('Group', {
+        user: {
+          email: email,
+          name: userName,
+          picture: user['picture'],
+          phone: phoneNumber,
+        },
+      });
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Register User</Text>
-      {/* <Text style={styles.subtext}>Please fill up the information below</Text> */}
       <Divider />
       <TextInput
         right={<TextInput.Icon icon='email' />}
         style={styles.input}
-        value={state['email']}
+        value={user['email']}
         label={'Email'}
         disabled
       />
@@ -87,7 +86,10 @@ export default function Inputs({ route, navigation }) {
         style={styles.input}
         underlineColorAndroid='transparent'
         label={'Full Name'}
-        onChangeText={handleFirstName}
+        value={userName}
+        onChangeText={handleNameChange}
+        autoCorrect={false}
+        error={nameMissing}
       />
       <TextInput
         right={<TextInput.Icon icon='phone' />}
@@ -96,6 +98,7 @@ export default function Inputs({ route, navigation }) {
         keyboardType='number-pad'
         value={phoneNumber}
         onChangeText={text => formatPhoneNumber(text)}
+        error={phoneMissing}
       />
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
         <Text style={styles.submitButtonText}> Join Caring Group </Text>
@@ -113,7 +116,8 @@ const styles = StyleSheet.create({
     margin: 12,
   },
   submitButton: {
-    backgroundColor: colors.gradientForm,
+    backgroundColor: colors.lightGreen,
+    fontFamily: 'Georgia',
     padding: 10,
     margin: 15,
     marginTop: 30,
