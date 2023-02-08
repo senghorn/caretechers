@@ -27,7 +27,7 @@ export default function Inputs({ route, navigation }) {
 
   // Formats the text of the phone number to display nicely
   // E.g., 123-449-4910
-  const formatPhoneNumber = text => {
+  const formatPhoneNumber = (text) => {
     var cleaned = '';
     var match = text.match(/\d/g);
     if (match) {
@@ -47,17 +47,16 @@ export default function Inputs({ route, navigation }) {
       cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
     }
     setPhoneNumber(cleaned);
-    if (cleaned.length == 12) {
-      setPhoneMissing(false);
-    }
+
+    setPhoneMissing(false);
   };
 
-  const handleNameChange = text => {
+  const handleNameChange = (text) => {
     setUserName(text);
     setNameMissing(false);
   };
 
-  const handleLastNameChange = text => {
+  const handleLastNameChange = (text) => {
     setLastName(text);
     setMissLastName(false);
   };
@@ -93,10 +92,12 @@ export default function Inputs({ route, navigation }) {
         value={user['email']}
         label={'Email'}
         disabled
+        mode={'outlined'}
       />
       <TextInput
         right={<TextInput.Icon icon='account' />}
         style={styles.input}
+        mode={'outlined'}
         underlineColorAndroid='transparent'
         label={'First Name'}
         value={userName}
@@ -107,6 +108,7 @@ export default function Inputs({ route, navigation }) {
       <TextInput
         right={<TextInput.Icon icon='account' />}
         style={styles.input}
+        mode={'outlined'}
         underlineColorAndroid='transparent'
         label={'Last Name'}
         value={lastName}
@@ -118,9 +120,10 @@ export default function Inputs({ route, navigation }) {
         right={<TextInput.Icon icon='phone' />}
         style={styles.input}
         label={'Phone Number'}
+        mode={'outlined'}
         keyboardType='number-pad'
         value={phoneNumber}
-        onChangeText={text => formatPhoneNumber(text)}
+        onChangeText={(text) => formatPhoneNumber(text)}
         error={phoneMissing}
       />
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
@@ -139,7 +142,7 @@ const styles = StyleSheet.create({
     margin: 12,
   },
   submitButton: {
-    backgroundColor: colors.lightGreen,
+    backgroundColor: colors.babyBlue,
     fontFamily: 'Georgia',
     padding: 10,
     margin: 15,
@@ -159,7 +162,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 30,
+    fontSize: 26,
     margin: 15,
   },
   subtext: {

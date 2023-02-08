@@ -2,6 +2,7 @@ export default {
     gradientForm: '#549BCE',
     primary: '#2196f3',
     white: '#FFFFFF',
+    warmWhite: '#e9ecef',
     dark: '#444',
     card:'#e3f2fd',
     bgColor: '#2D78E9',
@@ -12,5 +13,5 @@ export default {
     grayLight: '#ccc',
     black: '#0a0a0a',
     pink: '#F082AC',
-    lightGreen: '#74c69d'
+    babyBlue: '#a8dadc'
   };

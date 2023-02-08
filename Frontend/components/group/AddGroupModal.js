@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { View, SafeAreaView, StyleSheet, Modal, ScrollView, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  SafeAreaView,
+  StyleSheet,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import { Searchbar, Button } from 'react-native-paper';
 import COLORS from '../../constants/colors';
 import config from '../../constants/config';
@@ -22,9 +30,14 @@ const AddGroupModal = ({ modalVisible, setModalVisible, setGroupSelected }) => {
   const [groups, setGroups] = useState([]);
   fetchGroups(setGroups);
   return (
-    <Modal visible={modalVisible} transparent={true} animationType="slide">
+    <Modal visible={modalVisible} transparent={true} animationType='slide'>
       <SafeAreaView style={styles.modal}>
-        <Searchbar placeholder="Search" onChangeText={onChangeSearch} value={searchQuery} style={styles.searchBox} />
+        <Searchbar
+          placeholder='Search'
+          onChangeText={onChangeSearch}
+          value={searchQuery}
+          style={styles.searchBox}
+        />
         <View style={styles.searchResult}>
           <ScrollView>
             {groups.map((group) => {
@@ -46,10 +59,10 @@ const AddGroupModal = ({ modalVisible, setModalVisible, setGroupSelected }) => {
 
         <Button
           key={'newGroup'}
-          mode="contained"
+          mode='contained'
           uppercase={false}
-          color="#2196f3"
-          icon="checkbox-marked-circle-plus-outline"
+          color='#2196f3'
+          icon='checkbox-marked-circle-plus-outline'
           style={styles.exitButton}
           onPress={() => console.log('create new group pressed')}
         >
@@ -58,10 +71,10 @@ const AddGroupModal = ({ modalVisible, setModalVisible, setGroupSelected }) => {
 
         <Button
           key={'exit'}
-          mode="contained"
+          mode='contained'
           uppercase={false}
           color={COLORS.danger}
-          icon="exit-to-app"
+          icon='exit-to-app'
           style={styles.exitButton}
           onPress={() => setModalVisible(false)}
         >
