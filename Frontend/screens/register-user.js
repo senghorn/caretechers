@@ -7,15 +7,21 @@ import colors from '../constants/colors';
 export default function Inputs({ route, navigation }) {
   const { user } = route.params;
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneMissing, setPhoneMissing] = useState(false);
-  const [nameMissing, setNameMissing] = useState(false);
+  const [phoneMissing, setPhoneMissing] = useState(true);
+  const [nameMissing, setNameMissing] = useState(true);
   const [email, setEmail] = useState(null);
   const [userName, setUserName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [missLastName, setMissLastName] = useState(true);
 
   useEffect(() => {
     if (user != undefined) {
-      setUserName(user['name']);
+      setUserName(user['given_name']);
+      setLastName(user['family_name']);
       setEmail(user['email']);
+
+      setMissLastName(false);
+      setNameMissing(false);
     }
   }, [user]);
 
@@ -48,21 +54,28 @@ export default function Inputs({ route, navigation }) {
 
   const handleNameChange = text => {
     setUserName(text);
+    setNameMissing(false);
+  };
+
+  const handleLastNameChange = text => {
+    setLastName(text);
+    setMissLastName(false);
   };
 
   // Handles create user button being pressed
   const submit = async () => {
     if (userName == undefined || userName == '') {
       setNameMissing(true);
-      return;
+    } else if (lastName == undefined || lastName == '') {
+      setMissLastName(true);
     } else if (phoneNumber.length < 12) {
       setPhoneMissing(true);
-      return;
     } else {
       navigation.navigate('Group', {
         user: {
           email: email,
-          name: userName,
+          last: userName,
+          first: lastName,
           picture: user['picture'],
           phone: phoneNumber,
         },
@@ -85,11 +98,21 @@ export default function Inputs({ route, navigation }) {
         right={<TextInput.Icon icon='account' />}
         style={styles.input}
         underlineColorAndroid='transparent'
-        label={'Full Name'}
+        label={'First Name'}
         value={userName}
         onChangeText={handleNameChange}
         autoCorrect={false}
         error={nameMissing}
+      />
+      <TextInput
+        right={<TextInput.Icon icon='account' />}
+        style={styles.input}
+        underlineColorAndroid='transparent'
+        label={'Last Name'}
+        value={lastName}
+        onChangeText={handleLastNameChange}
+        autoCorrect={false}
+        error={missLastName}
       />
       <TextInput
         right={<TextInput.Icon icon='phone' />}

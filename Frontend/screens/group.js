@@ -4,14 +4,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   View,
-} from "react-native";
-import { useEffect, useState } from "react";
-import COLORS from "../constants/colors";
-import Header from "../components/group/header";
-import Icon from "react-native-vector-icons/FontAwesome";
-import AddGroupModal from "../components/group/AddGroupModal";
-import config from "../constants/config";
-const axios = require("axios").default;
+} from 'react-native';
+import { useEffect, useState } from 'react';
+import COLORS from '../constants/colors';
+import Header from '../components/group/header';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import AddGroupModal from '../components/group/AddGroupModal';
+import config from '../constants/config';
+const axios = require('axios').default;
 
 /**
  * Sends create new user request to the backend server using the given
@@ -29,18 +29,18 @@ const createUser = async (first, last, email, phone, group, photo) => {
       groupId: group,
       profilePic: photo,
     };
-    let connection_string = config.backend_server + "/user";
+    let connection_string = config.backend_server + '/user';
     return await axios
       .post(connection_string, data)
       .then(function (response) {
         return true;
       })
       .catch(function (error) {
-        console.log("create user error", error);
+        console.log('create user error', error);
         return false;
       });
   } catch (error) {
-    console.log("error", error.message);
+    console.log('error', error.message);
   }
   return false;
 };
@@ -49,15 +49,17 @@ const Group = ({ navigation, route }) => {
   const [groups, setGroups] = useState([]); // Groups the user are in
   const [selectedGroup, setGroupSelected] = useState(null);
   var { user } = route.params;
-  const handlePress = (group) => {
+
+  const handlePress = group => {
     console.log(`Group ${group.name} pressed`);
-    user["group"] = group.id;
-    navigation.navigate("Home", { user: user });
+    user['group'] = group.id;
+    navigation.navigate('Home', { user: user });
   };
+
   useEffect(() => {
     if (selectedGroup != null) {
-      user["group"] = selectedGroup.id;
-
+      user['group'] = selectedGroup.id;
+      console.log(user);
       const created = createUser(
         user.first,
         user.last,
@@ -67,7 +69,7 @@ const Group = ({ navigation, route }) => {
         user.picture
       );
       if (created) {
-        navigation.navigate("Home", { user: user });
+        navigation.navigate('Home', { user: user });
       } else {
       }
     }
@@ -86,18 +88,18 @@ const Group = ({ navigation, route }) => {
       />
       <Text style={styles.subtitle}>Select a group!</Text>
       <View style={styles.groupContainer}>
-        <View style={styles.groupCase} key="add">
+        <View style={styles.groupCase} key='add'>
           <TouchableOpacity
             style={styles.addGroup}
             onPress={() => {
               setModalVisible(true);
             }}
           >
-            <Icon name="search-plus" size={30} color="#fff" />
+            <Icon name='search-plus' size={30} color='#fff' />
           </TouchableOpacity>
           <Text style={styles.groupName}>Add Group</Text>
         </View>
-        {groups.map((group) => (
+        {groups.map(group => (
           <View style={styles.groupCase} key={group.id}>
             <TouchableOpacity
               style={styles.groupList}
@@ -122,25 +124,25 @@ const styles = StyleSheet.create({
   subtitle: {
     marginTop: 20,
     marginLeft: 15,
-    fontWeight: "100",
+    fontWeight: '100',
     fontSize: 20,
   },
   groupContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
   },
   icon: {
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
   },
   addGroup: {
     backgroundColor: COLORS.coolGray,
     borderRadius: 40,
     width: 80,
     height: 80,
-    justifyContent: "center",
-    alignSelf: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignSelf: 'center',
+    alignItems: 'center',
   },
   groupList: {
     backgroundColor: COLORS.card,
@@ -149,18 +151,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 80,
     height: 80,
-    justifyContent: "center",
-    alignSelf: "center",
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   groupName: {
-    fontWeight: "light",
+    fontWeight: 'light',
     fontSize: 15,
-    textAlign: "center",
+    textAlign: 'center',
     width: 80,
     maxHeight: 40,
   },
   groupCase: {
     margin: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
 });
