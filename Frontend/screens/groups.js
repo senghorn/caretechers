@@ -20,6 +20,18 @@ export default function Groups({ navigation, route }) {
   useEffect(() => {
     if (selectedGroup != null) {
       console.log('selected ' + selectedGroup.name);
+      const created = createUser(
+        user.first,
+        user.last,
+        user.email,
+        user.phone,
+        selectedGroup.id,
+        user.picture
+      );
+      if (created) {
+        navigation.navigate('Home', { user: user });
+      } else {
+      }
     }
   }, [selectedGroup]);
 

@@ -47,7 +47,7 @@ export default function Group({ navigation, route }) {
       <Button
         icon='check-all'
         mode='contained'
-        onPress={() => console.log('Pressed')}
+        onPress={() => createGroup(groupName, user)}
         style={styles.createButton}
         color='lightblue'
       >
@@ -56,6 +56,10 @@ export default function Group({ navigation, route }) {
     </SafeAreaView>
   );
 }
+
+const createGroup = (groupName, user) => {
+  console.log('Creating group ', groupName);
+};
 
 const styles = StyleSheet.create({
   container: {},
