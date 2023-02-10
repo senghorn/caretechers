@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
+import { createUser } from '../services/api/user';
 import colors from '../constants/colors';
 
 export default function Inputs({ route, navigation }) {
@@ -70,15 +71,26 @@ export default function Inputs({ route, navigation }) {
     } else if (phoneNumber.length < 12) {
       setPhoneMissing(true);
     } else {
-      navigation.navigate('Group', {
-        user: {
-          email: email,
-          last: userName,
-          first: lastName,
-          picture: user['picture'],
-          phone: phoneNumber,
-        },
-      });
+      const userCreated = await createUser(
+        userName,
+        lastName,
+        email,
+        phoneNumber,
+        user['picture']
+      );
+      if (userCreated == true) {
+        navigation.navigate('Group', {
+          user: {
+            email: email,
+            last: userName,
+            first: lastName,
+            picture: user['picture'],
+            phone: phoneNumber,
+          },
+        });
+      } else {
+        console.log('user created unsuccessful');
+      }
     }
   };
 
@@ -92,7 +104,6 @@ export default function Inputs({ route, navigation }) {
         value={user['email']}
         label={'Email'}
         disabled
-        // mode={'outlined'}
       />
       <TextInput
         right={<TextInput.Icon icon='account' />}
