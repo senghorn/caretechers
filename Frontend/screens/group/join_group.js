@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button, Appbar } from 'react-native-paper';
-import colors from '../constants/colors';
+import { addUserToGroup } from '../../services/api/user';
+import colors from '../../constants/colors';
 
-export default function Group({ navigation, route }) {
-  const { user } = route.params;
+export default function JoinGroup({ navigation, route }) {
+  const { user, group } = route.params;
   const [groupName, setGroupName] = useState('');
-
+  const [password, setPassword] = useState('');
   useEffect(() => {
-    if (user != null) {
-      setGroupName(user.first + ' ' + user.last + ' Family');
+    if (group != null) {
+      setGroupName(group.name);
     }
-  }, [user]);
+  }, [group]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -19,10 +20,10 @@ export default function Group({ navigation, route }) {
         <Appbar.Action
           icon='chevron-left'
           onPress={() => {
-            navigation.navigate('Group', { user });
+            navigation.goBack();
           }}
         />
-        <Appbar.Content title='Create Your Group' />
+        <Appbar.Content title='Join Your Group' />
       </Appbar.Header>
       <View style={styles.description}>
         <Text style={styles.text}>
@@ -35,30 +36,46 @@ export default function Group({ navigation, route }) {
         <TextInput
           right={<TextInput.Icon icon='home-heart' />}
           value={groupName}
-          onChangeText={(text) => setGroupName(text)}
-          label={'Group Name'}
+          label={'Group Selected'}
           activeUnderlineColor='lightblue'
           underlineColor='lightblue'
+          disabled
+        />
+        <TextInput
+          right={<TextInput.Icon icon='lock' />}
+          value={password}
+          secureTextEntry={true}
+          label={'Group Code'}
+          activeUnderlineColor='lightblue'
+          underlineColor='lightblue'
+          onChange={(text) => {
+            setPassword(text);
+          }}
         />
       </View>
       <Text style={styles.text}>
-        By creating a group, you agree do our Community Guidelines.
+        By joining a group, you agree to our Community Guidelines.
       </Text>
       <Button
         icon='check-all'
         mode='contained'
-        onPress={() => createGroup(groupName, user)}
+        onPress={() => joinGroupHandler(user, group, password, navigation)}
         style={styles.createButton}
         color='lightblue'
       >
-        Create Group
+        Join
       </Button>
     </SafeAreaView>
   );
 }
 
-const createGroup = (groupName, user) => {
-  console.log('Creating group ', groupName);
+const joinGroupHandler = async (user, group, password, navigation) => {
+  const joined = await addUserToGroup(user.email, group.id, password);
+  if (joined == true) {
+    navigation.navigate('Home', { user: user });
+  } else {
+    console.log('join group failed');
+  }
 };
 
 const styles = StyleSheet.create({

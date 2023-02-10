@@ -1,9 +1,10 @@
 import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
 import { useState, useEffect } from 'react';
-import GroupList from '../components/group/groupList';
-import colors from '../constants/colors';
-import config from '../constants/config';
+import GroupList from '../../components/group/groupList';
+import colors from '../../constants/colors';
+import config from '../../constants/config';
+import { addUserToGroup } from '../../services/api/user';
 
 const axios = require('axios').default;
 
@@ -19,19 +20,7 @@ export default function Groups({ navigation, route }) {
 
   useEffect(() => {
     if (selectedGroup != null) {
-      console.log('selected ' + selectedGroup.name);
-      const created = createUser(
-        user.first,
-        user.last,
-        user.email,
-        user.phone,
-        selectedGroup.id,
-        user.picture
-      );
-      if (created) {
-        navigation.navigate('Home', { user: user });
-      } else {
-      }
+      navigation.navigate('JoinGroup', { group: selectedGroup, user: user });
     }
   }, [selectedGroup]);
 
@@ -55,7 +44,6 @@ export default function Groups({ navigation, route }) {
         >
           Create Group
         </Button>
-
         <TextInput
           label={'Find Group'}
           style={styles.searchInput}
