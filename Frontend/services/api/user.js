@@ -60,11 +60,9 @@ export async function createUser(first, last, email, phone, photo) {
     return await axios
       .post(connection_string, data)
       .then(function (response) {
-        console.log('response', response);
         return true;
       })
       .catch(function (error) {
-        console.log('create user error', error);
         return false;
       });
   } catch (error) {
