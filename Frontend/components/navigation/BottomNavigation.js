@@ -1,6 +1,6 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Notes from '../../screens/notes';
+import Notes from '../../screens/note/notes';
 import Messages from '../../screens/messages';
 import Metrics from '../../screens/metrics';
 import Calendar from '../../screens/calendar';
