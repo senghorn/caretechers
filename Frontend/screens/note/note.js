@@ -99,12 +99,12 @@ export default function Note({ navigation, route }) {
             />
             <Appbar.Content title={'New Note'} titleStyle={styles.titleText} />
             <Appbar.Action
-              icon='check'
+              icon='content-save-check'
               onPress={async () => {
                 Keyboard.dismiss();
                 setEditing(false);
                 toggleRefresh();
-                await addNote(noteTitle,noteContent,user.group_id)
+                await addNote(noteTitle, noteContent, user.group_id);
                 navigation.goBack();
               }}
             />
@@ -118,7 +118,7 @@ export default function Note({ navigation, route }) {
               setEditing(true);
             }}
             label={'Note Title'}
-            style={styles.inputBox}
+            style={styles.titleInputBox}
             mode={'outlined'}
           />
           <TextInputBox
@@ -131,7 +131,7 @@ export default function Note({ navigation, route }) {
               setEditing(true);
             }}
             label={'Note Description'}
-            style={styles.inputBox}
+            style={styles.contentInputBox}
             mode={'outlined'}
           />
         </View>
@@ -144,7 +144,7 @@ const addNote = async (noteTitle, noteContent, groupId) => {
   CreateNote({ title: noteTitle, content: noteContent }, groupId)
     .then((noteId) => {
       if (noteId) {
-        console.log('note added successfully');
+        // Do something if required
       }
     })
     .catch((error) => console.error(error));
@@ -163,9 +163,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 18,
   },
-  inputBox: {
+  titleInputBox:{
     margin: 10,
     borderRadius: 20,
+  },
+  contentInputBox:{
+    margin: 10,
+    borderRadius: 20,
+    minHeight: '30%'
   },
   titleBox: {
     height: 'auto',
@@ -175,6 +180,7 @@ const styles = StyleSheet.create({
     margin: 10,
     minHeight: '10%',
     borderRadius: 15,
+    width: 800,
   },
   content: {
     height: 'auto',

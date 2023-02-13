@@ -1,4 +1,4 @@
-import {useContext} from 'react';
+import { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import COLORS from '../../constants/colors';
 
@@ -12,15 +12,17 @@ const Note = ({ navigation, route, note }) => {
         });
       }}
     >
-      {/* Add a title for the note */}
+      {/* Add a title for the note with ... if longer than 25 characters */}
       <Text Text style={styles.title}>
-        {' '}
-        {note.title}
+        {note.title.length > 25
+          ? note.title.substring(0, 25) + '...'
+          : note.title}
       </Text>
-      {/* Display the note content */}
+      {/* Display the note content with ... if longer than 70 characters */}
       <Text Text style={styles.content}>
-        {' '}
-        {note.content}
+        {note.content.length > 70
+          ? note.content.substring(0, 70) + '...'
+          : note.content}
       </Text>
     </TouchableOpacity>
   );
