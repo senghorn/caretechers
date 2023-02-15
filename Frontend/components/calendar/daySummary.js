@@ -1,6 +1,6 @@
 import { format, isBefore, isEqual, startOfDay } from 'date-fns';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, Animated, TouchableHighlight, Touchable } from 'react-native';
+import { Text, View, StyleSheet, Animated, TouchableHighlight, Touchable, Image } from 'react-native';
 import { DateToVisitsContext } from '../../screens/calendar';
 import { AntDesign } from '@expo/vector-icons';
 import UserContext from '../../services/context/UserContext';
@@ -111,7 +111,10 @@ export default function DaySummary({
       underlayColor="#ededed"
     >
       <View style={styles.innerContainer}>
-        <View style={[styles.pictureContainer, !visitInfo.visitor && styles.missedDayColor]} />
+        <Image
+          style={[styles.pictureContainer, !visitInfo.visitor && styles.missedDayColor]}
+          source={{ uri: visitInfo.profile_pic }}
+        />
         <View style={styles.flexLayout}>
           <Text style={styles.nameText}>{visitInfo.first_name || 'No Visitor'}</Text>
           <Text>{taskLabel}</Text>
