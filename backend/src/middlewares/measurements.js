@@ -13,3 +13,11 @@ module.exports.createNewHealthMeasurement = asyncHandler(async (req, _res, next)
 	await db.query(query);
 	next();
 });
+
+module.exports.getMeasurementsByGraphId = asyncHandler(async(req, _res, next) => {
+	const query = sql`SELECT * FROM HealthMeasurements M
+						WHERE M.graph_id = ${req.params.graphId}`;
+
+	req.result = await db.query(query);
+	next();
+});

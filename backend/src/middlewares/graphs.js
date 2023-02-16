@@ -35,3 +35,15 @@ module.exports.getGraphsByGroupId = asyncHandler(async(req, _res, next) => {
 	req.result = await db.query(query);
 	next();
 });
+
+module.exports.checkIfGraphExists = asyncHandler(async (req, res, next) => {
+	const query = sql`SELECT * FROM HealthGraphs
+						WHERE HealthGraphs.id = ${req.params.graphId}`;
+	const [result] = await db.query(query);
+
+	if (!result) {
+		return next(newError("This graph does not exist!", 404));
+	}
+
+	next();
+});
