@@ -1,34 +1,13 @@
 import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
-import { useState, useEffect } from 'react';
-import GroupList from '../../components/group/groupList';
+import { useState } from 'react';
 import colors from '../../constants/colors';
-import config from '../../constants/config';
 import { addUserToGroup } from '../../services/api/user';
-
-const axios = require('axios').default;
 
 export default function Groups({ navigation, route }) {
   const { user } = route.params;
-  const [searchValue, setSearchValue] = useState('');
-  const [groups, setGroups] = useState([]);
-  const [selectedGroup, setSelectedGroup] = useState(null);
-
-  useEffect(() => {
-    fetchGroups(setGroups);
-  }, []);
-
-  useEffect(() => {
-    if (selectedGroup != null) {
-      navigation.navigate('JoinGroup', { group: selectedGroup, user: user });
-    }
-  }, [selectedGroup]);
-
-  const searchGroup = () => {
-    // TODO: calls backend to search for groups and display them
-    // using setGroups
-    console.log('searching for ' + searchValue);
-  };
+  const [groupName, setGroupName] = useState('');
+  const [password, setPassword] = useState('');
 
   return (
     <View style={styles.container}>
@@ -44,67 +23,56 @@ export default function Groups({ navigation, route }) {
         >
           Create Group
         </Button>
-        <TextInput
-          label={'Find Group'}
-          style={styles.searchInput}
-          mode={'outlined'}
-          right={<TextInput.Icon icon='magnify' />}
-          value={searchValue}
-          onChangeText={(text) => {
-            setSearchValue(text);
-          }}
-          onSubmitEditing={searchGroup}
-          activeOutlineColor='lightblue'
-        ></TextInput>
 
-        <GroupList groups={groups} setSelectedGroup={setSelectedGroup} />
+        <View style={styles.form}>
+          <TextInput
+            right={<TextInput.Icon icon='home-heart' />}
+            value={groupName}
+            label={'Group ID'}
+            activeUnderlineColor='lightblue'
+            underlineColor='lightblue'
+            onChangeText={(text) => {
+              setGroupName(text);
+            }}
+          />
+          <TextInput
+            right={<TextInput.Icon icon='lock' />}
+            value={password}
+            secureTextEntry={true}
+            label={'Group Code'}
+            activeUnderlineColor='lightblue'
+            underlineColor='lightblue'
+            onChangeText={(text) => {
+              setPassword(text);
+            }}
+          />
+        </View>
+        <Text style={styles.text}>
+          By joining a group, you agree to our Community Guidelines.
+        </Text>
+        <Button
+          icon='check-all'
+          mode='contained'
+          onPress={() =>
+            joinGroupHandler(user, groupName, password, navigation)
+          }
+          style={styles.createButton}
+          color='lightblue'
+        >
+          Join
+        </Button>
       </SafeAreaView>
     </View>
   );
 }
 
-// Fetches all the groups
-const fetchGroups = async (setGroups) => {
-  try {
-    let connection_string = config.backend_server + '/groups/15';
-    await axios.get(connection_string).then(function (response) {
-      setGroups(response.data);
-    });
-  } catch (error) {
-    console.log(error.message);
+const joinGroupHandler = async (user, group, password, navigation) => {
+  const joined = await addUserToGroup(user.email, group, password);
+  if (joined == true) {
+    navigation.navigate('Home', { user: user });
+  } else {
+    console.log('join group failed');
   }
-};
-
-/**
- * Sends create new user request to the backend server using the given
- * first name, last name , email and phone number.
- * @return True : on success
- *         False: on error
- */
-const createUser = async (first, last, email, phone, group, photo) => {
-  try {
-    const data = {
-      email: email,
-      firstName: first,
-      lastName: last,
-      phoneNum: phone,
-      groupId: group,
-      profilePic: photo,
-    };
-    let connection_string = config.backend_server + '/user';
-    return await axios
-      .post(connection_string, data)
-      .then(function (response) {
-        return true;
-      })
-      .catch(function (error) {
-        console.log('create user error', error);
-        return false;
-      });
-  } catch (error) {
-    console.log('error', error.message);
-  }
-  return false;
 };
 
 const styles = StyleSheet.create({
@@ -123,5 +91,17 @@ const styles = StyleSheet.create({
   },
   topItem: {
     marginTop: 70,
+  },
+  form: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  text: {
+    alignSelf: 'center',
+    fontSize: 10,
+  },
+  createButton: {
+    marginTop: 10,
+    margin: 10,
   },
 });

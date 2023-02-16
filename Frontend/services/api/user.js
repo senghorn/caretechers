@@ -79,7 +79,7 @@ export async function createUser(first, last, email, phone, photo) {
  */
 export async function addUserToGroup(email, groupId, password) {
   const data = {
-    groupId: groupId,
+    groupId: Number(groupId),
   };
   try {
     let connection_string = config.backend_server + '/user/' + email + '/group';

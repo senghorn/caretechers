@@ -1,19 +1,18 @@
-import { StyleSheet, View, Text } from "react-native";
-import { useState } from "react";
-import { Searchbar } from "react-native-paper";
-import { Dropdown } from "react-native-element-dropdown";
-import COLORS from "../../constants/colors";
+import { StyleSheet, View, Text } from 'react-native';
+import { useState } from 'react';
+import { Searchbar } from 'react-native-paper';
+import { Dropdown } from 'react-native-element-dropdown';
+import COLORS from '../../constants/colors';
 
 export default function Header() {
-
   // Sort drop down values
   const data = [
-    { label: "Date", value: "1" },
-    { label: "Alphabets", value: "2" },
-    { label: "Relevant", value: "3" },
+    { label: 'Date', value: '1' },
+    { label: 'Alphabets', value: '2' },
+    { label: 'Relevant', value: '3' },
   ];
   const [sortValue, setSortValue] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   const onChangeSearch = (query) => setSearchQuery(query);
   return (
@@ -28,9 +27,9 @@ export default function Header() {
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             data={data}
-            labelField="label"
-            valueField="value"
-            placeholder="Sort By"
+            labelField='label'
+            valueField='value'
+            placeholder='Sort By'
             value={sortValue}
             onChange={(item) => {
               setSortValue(item.value);
@@ -40,7 +39,7 @@ export default function Header() {
         </View>
         <View style={styles.search}>
           <Searchbar
-            placeholder="Search"
+            placeholder='Search'
             onChangeText={onChangeSearch}
             value={searchQuery}
             style={styles.box}
@@ -53,44 +52,44 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   titleText: {
-    fontWeight: "500",
+    fontWeight: '500',
     fontSize: 20,
   },
   row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignSelf: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignSelf: 'center',
+    alignItems: 'center',
   },
   search: {
-    width: "100%",
+    width: '100%',
     padding: 8,
   },
   title: {
-    marginLeft: "5%",
-    width: "65%",
+    marginLeft: '5%',
+    width: '65%',
   },
   titleText: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   sort: {
-    width: "30%",
+    width: '30%',
   },
   header: {
     backgroundColor: COLORS.bgColor,
   },
   box: {
-    width: "100%",
+    width: '100%',
   },
   item: {
     padding: 17,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   selectedTextStyle: {
     fontSize: 16,

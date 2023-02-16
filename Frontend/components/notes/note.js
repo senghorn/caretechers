@@ -1,27 +1,32 @@
-import React from 'react';
+import { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import COLORS from '../../constants/colors';
 
-const Note = ({ content, title, id, setSelectedNote, navigation }) => (
-  <TouchableOpacity
-    style={styles.note}
-    onPress={() => {
-      navigation.navigate('Note');
-      // setSelectedNote({ id: id, title: title, content: content });
-    }}
-  >
-    {/* Add a title for the note */}
-    <Text Text style={styles.title}>
-      {' '}
-      {title}
-    </Text>
-    {/* Display the note content */}
-    <Text Text style={styles.content}>
-      {' '}
-      {content}
-    </Text>
-  </TouchableOpacity>
-);
+const Note = ({ navigation, route, note }) => {
+  return (
+    <TouchableOpacity
+      style={styles.note}
+      onPress={() => {
+        navigation.navigate('Note', {
+          note: note,
+        });
+      }}
+    >
+      {/* Add a title for the note with ... if longer than 25 characters */}
+      <Text Text style={styles.title}>
+        {note.title.length > 25
+          ? note.title.substring(0, 25) + '...'
+          : note.title}
+      </Text>
+      {/* Display the note content with ... if longer than 70 characters */}
+      <Text Text style={styles.content}>
+        {note.content.length > 70
+          ? note.content.substring(0, 70) + '...'
+          : note.content}
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   note: {
