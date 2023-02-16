@@ -3,8 +3,7 @@ import BottomNavigation from './BottomNavigation';
 import GoogleLogin from '../../screens/google';
 import RegisterUser from '../../screens/register-user';
 import Groups from '../../screens/group/groups';
-import Group from '../../screens/group/group';
-import JoinGroup from '../../screens/group/join_group';
+import CreateGroup from '../../screens/group/create-group';
 import Visit from '../../screens/visit';
 import Task from '../../screens/task';
 import { useState } from 'react';
@@ -77,12 +76,7 @@ export default function Navigation() {
                   />
                   <Stack.Screen
                     name={'CreateGroup'}
-                    component={Group}
-                    options={{ headerShown: false, gestureEnabled: false }}
-                  />
-                  <Stack.Screen
-                    name='JoinGroup'
-                    component={JoinGroup}
+                    component={CreateGroup}
                     options={{ headerShown: false, gestureEnabled: false }}
                   />
                   <Stack.Screen

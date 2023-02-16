@@ -37,21 +37,16 @@ export default function Notes({ navigation }) {
     mutate();
   }, [refresh]);
 
-
-  // Add a state variable to control the visibility of the modal
-  const [modalVisible, setModalVisible] = useState(false);
   const [notes, setNotes] = useState(null);
   const [noteModified, setNoteModified] = useState(null);
 
   useEffect(() => {
     if (noteModified) {
-      // Do something
       fetchNotes(user, setNotes);
       setNoteModified(null);
     }
   }, [noteModified]);
 
-  // prop
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
