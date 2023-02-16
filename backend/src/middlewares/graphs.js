@@ -28,3 +28,10 @@ module.exports.createNewHealthGraph = asyncHandler(async (req, _res, next) => {
 	await db.query(query);
 	next();
 });
+
+module.exports.getGraphsByGroupId = asyncHandler(async(req, _res, next) => {
+	const query = sql`SELECT * FROM HealthGraphs WHERE HealthGraphs.group_id = ${req.params.groupId}`;
+
+	req.result = await db.query(query);
+	next();
+});
