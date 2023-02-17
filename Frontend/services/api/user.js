@@ -89,6 +89,7 @@ export async function addUserToGroup(email, groupId, password) {
         return true;
       })
       .catch(function (error) {
+        console.log(error);
         return false;
       });
   } catch (error) {
