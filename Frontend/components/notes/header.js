@@ -1,97 +1,87 @@
 import { StyleSheet, View, Text } from 'react-native';
-import { useState } from 'react';
-import { Searchbar } from 'react-native-paper';
-import { Dropdown } from 'react-native-element-dropdown';
-import COLORS from '../../constants/colors';
+import { useState, useContext } from 'react';
+import { TextInput } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
+import { RefreshContext } from '../../services/context/RefreshContext';
 
-export default function Header() {
+export default function Header({ navigation, route, title, sort }) {
   // Sort drop down values
   const data = [
     { label: 'Date', value: '1' },
     { label: 'Alphabets', value: '2' },
     { label: 'Relevant', value: '3' },
   ];
-  const [sortValue, setSortValue] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const onChangeSearch = (query) => setSearchQuery(query);
+  const { sortRefresh } = useContext(RefreshContext);
+
+  // If true, sorts the notes ascending lexicographical order, otherwise descending
+  const [sortAscending, sortSortAscending] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchMode, setSearchMode] = useState(false);
   return (
     <View>
-      <View style={styles.row}>
-        <View style={styles.title}>
-          <Text style={styles.titleText}>Notes</Text>
-        </View>
-        <View style={styles.sort}>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            data={data}
-            labelField='label'
-            valueField='value'
-            placeholder='Sort By'
-            value={sortValue}
-            onChange={(item) => {
-              setSortValue(item.value);
-              console.log(item);
+      <Appbar.Header style={styles.headerContainer}>
+        <Appbar.Action icon={'account-cog'} onPress={() => {}} />
+        {searchMode ? (
+          <TextInput
+            style={styles.titleInput}
+            label='Search'
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              console.log(text);
+            }}
+            onEndEditing={() => {
+              console.log('Search queried of text:', searchQuery);
+            }}
+            mode='outlined'
+          />
+        ) : (
+          <Appbar.Content title={title} titleStyle={styles.title} />
+        )}
+        {searchMode ? (
+          <Appbar.Action
+            icon='close'
+            onPress={() => {
+              setSearchMode(false);
             }}
           />
-        </View>
-        <View style={styles.search}>
-          <Searchbar
-            placeholder='Search'
-            onChangeText={onChangeSearch}
-            value={searchQuery}
-            style={styles.box}
+        ) : (
+          <Appbar.Action
+            icon='magnify'
+            onPress={() => {
+              setSearchMode(true);
+            }}
           />
-        </View>
-      </View>
+        )}
+        {!searchMode && sort && (
+          <Appbar.Action
+            icon={'sort-alphabetical-variant'}
+            onPress={() => {
+              sortSortAscending(!sortAscending);
+              sortRefresh(sortAscending ? 'ascending' : 'descending');
+            }}
+          />
+        )}
+      </Appbar.Header>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  headerContainer: {
+    flex: 0,
     backgroundColor: '#fff',
   },
-  titleText: {
-    fontWeight: '500',
-    fontSize: 20,
-  },
-  row: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignSelf: 'center',
-    alignItems: 'center',
-  },
-  search: {
-    width: '100%',
-    padding: 8,
-  },
   title: {
-    marginLeft: '5%',
-    width: '65%',
-  },
-  titleText: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
   },
-  sort: {
-    width: '30%',
-  },
-  header: {
-    backgroundColor: COLORS.bgColor,
-  },
-  box: {
-    width: '100%',
-  },
-  item: {
-    padding: 17,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  selectedTextStyle: {
-    fontSize: 16,
+  titleInput: {
+    flexGrow: 1,
+    height: 40,
+    marginRight: 16,
+    marginBottom: 4,
+    fontSize: 18,
   },
 });
