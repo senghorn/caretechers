@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button, Appbar } from 'react-native-paper';
 import colors from '../../constants/colors';
+import { createNewGroup } from '../../services/api/groups';
+import { addUserToGroup } from '../../services/api/user';
+
 
 export default function CreateGroup({ navigation, route }) {
   const { user } = route.params;
@@ -10,7 +13,7 @@ export default function CreateGroup({ navigation, route }) {
   useEffect(() => {
     if (user != null) {
       if (user.given_name == null) {
-        setGroupName(user.first + ' ', user.last + ' Family');
+        setGroupName(user.first + ' ' + user.last + ' Family');
       } else {
         setGroupName(user.given_name + ' ' + user.family_name + ' Family');
       }
@@ -51,7 +54,7 @@ export default function CreateGroup({ navigation, route }) {
       <Button
         icon='check-all'
         mode='contained'
-        onPress={() => createGroup(groupName, user)}
+        onPress={() => createGroup(groupName, user, navigation)}
         style={styles.createButton}
         color='lightblue'
       >
@@ -61,8 +64,36 @@ export default function CreateGroup({ navigation, route }) {
   );
 }
 
-const createGroup = (groupName, user) => {
-  console.log('Creating group ', groupName);
+/**
+ * Creates a new group given the name, timezone and visit frequency.
+ * Then, adds user to the created group.
+ * @param {string} groupName 
+ * @param {json} user 
+ */
+const createGroup = async (groupName, user, navigation) => {
+  // TODO: get visit frequency and group password below
+  const timezone = "America/Denver";
+  const result = await createNewGroup(groupName, timezone, 4);
+  if (result.groupId != null) {
+    const joinGroupWithRetry = async (userEmail, groupId, maxAttempts = 3, attempt = 1) => {
+      const joined = await addUserToGroup(userEmail, groupId, 1);
+      if (joined) {
+        navigation.navigate('Home', { user: user });
+      } else {
+        console.log(`Join group failed on attempt ${attempt}`);
+        if (attempt < maxAttempts) {
+          setTimeout(async () => {
+            await joinGroupWithRetry(userEmail, groupId, maxAttempts, attempt + 1);
+          }, 2000);
+        } else {
+          console.log(`Maximum attempts (${maxAttempts}) reached. Join group failed.`);
+        }
+      }
+    };
+
+    joinGroupWithRetry(user.email, result.groupId, 3);
+
+  }
 };
 
 const styles = StyleSheet.create({
