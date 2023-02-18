@@ -30,7 +30,7 @@ export default function Notes({ navigation }) {
       data
     ) {
       if (sort != 'none') {
-        setNotes(sortNotesByTitle(data, sort == 'ascending'));
+        setNotes(sortNotesByTitle(data, sort));
       } else {
         setNotes(data);
       }
@@ -69,7 +69,7 @@ export default function Notes({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header title={'Notes'} sort={true} />
+      <Header title={'Notes'} sort={true} navigation={navigation} />
       <ScrollView
         style={styles.tasksContainer}
         refreshControl={

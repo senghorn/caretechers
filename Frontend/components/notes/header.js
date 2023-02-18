@@ -21,7 +21,7 @@ export default function Header({ navigation, route, title, sort }) {
   return (
     <View>
       <Appbar.Header style={styles.headerContainer}>
-        <Appbar.Action icon={'account-cog'} onPress={() => {}} />
+        <Appbar.Action icon={'account-cog'} onPress={() => { navigation.navigate('Settings'); }} />
         {searchMode ? (
           <TextInput
             style={styles.titleInput}
