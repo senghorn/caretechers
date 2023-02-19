@@ -1,172 +1,223 @@
-import { StyleSheet, View } from "react-native";
-import { Appbar, Avatar, TextInput, Button } from "react-native-paper";
-import colors from "../constants/colors";
-import UserContext from "../services/context/UserContext";
+import { StyleSheet, View, ScrollView } from "react-native";
 import { useState, useContext, useEffect } from "react";
-
+import { Appbar, Avatar, Text, Button, Switch } from "react-native-paper";
+import { AntDesign } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import UserContext from "../services/context/UserContext";
+import colors from "../constants/colors";
 
 export default function Settings({ navigation, route }) {
+    const [notificationOn, setNotificationOn] = useState(false);
+    const [darkOn, setDarkOn] = useState(false);
+    const [username, setUsername] = useState('John Doe');
+    const [phone, setPhone] = useState('123-321-1234');
+    const [email, setEmail] = useState('johndoe@fakemail.com');
+    const [photo, setPhoto] = useState(require('../assets/favicon.png'));
 
     const user = useContext(UserContext);
-    const [editMode, setEditMode] = useState(false);
-    const [profile, setProfile] = useState('../assets/favicon.png');
-    const [firstName, setFirstName] = useState('John');
-    const [lastName, setLastName] = useState('Doe')
-    const [phone, setPhone] = useState('123-321-3211');
-    const [email, setEmail] = useState('johndoe@user.com');
-
     useEffect(() => {
         if (user) {
-
+            setUsername(user.first_name + " " + user.last_name);
+            setPhone(user.phone_num);
+            setEmail(user.email);
+            setPhoto({ uri: user.profile_pic });
         }
     }, [user]);
 
-    const formatPhoneNumber = (text) => {
-        var cleaned = '';
-        var match = text.match(/\d/g);
-        if (match) {
-            cleaned = match.join('');
-            if (cleaned.length > 10) {
-                cleaned = cleaned.substring(0, 10);
-            }
-        }
-        if (cleaned.length >= 7) {
-            cleaned =
-                cleaned.slice(0, 3) +
-                '-' +
-                cleaned.slice(3, 6) +
-                '-' +
-                cleaned.slice(6);
-        } else if (cleaned.length > 3) {
-            cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
-        }
-        setPhone(cleaned);
-    };
-
-    return (<View style={styles.container}>
+    return (<ScrollView>
         <Appbar.Header style={styles.headerContainer}>
-            {!editMode && <Appbar.Action icon={'arrow-left'} onPress={() => { navigation.goBack(); }} />}
-            {editMode && <Appbar.Action icon={'close-outline'} onPress={() => { setEditMode(!editMode); }} />}
-            <Appbar.Content title={''} titleStyle={styles.title} />
-            {!editMode && <Appbar.Action icon={'account-edit'} onPress={() => { setEditMode(!editMode); }} />}
-            {editMode && <Appbar.Action icon={'check-outline'} onPress={() => { setEditMode(!editMode); }} />}
+            <Appbar.Action icon={'arrow-left'} onPress={() => { navigation.goBack(); }} />
+            <Appbar.Content title={'Settings'} titleStyle={styles.title} />
+            <Appbar.Action icon={'account-edit'} onPress={() => { }} />
         </Appbar.Header>
-        <View style={styles.profileContainer}>
-            <Avatar.Image size={80} source={require('../assets/favicon.png')} />
+        <View style={styles.topHalf}>
+            <View style={styles.profileContainer}>
+                <View style={styles.leftContainer}>
+                    <Avatar.Image size={65} source={photo} style={styles.photo} />
+                </View>
+                <View style={styles.rightContainer}>
+                    <View style={styles.nameRow}>
+                        <Text style={styles.name}>{username}</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <AntDesign name="phone" size={20} color={colors.orange} style={styles.infoIcon} />
+                        <Text style={styles.phone}>{phone}</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <AntDesign name="mail" size={20} color={colors.orange} style={styles.infoIcon} />
+                        <Text style={styles.phone}>{email}</Text>
+                    </View>
+                </View>
+            </View>
+            <View style={styles.settingsContainer}>
+                <Button
+                    mode='contained'
+                    uppercase={false}
+                    color={'lightgray'}
+                    icon='account-edit'
+                    style={styles.editButton}
+                    labelStyle={styles.editButtonText}
+                    onPress={() => {
+                        console.log('Account Edit Pressed');
+                    }}
+                >
+                    Edit Profile
+                </Button>
+                <Button
+                    mode='contained'
+                    uppercase={false}
+                    color={'lightgray'}
+                    icon='account-group'
+                    style={styles.editButton}
+                    labelStyle={styles.editButtonText}
+                    onPress={() => {
+                        console.log('Account Edit Pressed');
+                    }}
+                >
+                    Group Settings
+                </Button>
+            </View>
         </View>
-        <View style={styles.infoContainer}>
-            <TextInput
-                mode="outlined"
-                left={<TextInput.Icon icon="account" style={styles.iconStyle} size={20} />}
-                value={firstName}
-                style={styles.phone}
-                activeOutlineColor={colors.orange}
-                outlineColor={colors.darkblue}
-                onChangeText={(text) => { setFirstName(text); }}
-                disabled={!editMode}
-            />
-            <TextInput
-                mode="outlined"
-                left={<TextInput.Icon icon="account" style={styles.iconStyle} size={20} />}
-                value={lastName}
-                style={styles.phone}
-                activeOutlineColor={colors.orange}
-                outlineColor={colors.darkblue}
-                onChangeText={(text) => { setLastName(text); }}
-                disabled={!editMode}
-            />
-            <TextInput
-                mode="outlined"
-                left={<TextInput.Icon icon="phone" style={styles.iconStyle} size={20} />}
-                value={phone}
-                style={styles.phone}
-                activeOutlineColor={colors.orange}
-                outlineColor={colors.darkblue}
-                onChangeText={(text) => { formatPhoneNumber(text); }}
-                keyboardType='number-pad'
-                disabled={!editMode}
-            />
-            <TextInput
-                mode="outlined"
-                left={<TextInput.Icon icon="email" style={styles.iconStyle} size={20} />}
-                value={email}
-                style={styles.email}
-                outlineColor={colors.darkblue}
-                activeOutlineColor={colors.orange}
-                onChangeText={(text) => { setEmail(text); }}
-                disabled
-            />
-            <Button
-                mode='contained'
-                uppercase={true}
-                color={colors.dimRed}
-                icon='logout'
-                style={styles.logout}
-                labelStyle={styles.logoutButtonText}
-                onPress={() => {
-                }}
-            >
-                Logout
-            </Button>
+        <View style={styles.switchList}>
+            <View style={styles.switchItem}>
+                <View style={styles.switchLabel}>
+                    {notificationOn && <Ionicons name="notifications" size={26} />}
+                    {!notificationOn && <Ionicons name="notifications-off" size={26} />}
+                    <Text style={styles.textLabel}>Notification</Text>
+                </View>
+                <View style={styles.switchLabel}>
+                    <Text style={styles.switchValue}>{notificationOn ? 'On' : 'Off'}</Text>
+                    <Switch color={colors.orange} value={notificationOn} onValueChange={() => { setNotificationOn(!notificationOn); }} />
+                </View>
+            </View>
+            <View style={styles.switchItem}>
+                <View style={styles.switchLabel}>
+                    {darkOn && <Ionicons name="moon" size={26} />}
+                    {!darkOn && <Ionicons name="ios-sunny" size={26} />}
+                    <Text style={styles.textLabel}>Dark Mode</Text>
+                </View>
+                <View style={styles.switchLabel}>
+                    <Text style={styles.switchValue}>{darkOn ? 'On' : 'Off'}</Text>
+                    <Switch color={colors.orange} value={darkOn} onValueChange={() => { setDarkOn(!darkOn); }} />
+                </View>
+            </View>
         </View>
-    </View>)
+        <Button
+            mode='contained'
+            uppercase={true}
+            color={colors.pinkishRed}
+            icon='logout'
+            style={styles.logout}
+            labelStyle={styles.logoutButtonText}
+            onPress={() => {
+                console.log('Log out pressed');
+            }}
+        >
+            Logout
+        </Button>
+    </ScrollView>)
 };
 
 const styles = StyleSheet.create({
-    container: {
-
-    },
     headerContainer: {
         flex: 0,
         backgroundColor: '#fff',
     },
+    topHalf: {
+        paddingTop: 10,
+        backgroundColor: colors.profileCard,
+        borderBottomEndRadius: 30,
+        borderBottomStartRadius: 30
+    },
     title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        alignSelf: 'center'
+        fontSize: 18
+    },
+    settingsContainer: {
+        flexDirection: 'row',
+        margin: 10,
+        justifyContent: 'space-evenly',
+        marginTop: 30,
     },
     profileContainer: {
-        justifyContent: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        marginTop: 20
+    },
+    leftContainer: {
+        width: "40%",
         alignContent: 'center',
+        justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 16,
-        margin: 20,
+    },
+    rightContainer: {
+        flex: 1,
+        display: 'flex',
+    },
+    nameRow: {
+        marginBottom: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    infoIcon: {
+        marginRight: 15,
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     name: {
         fontSize: 20,
-        color: colors.black,
         fontWeight: 'bold',
-        marginBottom: 10
     },
     phone: {
-        fontSize: 16,
+        fontSize: 14,
         color: 'gray',
-        backgroundColor: colors.warmWhite,
-        width: '98%',
-        justifyContent: 'center'
+        flexWrap: 'wrap'
     },
-    email: {
-        fontSize: 16,
-        color: 'gray',
-        backgroundColor: colors.warmWhite,
-        width: '98%',
-        justifyContent: 'center'
+    photo: {
+        backgroundColor: 'lightgray',
     },
-    infoContainer: {
-        flexDirection: 'column',
-        margin: 10,
-        marginLeft: 20,
+    editButton: {
+        marginVertical: 18,
+        width: '45%',
+        alignSelf: 'center',
     },
-    iconStyle: {
-        paddingRight: 10,
+    editButtonText: {
+        fontSize: 14,
     },
     logoutButtonText: {
         fontSize: 14,
     },
     logout: {
-        marginTop: 40,
-        height:50,
-        alignContent:'center',
-        justifyContent:'center'
+        marginTop: "50%",
+        height: 50,
+        alignContent: 'center',
+        justifyContent: 'center',
+        margin: 10
     },
+    switchList: {
+        alignContent: 'center',
+        margin: 20
+    },
+    switchItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'space-between',
+        margin: 10
+    },
+    textLabel: {
+        marginLeft: 10,
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    switchLabel: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    switchValue: {
+        marginRight: 5,
+        fontSize: 12,
+        color: colors.gray
+    }
 });

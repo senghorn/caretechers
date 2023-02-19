@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
-import { createUser } from '../services/api/user';
-import colors from '../constants/colors';
+import { createUser } from '../../services/api/user';
+import colors from '../../constants/colors';
 
 export default function Inputs({ route, navigation }) {
   const { user } = route.params;
