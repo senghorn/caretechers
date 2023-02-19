@@ -24,11 +24,10 @@ export default function Settings({ navigation, route }) {
         }
     }, [user]);
 
-    return (<ScrollView>
+    return (<View>
         <Appbar.Header style={styles.headerContainer}>
             <Appbar.Action icon={'arrow-left'} onPress={() => { navigation.goBack(); }} />
             <Appbar.Content title={'Settings'} titleStyle={styles.title} />
-            <Appbar.Action icon={'account-edit'} onPress={() => { }} />
         </Appbar.Header>
         <View style={styles.topHalf}>
             <View style={styles.profileContainer}>
@@ -58,7 +57,7 @@ export default function Settings({ navigation, route }) {
                     style={styles.editButton}
                     labelStyle={styles.editButtonText}
                     onPress={() => {
-                        console.log('Account Edit Pressed');
+                        navigation.navigate('UserAccount');
                     }}
                 >
                     Edit Profile
@@ -78,44 +77,46 @@ export default function Settings({ navigation, route }) {
                 </Button>
             </View>
         </View>
-        <View style={styles.switchList}>
-            <View style={styles.switchItem}>
-                <View style={styles.switchLabel}>
-                    {notificationOn && <Ionicons name="notifications" size={26} />}
-                    {!notificationOn && <Ionicons name="notifications-off" size={26} />}
-                    <Text style={styles.textLabel}>Notification</Text>
+        <ScrollView>
+            <View style={styles.switchList}>
+                <View style={styles.switchItem}>
+                    <View style={styles.switchLabel}>
+                        {notificationOn && <Ionicons name="notifications" size={26} />}
+                        {!notificationOn && <Ionicons name="notifications-off" size={26} />}
+                        <Text style={styles.textLabel}>Notification</Text>
+                    </View>
+                    <View style={styles.switchLabel}>
+                        <Text style={styles.switchValue}>{notificationOn ? 'On' : 'Off'}</Text>
+                        <Switch color={colors.orange} value={notificationOn} onValueChange={() => { setNotificationOn(!notificationOn); }} />
+                    </View>
                 </View>
-                <View style={styles.switchLabel}>
-                    <Text style={styles.switchValue}>{notificationOn ? 'On' : 'Off'}</Text>
-                    <Switch color={colors.orange} value={notificationOn} onValueChange={() => { setNotificationOn(!notificationOn); }} />
+                <View style={styles.switchItem}>
+                    <View style={styles.switchLabel}>
+                        {darkOn && <Ionicons name="moon" size={26} />}
+                        {!darkOn && <Ionicons name="ios-sunny" size={26} />}
+                        <Text style={styles.textLabel}>Dark Mode</Text>
+                    </View>
+                    <View style={styles.switchLabel}>
+                        <Text style={styles.switchValue}>{darkOn ? 'On' : 'Off'}</Text>
+                        <Switch color={colors.orange} value={darkOn} onValueChange={() => { setDarkOn(!darkOn); }} />
+                    </View>
                 </View>
             </View>
-            <View style={styles.switchItem}>
-                <View style={styles.switchLabel}>
-                    {darkOn && <Ionicons name="moon" size={26} />}
-                    {!darkOn && <Ionicons name="ios-sunny" size={26} />}
-                    <Text style={styles.textLabel}>Dark Mode</Text>
-                </View>
-                <View style={styles.switchLabel}>
-                    <Text style={styles.switchValue}>{darkOn ? 'On' : 'Off'}</Text>
-                    <Switch color={colors.orange} value={darkOn} onValueChange={() => { setDarkOn(!darkOn); }} />
-                </View>
-            </View>
-        </View>
-        <Button
-            mode='contained'
-            uppercase={true}
-            color={colors.pinkishRed}
-            icon='logout'
-            style={styles.logout}
-            labelStyle={styles.logoutButtonText}
-            onPress={() => {
-                console.log('Log out pressed');
-            }}
-        >
-            Logout
-        </Button>
-    </ScrollView>)
+            <Button
+                mode='contained'
+                uppercase={true}
+                color={colors.pinkishRed}
+                icon='logout'
+                style={styles.logout}
+                labelStyle={styles.logoutButtonText}
+                onPress={() => {
+                    console.log('Log out pressed');
+                }}
+            >
+                Logout
+            </Button>
+        </ScrollView>
+    </View>)
 };
 
 const styles = StyleSheet.create({
@@ -157,6 +158,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         flexDirection: 'row',
         alignItems: 'center',
+
     },
     infoIcon: {
         marginRight: 15,
@@ -168,6 +170,7 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 20,
         fontWeight: 'bold',
+        color: colors.black
     },
     phone: {
         fontSize: 14,

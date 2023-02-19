@@ -1,24 +1,35 @@
-import { StyleSheet, View } from "react-native";
-import { Appbar, Avatar, TextInput } from "react-native-paper";
-import colors from "../constants/colors";
-import UserContext from "../services/context/UserContext";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Appbar, Avatar, TextInput, Button, Text } from "react-native-paper";
+import colors from "../../constants/colors"
+import UserContext from "../../services/context/UserContext";
 import { useState, useContext, useEffect } from "react";
 
 export default function UserAccount({ navigation, route, newUser }) {
 
     const user = useContext(UserContext);
-    const [editMode, setEditMode] = useState(false);
-    const [profile, setProfile] = useState('../assets/favicon.png');
+    const [profile, setProfile] = useState(require('../../assets/favicon.png'));
     const [firstName, setFirstName] = useState('John');
     const [lastName, setLastName] = useState('Doe')
     const [phone, setPhone] = useState('123-321-3211');
     const [email, setEmail] = useState('johndoe@user.com');
 
     useEffect(() => {
-        if (user) {
+        resetData();
+    }, [user, newUser]);
 
+    const resetData = () => {
+        if (user && !newUser) {
+            setFirstName(user.first_name);
+            setLastName(user.last_name);
+            setPhone(user.phone_num);
+            setEmail(user.email);
+            setProfile({ uri: user.profile_pic });
         }
-    }, [user]);
+    };
+
+    const handleSave = () => {
+        console.log("handling save");
+    };
 
     const formatPhoneNumber = (text) => {
         var cleaned = '';
@@ -44,46 +55,46 @@ export default function UserAccount({ navigation, route, newUser }) {
 
     return (<View style={styles.container}>
         <Appbar.Header style={styles.headerContainer}>
-            {!editMode && <Appbar.Action icon={'arrow-left'} onPress={() => { navigation.goBack(); }} />}
-            {editMode && <Appbar.Action icon={'close-outline'} onPress={() => { setEditMode(!editMode); }} />}
-            <Appbar.Content title={''} titleStyle={styles.title} />
-            {!editMode && <Appbar.Action icon={'account-edit'} onPress={() => { setEditMode(!editMode); }} />}
-            {editMode && <Appbar.Action icon={'check-outline'} onPress={() => { setEditMode(!editMode); }} />}
+            <Appbar.Action icon={'arrow-left'} onPress={() => { navigation.goBack(); }} />
+            <Appbar.Content title={'Account'} titleStyle={styles.title} />
         </Appbar.Header>
         <View style={styles.profileContainer}>
-            <Avatar.Image size={80} source={require('../assets/favicon.png')} />
+            <TouchableOpacity>
+                <Avatar.Image size={90} source={profile} />
+                <Text style={styles.uploadPhotoText}>Change</Text>
+            </TouchableOpacity>
         </View>
         <View style={styles.infoContainer}>
             <TextInput
                 mode="outlined"
-                left={<TextInput.Icon icon="account" style={styles.iconStyle} size={20} />}
+                left={<TextInput.Icon icon="account" style={styles.iconStyle} size={20} color={colors.orange} />}
                 value={firstName}
                 style={styles.phone}
                 activeOutlineColor={colors.orange}
                 outlineColor={colors.darkblue}
-                onChangeText={(text) => { setFirstName(text); }}
-                disabled={!editMode}
+                onChangeText={(text) => {
+                    setFirstName(text);
+
+                }}
             />
             <TextInput
                 mode="outlined"
-                left={<TextInput.Icon icon="account" style={styles.iconStyle} size={20} />}
+                left={<TextInput.Icon icon="account" style={styles.iconStyle} size={20} color={colors.orange} />}
                 value={lastName}
                 style={styles.phone}
                 activeOutlineColor={colors.orange}
                 outlineColor={colors.darkblue}
                 onChangeText={(text) => { setLastName(text); }}
-                disabled={!editMode}
             />
             <TextInput
                 mode="outlined"
-                left={<TextInput.Icon icon="phone" style={styles.iconStyle} size={20} />}
+                left={<TextInput.Icon icon="phone" style={styles.iconStyle} size={20} color={colors.orange} />}
                 value={phone}
                 style={styles.phone}
                 activeOutlineColor={colors.orange}
                 outlineColor={colors.darkblue}
                 onChangeText={(text) => { formatPhoneNumber(text); }}
                 keyboardType='number-pad'
-                disabled={!editMode}
             />
             <TextInput
                 mode="outlined"
@@ -92,10 +103,35 @@ export default function UserAccount({ navigation, route, newUser }) {
                 style={styles.email}
                 outlineColor={colors.darkblue}
                 activeOutlineColor={colors.orange}
-                onChangeText={(text) => { setEmail(text); }}
                 disabled
             />
         </View>
+        {!newUser && (
+            <View style={styles.buttonRow}>
+                <Button
+                    mode='contained'
+                    color={colors.yellow}
+                    icon='progress-check'
+                    style={styles.createButton}
+                    labelStyle={styles.createButtonText}
+                    onPress={handleSave}
+                >
+                    Save
+                </Button>
+                <Button
+                    mode='contained'
+                    color={colors.gray}
+                    icon='cancel'
+                    style={styles.createButton}
+                    labelStyle={styles.createButtonText}
+                    onPress={() => {
+                        resetData();
+                    }}
+                >
+                    Cancel
+                </Button>
+            </View>
+        )}
     </View>)
 };
 
@@ -147,4 +183,22 @@ const styles = StyleSheet.create({
     iconStyle: {
         paddingRight: 10,
     },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly'
+    },
+    createButton: {
+        marginVertical: 32,
+        width: '40%',
+        alignSelf: 'center',
+    },
+    createButtonText: {
+        fontSize: 14,
+    },
+    uploadPhotoText: {
+        fontSize: 12,
+        color: colors.black,
+        fontWeight: '400',
+        alignSelf: 'center'
+    }
 });
