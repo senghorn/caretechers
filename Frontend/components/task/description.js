@@ -49,6 +49,7 @@ export default function Description({
                   mode={'date'}
                   display="default"
                   is24Hour={true}
+                  minimumDate={new Date()}
                 />
               )}
             </View>
