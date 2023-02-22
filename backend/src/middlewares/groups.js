@@ -38,9 +38,11 @@ module.exports.verifyGroupBody = asyncHandler(async (req, _res, next) => {
 module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
 	let query;
 	if (req.body.timeZone) {
-		query = sql`INSERT INTO \`Groups\`(name, visit_frequency, timezone) VALUES (${req.body.name}, ${req.body.visitFrequency}, ${req.body.timeZone});`;
+		query = sql`INSERT INTO \`Groups\`(name, visit_frequency, timezone, password) VALUES (${req.body.name}, 
+			${req.body.visitFrequency}, ${req.body.timeZone}, SUBSTR(MD5(RAND()), 1, 15));`;
 	} else {
-		query = sql`INSERT INTO \`Groups\`(name, visit_frequency) VALUES (${req.body.name}, ${req.body.visitFrequency});`;
+		query = sql`INSERT INTO \`Groups\`(name, visit_frequency, password) VALUES (${req.body.name}, 
+			${req.body.visitFrequency}, SUBSTR(MD5(RAND()), 1, 15));`;
 	}
 
 	const result = await db.query(query);
