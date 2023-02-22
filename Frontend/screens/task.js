@@ -105,18 +105,21 @@ export default function Task({ route, navigation }) {
           setEditDescription={setEditDescription}
           editStartDate={editStartDate}
           setEditStartDate={setEditStartDate}
+          hideStartDate={hideEditButtons}
         />
-        <RepeatBehavior
-          id={id}
-          data={repeatsData}
-          isLoading={isRepeatsLoading}
-          error={repeatsError}
-          editMode={editMode}
-          editRepeat={editRepeat}
-          setEditRepeat={setEditRepeat}
-          editRepeatTitle={editRepeatTitle}
-          setEditRepeatTitle={setEditRepeatTitle}
-        />
+        {!hideEditButtons && (
+          <RepeatBehavior
+            id={id}
+            data={repeatsData}
+            isLoading={isRepeatsLoading}
+            error={repeatsError}
+            editMode={editMode}
+            editRepeat={editRepeat}
+            setEditRepeat={setEditRepeat}
+            editRepeatTitle={editRepeatTitle}
+            setEditRepeatTitle={setEditRepeatTitle}
+          />
+        )}
       </ScrollView>
       {editMode && (
         <View style={styles.buttonsContainer}>
