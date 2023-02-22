@@ -1,10 +1,11 @@
-import { StyleSheet, SafeAreaView } from 'react-native';
+import { StyleSheet, SafeAreaView, View } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { ActivityIndicator } from 'react-native-paper';
 import COLORS from '../constants/colors';
 import TopBar from '../components/messages/top-bar';
+import Header from '../components/notes/header';
 import { FetchMessages, FetchUsers } from '../services/api/messages';
 import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
@@ -89,7 +90,7 @@ export default function Messages({ route, navigation }) {
         position={message_sender_id == user['user'].email ? 'right' : 'left'}
         wrapperStyle={{
           right: {
-            backgroundColor: COLORS.warning,
+            backgroundColor: COLORS.orange,
             marginVertical: 5,
           },
           left: {
@@ -102,8 +103,8 @@ export default function Messages({ route, navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <TopBar />
+    <View style={styles.container}>
+      <Header title={"Message"} navigation={navigation}/>
       <GiftedChat
         renderBubble={renderBubble}
         showUserAvatar={true}
@@ -112,7 +113,7 @@ export default function Messages({ route, navigation }) {
         onSend={(messages) => onMessageSend(messages)}
         user={this_user}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -128,30 +129,3 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
-
-// const [hasGalPermission, setGalPermission] = useState(null);
-//   (async () => {
-//   const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
-//   setGalPermission(galleryStatus.status === "granted");
-// })();
-
-// Handles image selection
-// const handleImageSelection = async () => {
-//   let result = await ImagePicker.launchImageLibraryAsync({
-//     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//     allowsEditing: true,
-//     aspect: [4, 3],
-//     quality: 1,
-//   });
-
-//   result = result.assets;
-//   imgValues = result[0];
-//   const imageMessage = {
-//     user: user[0],
-//     createdAt: Date.now(),
-//     _id: uuidv4(),
-//     messageType: "image",
-//     image: imgValues["uri"],
-//   };
-//   console.log(imageMessage);
-// };

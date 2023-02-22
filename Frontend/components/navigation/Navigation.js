@@ -1,11 +1,13 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomNavigation from './BottomNavigation';
 import GoogleLogin from '../../screens/google';
-import RegisterUser from '../../screens/register-user';
+import RegisterUser from '../../screens/user/register-user';
 import Groups from '../../screens/group/groups';
 import CreateGroup from '../../screens/group/create-group';
 import Visit from '../../screens/visit';
 import Task from '../../screens/task';
+import Settings from '../../screens/settings';
+import UserAccount from '../../screens/user/user-account';
 import { useState } from 'react';
 import UserProvider from '../../services/providers/UserProvider';
 import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
@@ -92,6 +94,16 @@ export default function Navigation() {
                   <Stack.Screen
                     name='Note'
                     component={Note}
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name='Settings'
+                    component={Settings}
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name='UserAccount'
+                    component={UserAccount}
                     options={{ headerShown: false }}
                   />
                 </Stack.Navigator>

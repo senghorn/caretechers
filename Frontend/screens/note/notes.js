@@ -6,16 +6,16 @@ import COLORS from '../../constants/colors';
 import Header from '../../components/notes/header';
 import config from '../../constants/config';
 import UserContext from '../../services/context/UserContext';
+import { fetchNotes } from '../../services/api/notes';
 import useSWR from 'swr';
 import { RefreshContext } from '../../services/context/RefreshContext';
 
-const axios = require('axios').default;
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Notes({ navigation }) {
   // Grab user data from UserContext
   const user = useContext(UserContext);
-  const { refresh } = useContext(RefreshContext);
+  const { refresh, sort } = useContext(RefreshContext);
 
   const { data, isLoading, error, mutate } = useSWR(
     config.backend_server + '/notes/group/' + user.group_id,
@@ -29,13 +29,23 @@ export default function Notes({ navigation }) {
       !isLoading &&
       data
     ) {
-      setNotes(data);
+      if (sort != 'none') {
+        setNotes(sortNotesByTitle(data, sort));
+      } else {
+        setNotes(data);
+      }
     }
   }, [user, data, isLoading]);
 
   useEffect(() => {
     mutate();
   }, [refresh]);
+
+  useEffect(() => {
+    if (notes && sort) {
+      setNotes(sortNotesByTitle(notes, sort == 'ascending'));
+    }
+  }, [sort, notes]);
 
   const [notes, setNotes] = useState(null);
   const [noteModified, setNoteModified] = useState(null);
@@ -59,7 +69,7 @@ export default function Notes({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header />
+      <Header title={'Notes'} sort={true} navigation={navigation} />
       <ScrollView
         style={styles.tasksContainer}
         refreshControl={
@@ -97,23 +107,28 @@ export default function Notes({ navigation }) {
   );
 }
 
-const fetchNotes = async (user, setNotes) => {
-  try {
-    let connection_string =
-      config.backend_server + '/notes/group/' + user.group_id;
-    await axios.get(connection_string).then(function (response) {
-      setNotes(response.data);
-    });
-  } catch (error) {
-    console.log('Fetching note error', error.message);
-  }
-};
+function sortNotesByTitle(notes, ascending = true) {
+  console.log(ascending);
+  // Sort the notes by title in ascending or descending order
+  notes.sort(function (a, b) {
+    var titleA = a.title.toUpperCase();
+    var titleB = b.title.toUpperCase();
+    if (titleA < titleB) {
+      return ascending ? -1 : 1;
+    }
+    if (titleA > titleB) {
+      return ascending ? 1 : -1;
+    }
+    return 0;
+  });
+
+  return notes;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 40,
   },
   headerContainer: {
     flexDirection: 'row',

@@ -104,8 +104,12 @@ export default function Note({ navigation, route }) {
                 Keyboard.dismiss();
                 setEditing(false);
                 toggleRefresh();
-                await addNote(noteTitle, noteContent, user.group_id);
-                navigation.goBack();
+                await addNote(
+                  noteTitle,
+                  noteContent,
+                  user.group_id,
+                  navigation
+                );
               }}
             />
           </Appbar.Header>
@@ -140,14 +144,18 @@ export default function Note({ navigation, route }) {
   );
 }
 
-const addNote = async (noteTitle, noteContent, groupId) => {
-  CreateNote({ title: noteTitle, content: noteContent }, groupId)
-    .then((noteId) => {
-      if (noteId) {
-        // Do something if required
-      }
-    })
-    .catch((error) => console.error(error));
+const addNote = async (noteTitle, noteContent, groupId, navigation) => {
+  if (noteTitle && noteContent) {
+    CreateNote({ title: noteTitle, content: noteContent }, groupId)
+      .then((noteId) => {
+        if (noteId) {
+          navigation.goBack();
+        }
+      })
+      .catch((error) => console.error(error));
+  } else {
+    alert('Note must have both title and content');
+  }
 };
 
 const styles = StyleSheet.create({
@@ -163,14 +171,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 18,
   },
-  titleInputBox:{
+  titleInputBox: {
     margin: 10,
     borderRadius: 20,
   },
-  contentInputBox:{
+  contentInputBox: {
     margin: 10,
     borderRadius: 20,
-    minHeight: '30%'
+    minHeight: '30%',
   },
   titleBox: {
     height: 'auto',
