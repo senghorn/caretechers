@@ -3,24 +3,26 @@ import { ActivityIndicator } from 'react-native-paper';
 import { Checkbox } from 'react-native-paper';
 import Task from '../tasks/task';
 
-export default function Tasks({ tasks, date, isLoading, navigation }) {
+export default function Tasks({ tasks, dateString, isLoading, navigation }) {
   if (isLoading) {
     return <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />;
   }
   if (tasks.length === 0) {
     return <Text style={styles.noTasksLabel}>No tasks assigned to this visit</Text>;
   }
-  const renderedTasks = tasks.map((task, index) => <TaskWrapper task={task} key={index} navigation={navigation} date={date} />);
+  const renderedTasks = tasks.map((task, index) => (
+    <TaskWrapper task={task} key={index} navigation={navigation} dateString={dateString} />
+  ));
   return <ScrollView style={styles.container}>{renderedTasks}</ScrollView>;
 }
 
-function TaskWrapper({ task, navigation }) {
+function TaskWrapper({ task, navigation, dateString }) {
   return (
     <View style={styles.checkboxContainer}>
       <View>
         <Checkbox.Android status={task.taskCompleted ? 'checked' : 'unchecked'} color="#199b1e" />
       </View>
-      <Task showIcon={false} title={task.title} key={task.id} navigation={navigation} id={task.id} />
+      <Task showIcon={false} title={task.title} key={task.id} navigation={navigation} id={task.id} dateString={dateString} />
     </View>
   );
 }

@@ -25,13 +25,19 @@ module.exports.getTasksByGroup = asyncHandler(async (req, _res, next) => {
           RP.task_id AS rp_id, RP.separation_count, RP.day_of_week, RP.week_of_month, RP.day_of_month, RP.month_of_year
           FROM TaskMeta TM
 					LEFT JOIN RecurringPattern RP on TM.id = RP.task_id
-					WHERE TM.group_id = ${req.params.groupId};`;
+					WHERE TM.group_id = ${req.params.groupId} AND (TM.end_date IS NULL OR TM.end_date > ${req.query.after_date});`;
   req.result = await db.query(query);
   next();
 });
 
 module.exports.deleteTask = asyncHandler(async (req, _res, next) => {
-  const query = sql`DELETE FROM TaskMeta WHERE id = ${req.params.taskId};`;
+  const taskInfoQuery = sql`SELECT start_date FROM TaskMeta WHERE id = ${req.params.taskId}`;
+  const [task] = await db.query(taskInfoQuery);
+  const shouldDelete = task.start_date === req.query.end_date;
+  const query =
+    req.query.end_date && !shouldDelete
+      ? sql`UPDATE TaskMeta SET end_date = ${req.query.end_date} WHERE id = ${req.params.taskId};`
+      : sql`DELETE FROM TaskMeta WHERE id = ${req.params.taskId};`;
   await db.query(query);
   next();
 });

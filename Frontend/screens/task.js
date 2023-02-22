@@ -6,23 +6,23 @@ import Header from '../components/task/header';
 import RepeatBehavior from '../components/task/repeatBehavior';
 import config from '../constants/config';
 import useSWR from 'swr';
-import { format } from 'date-fns';
+import { differenceInDays, format, isSameDay, startOfDay } from 'date-fns';
 import UserContext from '../services/context/UserContext';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import TasksRefreshContext from '../services/context/TasksRefreshContext';
 import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
+import { getDateFromDateString } from '../utils/date';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-const getDateFromDateString = (dateString) => {
-  const year = dateString.substring(0, 4);
-  const month = dateString.substring(5, 7);
-  const day = dateString.substring(8, 10);
-  return new Date(year, Number(month) - 1, day);
-};
-
 export default function Task({ route, navigation }) {
-  const { title, id } = route.params;
+  const { title, id, dateString } = route.params;
+
+  let hideEditButtons = false;
+  if (dateString) {
+    const dayDiff = differenceInDays(startOfDay(getDateFromDateString(dateString)), startOfDay(new Date()));
+    hideEditButtons = dayDiff < 0; // disable task deletion/editing if task has already occurred in a past visit
+  }
 
   const [refreshCalendar] = useContext(CalendarRefreshContext);
 
@@ -87,7 +87,7 @@ export default function Task({ route, navigation }) {
       <Header
         id={id}
         navigation={navigation}
-        hideButtons={id === 'new'}
+        hideButtons={id === 'new' || hideEditButtons}
         title={titleState}
         editMode={editMode}
         setEditMode={setEditMode}

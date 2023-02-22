@@ -2,13 +2,13 @@ import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { Fragment } from 'react';
 
-export default function Task({ title, id, navigation, showIcon }) {
+export default function Task({ title, id, dateString, navigation, showIcon }) {
   if (!title) return null;
   return (
     <TouchableHighlight
       style={styles.taskContainer}
       underlayColor="#e3f2fd"
-      onPress={() => navigation.navigate('Task', { title, id })}
+      onPress={() => navigation.navigate('Task', { title, id, dateString })}
     >
       <Fragment>
         <View style={styles.taskTitleContainer}>

@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { Fragment, useContext } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { Appbar, TextInput } from 'react-native-paper';
@@ -48,7 +49,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
               color="#D11A2A"
               onPress={() => {
                 Alert.alert(
-                  'Are you sure you want to delete this task?',
+                  'Delete this task from future visits?',
                   '', // <- this part is optional, you can pass an empty string
                   [
                     {
@@ -82,7 +83,8 @@ const headers = {
 };
 
 const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refreshCalendar) => {
-  const url = `${config.backend_server}/tasks/${id}`;
+  const currDate = format(new Date(), 'yyyy-MM-dd');
+  const url = `${config.backend_server}/tasks/${id}?end_date=${currDate}`;
   const method = 'DELETE';
   try {
     await fetch(url, {

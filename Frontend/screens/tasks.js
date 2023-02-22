@@ -8,6 +8,7 @@ import config from '../constants/config';
 import useSWR from 'swr';
 import UserContext from '../services/context/UserContext';
 import TasksRefreshContext from '../services/context/TasksRefreshContext';
+import { format } from 'date-fns';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -17,7 +18,7 @@ export default function Tasks({ navigation }) {
 
   const user = useContext(UserContext);
 
-  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}`;
+  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}?after_date=${format(new Date(), 'yyyy-MM-dd')}`;
 
   const [, setRefreshTasks] = useContext(TasksRefreshContext);
 

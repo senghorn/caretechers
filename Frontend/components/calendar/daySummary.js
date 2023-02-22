@@ -104,9 +104,10 @@ export default function DaySummary({
       : `${visitInfo.taskCount} Tasks`
     : 'No Tasks';
 
+  const dateString = format(date, 'yyyy-MM-dd');
   return (
     <TouchableHighlight
-      onPress={() => navigation.navigate('Visit', { date })}
+      onPress={() => navigation.navigate('Visit', { dateString })}
       style={[styles.container, colorStyle]}
       underlayColor="#ededed"
     >
