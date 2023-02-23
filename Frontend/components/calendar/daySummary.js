@@ -78,7 +78,7 @@ export default function DaySummary({
       <TouchableHighlight
         onPress={() => {
           volunteerForVisit(key, user);
-          setVisitInfo({ ...visitInfo, visitor: user.email, first_name: user.first_name });
+          setVisitInfo({ ...visitInfo, visitor: user.email, first_name: user.first_name, profile_pic: user.profile_pic });
         }}
         style={styles.buttonContainer}
         underlayColor="#ededed"
