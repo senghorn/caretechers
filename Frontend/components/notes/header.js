@@ -4,7 +4,7 @@ import { TextInput } from 'react-native-paper';
 import { Appbar } from 'react-native-paper';
 import { RefreshContext } from '../../services/context/RefreshContext';
 
-export default function Header({ navigation, route, title, sort }) {
+export default function Header({ navigation, route, title, sort, pin = false }) {
   // Sort drop down values
   const data = [
     { label: 'Date', value: '1' },
@@ -21,11 +21,16 @@ export default function Header({ navigation, route, title, sort }) {
   return (
     <View>
       <Appbar.Header style={styles.headerContainer}>
-        <Appbar.Action icon={'account-cog'} onPress={() => { navigation.navigate('Settings'); }} />
+        <Appbar.Action
+          icon={'account-cog'}
+          onPress={() => {
+            navigation.navigate('Settings');
+          }}
+        />
         {searchMode ? (
           <TextInput
             style={styles.titleInput}
-            label='Search'
+            label="Search"
             value={searchQuery}
             onChangeText={(text) => {
               setSearchQuery(text);
@@ -34,21 +39,21 @@ export default function Header({ navigation, route, title, sort }) {
             onEndEditing={() => {
               console.log('Search queried of text:', searchQuery);
             }}
-            mode='outlined'
+            mode="outlined"
           />
         ) : (
           <Appbar.Content title={title} titleStyle={styles.title} />
         )}
         {searchMode ? (
           <Appbar.Action
-            icon='close'
+            icon="close"
             onPress={() => {
               setSearchMode(false);
             }}
           />
         ) : (
           <Appbar.Action
-            icon='magnify'
+            icon="magnify"
             onPress={() => {
               setSearchMode(true);
             }}
@@ -63,6 +68,14 @@ export default function Header({ navigation, route, title, sort }) {
             }}
           />
         )}
+        {!searchMode && pin && (
+          <Appbar.Action
+            icon="pin"
+            onPress={() => {
+              console.log('open pinned messages');
+            }}
+          />
+        )}
       </Appbar.Header>
     </View>
   );
@@ -74,8 +87,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
+    fontWeight: '500',
     fontSize: 20,
-    fontWeight: 'bold',
   },
   titleInput: {
     flexGrow: 1,

@@ -1,10 +1,7 @@
 import { StyleSheet, SafeAreaView, View } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
-import * as ImagePicker from 'expo-image-picker';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
-import { ActivityIndicator } from 'react-native-paper';
 import COLORS from '../constants/colors';
-import TopBar from '../components/messages/top-bar';
 import Header from '../components/notes/header';
 import { FetchMessages, FetchUsers } from '../services/api/messages';
 import createSocket from '../components/messages/socket';
@@ -18,6 +15,7 @@ export default function Messages({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
   const user_i = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user_i && !(Object.keys(user).length === 0)) {
@@ -94,7 +92,6 @@ export default function Messages({ route, navigation }) {
             marginVertical: 5,
           },
           left: {
-            backgroundColor: COLORS.grayLight,
             marginVertical: 5,
           },
         }}
@@ -104,9 +101,10 @@ export default function Messages({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header title={"Message"} navigation={navigation}/>
+      <Header title={'Messages'} navigation={navigation} pin />
       <GiftedChat
         renderBubble={renderBubble}
+        wrapInSafeArea={false}
         showUserAvatar={true}
         messages={messages}
         renderUsernameOnMessage={true}
@@ -120,6 +118,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: 0,
+    margin: 0,
   },
   textInput: {
     height: 40,

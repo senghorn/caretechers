@@ -7,6 +7,9 @@ import Calendar from '../../screens/calendar';
 import Tasks from '../../screens/tasks';
 import { useEffect } from 'react';
 import config from '../../constants/config';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet } from 'react-native';
+import colors from '../../constants/colors';
 
 const axios = require('axios').default;
 
@@ -28,46 +31,55 @@ export default function BottomNavigation({ route, navigation, setUser }) {
   }, [route.params]);
 
   return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Notes"
-        component={Notes}
-        initialParams={{ user: route['params'] }}
-        options={{
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="notebook" color={color} size={26} />,
-        }}
-      />
-      <Tab.Screen
-        name="Messages"
-        component={Messages}
-        initialParams={{ user: route['params'] }}
-        options={{
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="android-messages" color={color} size={26} />,
-        }}
-      />
-      <Tab.Screen
-        name="Calendar"
-        component={Calendar}
-        navigation={navigation}
-        options={{
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="calendar-heart" color={color} size={26} />,
-        }}
-      />
-      <Tab.Screen
-        name="Metrics"
-        component={Metrics}
-        options={{
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="chart-box" color={color} size={26} />,
-        }}
-      />
-      <Tab.Screen
-        name="Tasks"
-        component={Tasks}
-        navigation={navigation}
-        options={{
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="checkbox-multiple-marked" color={color} size={26} />,
-        }}
-      />
-    </Tab.Navigator>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Notes"
+          component={Notes}
+          initialParams={{ user: route['params'] }}
+          options={{
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="notebook" color={color} size={26} />,
+          }}
+        />
+        <Tab.Screen
+          name="Messages"
+          component={Messages}
+          initialParams={{ user: route['params'] }}
+          options={{
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="android-messages" color={color} size={26} />,
+          }}
+        />
+        <Tab.Screen
+          name="Calendar"
+          component={Calendar}
+          navigation={navigation}
+          options={{
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="calendar-heart" color={color} size={26} />,
+          }}
+        />
+        <Tab.Screen
+          name="Metrics"
+          component={Metrics}
+          options={{
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="chart-box" color={color} size={26} />,
+          }}
+        />
+        <Tab.Screen
+          name="Tasks"
+          component={Tasks}
+          navigation={navigation}
+          options={{
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="checkbox-multiple-marked" color={color} size={26} />,
+          }}
+        />
+      </Tab.Navigator>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+});

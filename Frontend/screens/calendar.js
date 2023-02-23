@@ -15,7 +15,7 @@ import {
 } from 'date-fns';
 import { uniqueId } from 'lodash';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
 import Header from '../components/calendar/header';
 import useSWR from 'swr';
 import ScrollableScreen from '../components/calendar/scrollableScreen';
@@ -83,22 +83,24 @@ export default function Calendar({ navigation }) {
   }, [currentDateDisplayed]);
 
   return (
-    <View style={styles.container}>
-      <Header date={currentDateDisplayed} setInitDate={setInitDate} />
-      <DateToVisitsContext.Provider value={dateToVisitsMap}>
-        {!resetScreen && (
-          <ScrollableScreen
-            renderingDataForFlatList={renderingDataForFlatList}
-            setRenderingDataForFlatList={setRenderingDataForFlatList}
-            createRenderingDataForFlatList={createRenderingDataForFlatList}
-            setCurrentDateDisplayed={setCurrentDateDisplayed}
-            resetScreen={resetScreen}
-            setResetScreen={setResetScreen}
-            navigation={navigation}
-          />
-        )}
-      </DateToVisitsContext.Provider>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Header date={currentDateDisplayed} setInitDate={setInitDate} navigation={navigation} />
+        <DateToVisitsContext.Provider value={dateToVisitsMap}>
+          {!resetScreen && (
+            <ScrollableScreen
+              renderingDataForFlatList={renderingDataForFlatList}
+              setRenderingDataForFlatList={setRenderingDataForFlatList}
+              createRenderingDataForFlatList={createRenderingDataForFlatList}
+              setCurrentDateDisplayed={setCurrentDateDisplayed}
+              resetScreen={resetScreen}
+              setResetScreen={setResetScreen}
+              navigation={navigation}
+            />
+          )}
+        </DateToVisitsContext.Provider>
+      </View>
+    </SafeAreaView>
   );
 }
 
