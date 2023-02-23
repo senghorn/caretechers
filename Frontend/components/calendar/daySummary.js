@@ -5,6 +5,7 @@ import { DateToVisitsContext } from '../../screens/calendar';
 import { AntDesign } from '@expo/vector-icons';
 import UserContext from '../../services/context/UserContext';
 import config from '../../constants/config';
+import { getDateString } from '../../utils/date';
 
 export default function DaySummary({
   date,
@@ -15,8 +16,8 @@ export default function DaySummary({
   errorOverride = false,
 }) {
   const dateToVisitsMap = useContext(DateToVisitsContext);
-  const {user} = useContext(UserContext);
-  const key = format(date, 'yyyy-MM-dd');
+  const user = useContext(UserContext);
+  const key = getDateString(date);
 
   const [isLoading, setIsLoading] = useState(isLoadingOverride);
   const [visitInfo, setVisitInfo] = useState(visitInfoOverride);
@@ -77,7 +78,7 @@ export default function DaySummary({
       <TouchableHighlight
         onPress={() => {
           volunteerForVisit(key, user);
-          setVisitInfo({ ...visitInfo, visitor: user.email, first_name: user.first_name });
+          setVisitInfo({ ...visitInfo, visitor: user.email, first_name: user.first_name, profile_pic: user.profile_pic });
         }}
         style={styles.buttonContainer}
         underlayColor="#ededed"
@@ -92,7 +93,7 @@ export default function DaySummary({
   }
 
   let colorStyle = styles.futureDayColor;
-  if (visitInfo.visitor && visitInfo.completedTaskCount === visitInfo.taskCount && inThePast)
+  if (visitInfo.visitor && visitInfo.completedTaskCount === visitInfo.taskCount && inThePast && visitInfo.visitCompleted)
     colorStyle = styles.completedDayColor;
   else if (isCurrentDay) colorStyle = styles.currentDayColor;
   else if (!visitInfo.visitor || inThePast) colorStyle = styles.missedDayColor;
@@ -104,9 +105,10 @@ export default function DaySummary({
       : `${visitInfo.taskCount} Tasks`
     : 'No Tasks';
 
+  const dateString = getDateString(date);
   return (
     <TouchableHighlight
-      onPress={() => navigation.navigate('Visit', { date })}
+      onPress={() => navigation.navigate('Visit', { dateString })}
       style={[styles.container, colorStyle]}
       underlayColor="#ededed"
     >

@@ -20,6 +20,7 @@ export default function Description({
   setEditDescription,
   editStartDate,
   setEditStartDate,
+  hideStartDate,
 }) {
   return (
     <Fragment>
@@ -36,22 +37,27 @@ export default function Description({
               setEditDescription={setEditDescription}
               data={data}
             />
-            <Text style={styles.header}>Schedule</Text>
-            <View style={styles.selectDateContainer}>
-              <Text style={styles.takesPlaceText}>
-                Starts {!editMode && format(getDateFromDateString(data[0].start_date), 'MMMM do, y')}
-              </Text>
-              {editMode && (
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={editMode ? editStartDate : getDateFromDateString(data[0].start_date)}
-                  onChange={(event, date) => setEditStartDate(date)}
-                  mode={'date'}
-                  display="default"
-                  is24Hour={true}
-                />
-              )}
-            </View>
+            {!hideStartDate && (
+              <Fragment>
+                <Text style={styles.header}>Schedule</Text>
+                <View style={styles.selectDateContainer}>
+                  <Text style={styles.takesPlaceText}>
+                    Starts {!editMode && format(getDateFromDateString(data[0].start_date), 'MMMM do, y')}
+                  </Text>
+                  {editMode && (
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={editMode ? editStartDate : getDateFromDateString(data[0].start_date)}
+                      onChange={(event, date) => setEditStartDate(date)}
+                      mode={'date'}
+                      display="default"
+                      is24Hour={true}
+                      minimumDate={new Date()}
+                    />
+                  )}
+                </View>
+              </Fragment>
+            )}
           </Fragment>
         )}
       </View>

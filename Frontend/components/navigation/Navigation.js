@@ -33,13 +33,9 @@ const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   const [user, setUser] = useState({});
-  const [refreshCalendar, setRefreshCalendar] = useState(
-    () => initRefreshCalendar
-  );
+  const [refreshCalendar, setRefreshCalendar] = useState(() => initRefreshCalendar);
   const [refreshTasks, setRefreshTasks] = useState(() => initRefreshTasks);
-  const [refreshVisitTasks, setRefreshVisitTasks] = useState(
-    () => initRefreshTasks
-  );
+  const [refreshVisitTasks, setRefreshVisitTasks] = useState(() => initRefreshTasks);
   const [refreshVisit, setRefreshVisit] = useState(() => initRefreshVisit);
   return (
     <UserProvider user={user} setUser={setUser}>
@@ -48,64 +44,25 @@ export default function Navigation() {
       >
         <TasksRefreshContext.Provider value={[refreshTasks, setRefreshTasks]}>
           <VisitRefreshContext.Provider value={[refreshVisit, setRefreshVisit]}>
-            <VisitTasksRefreshContext.Provider
-              value={[refreshVisitTasks, setRefreshVisitTasks]}
-            >
+            <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>
               <RefreshProvider>
                 <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
-                  <Stack.Screen
-                    name={'Login'}
-                    component={GoogleLogin}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name={'Home'}
-                    options={{ headerShown: false, gestureEnabled: false }}
-                  >
-                    {(props) => (
-                      <BottomNavigation {...props} setUser={setUser} />
-                    )}
+                  <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
+                  <Stack.Screen name={'Home'} options={{ headerShown: false, gestureEnabled: false }}>
+                    {(props) => <BottomNavigation {...props} setUser={setUser} />}
                   </Stack.Screen>
-                  <Stack.Screen
-                    name={'RegisterUser'}
-                    component={RegisterUser}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name={'Group'}
-                    component={Groups}
-                    options={{ headerShown: false, gestureEnabled: false }}
-                  />
+                  <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
+                  <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false }} />
                   <Stack.Screen
                     name={'CreateGroup'}
                     component={CreateGroup}
                     options={{ headerShown: false, gestureEnabled: false }}
                   />
-                  <Stack.Screen
-                    name='Visit'
-                    component={Visit}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name='Task'
-                    component={Task}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name='Note'
-                    component={Note}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name='Settings'
-                    component={Settings}
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name='UserAccount'
-                    component={UserAccount}
-                    options={{ headerShown: false }}
-                  />
+                  <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
+                  <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
+                  <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
+                  <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+                  <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
                 </Stack.Navigator>
               </RefreshProvider>
             </VisitTasksRefreshContext.Provider>

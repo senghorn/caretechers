@@ -2,10 +2,16 @@ import { format, startOfDay } from 'date-fns';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
-export default function Header({ date, setInitDate }) {
+export default function Header({ date, setInitDate, navigation }) {
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
+        <Appbar.Action
+          icon={'account-cog'}
+          onPress={() => {
+            navigation.navigate('Settings');
+          }}
+        />
         <Appbar.Content title={format(date, 'LLLL Y')} titleStyle={styles.titleText} />
         <Appbar.Action
           icon="calendar"

@@ -25,13 +25,7 @@ export default function Note({ navigation, route }) {
       setNoteTitle(note.title);
       const date = new Date(note.last_edited);
       const dayOfWeek = format(date, 'E');
-      setEditTime(
-        dayOfWeek +
-        ', ' +
-        date.toLocaleDateString() +
-        ' ' +
-        date.toLocaleTimeString()
-      );
+      setEditTime(dayOfWeek + ', ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString());
     }
   }, [note]);
 
@@ -42,7 +36,7 @@ export default function Note({ navigation, route }) {
         <View>
           <Appbar.Header style={styles.headerContainer}>
             <Appbar.Action
-              icon='chevron-left'
+              icon="chevron-left"
               onPress={() => {
                 navigation.goBack();
               }}
@@ -50,7 +44,7 @@ export default function Note({ navigation, route }) {
             <Appbar.Content title={noteTitle} titleStyle={styles.titleText} />
             {editing && (
               <Appbar.Action
-                icon='check'
+                icon="check"
                 onPress={async () => {
                   Keyboard.dismiss();
                   setEditing(false);
@@ -65,7 +59,7 @@ export default function Note({ navigation, route }) {
             )}
             {!editing && (
               <Appbar.Action
-                icon='trash-can'
+                icon="trash-can"
                 onPress={async () => {
                   await RemoveNote(noteId);
                   toggleRefresh();
@@ -76,7 +70,8 @@ export default function Note({ navigation, route }) {
           </Appbar.Header>
           <Text style={styles.time}>Last Edited: {editTime}</Text>
           <TextInput
-            multiline
+            multiline={true}
+            numberOfLines={4}
             value={noteContent}
             onChangeText={(text) => {
               setNoteContent(text);
@@ -92,24 +87,19 @@ export default function Note({ navigation, route }) {
         <View>
           <Appbar.Header style={styles.headerContainer}>
             <Appbar.Action
-              icon='chevron-left'
+              icon="chevron-left"
               onPress={() => {
                 navigation.goBack();
               }}
             />
             <Appbar.Content title={'New Note'} titleStyle={styles.titleText} />
             <Appbar.Action
-              icon='content-save-check'
+              icon="content-save-check"
               onPress={async () => {
                 Keyboard.dismiss();
                 setEditing(false);
                 toggleRefresh();
-                await addNote(
-                  noteTitle,
-                  noteContent,
-                  user.group_id,
-                  navigation
-                );
+                await addNote(noteTitle, noteContent, user.group_id, navigation);
               }}
             />
           </Appbar.Header>
@@ -198,7 +188,7 @@ const styles = StyleSheet.create({
     margin: 10,
     marginTop: 20,
     minHeight: '10%',
-    borderRadius: 15,
+    borderRadius: 4,
   },
   time: {
     fontSize: 12,

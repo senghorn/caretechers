@@ -8,6 +8,7 @@ import config from '../constants/config';
 import useSWR from 'swr';
 import UserContext from '../services/context/UserContext';
 import TasksRefreshContext from '../services/context/TasksRefreshContext';
+import { getCurrentDateString } from '../utils/date';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -17,7 +18,7 @@ export default function Tasks({ navigation }) {
 
   const {user} = useContext(UserContext);
 
-  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}`;
+  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}?after_date=${getCurrentDateString()}`;
 
   const [, setRefreshTasks] = useContext(TasksRefreshContext);
 
@@ -46,7 +47,7 @@ export default function Tasks({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Header title="Every Visit" id="every" selected={selected} setSelected={setSelected} />
+        <Header title="Daily" id="every" selected={selected} setSelected={setSelected} />
         <Header title="Scheduled" id="scheduled" selected={selected} setSelected={setSelected} />
       </View>
       <ScrollView style={styles.tasksContainer}>
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    paddingTop: 64,
+    paddingTop: 16,
   },
   headerContainer: {
     flexDirection: 'row',

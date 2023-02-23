@@ -15,7 +15,7 @@ import {
 } from 'date-fns';
 import { uniqueId } from 'lodash';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
 import Header from '../components/calendar/header';
 import useSWR from 'swr';
 import ScrollableScreen from '../components/calendar/scrollableScreen';
@@ -23,6 +23,7 @@ import ScrollableScreen from '../components/calendar/scrollableScreen';
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
+import { getDateString } from '../utils/date';
 
 const DateToVisitsContext = createContext();
 
@@ -36,8 +37,8 @@ export default function Calendar({ navigation }) {
   const [currentDateDisplayed, setCurrentDateDisplayed] = useState(initDate);
   const [dateToVisitsMap, setDateToVisitsMap] = useState(undefined);
 
-  const startDateString = format(subWeeks(startDate, 2), 'yyyy-MM-dd');
-  const endDateString = format(addWeeks(endDate, 2), 'yyyy-MM-dd');
+  const startDateString = getDateString(subWeeks(startDate, 2));
+  const endDateString = getDateString(addWeeks(endDate, 2));
 
   const [resetScreen, setResetScreen] = useState(false);
 
@@ -82,22 +83,24 @@ export default function Calendar({ navigation }) {
   }, [currentDateDisplayed]);
 
   return (
-    <View style={styles.container}>
-      <Header date={currentDateDisplayed} setInitDate={setInitDate} />
-      <DateToVisitsContext.Provider value={dateToVisitsMap}>
-        {!resetScreen && (
-          <ScrollableScreen
-            renderingDataForFlatList={renderingDataForFlatList}
-            setRenderingDataForFlatList={setRenderingDataForFlatList}
-            createRenderingDataForFlatList={createRenderingDataForFlatList}
-            setCurrentDateDisplayed={setCurrentDateDisplayed}
-            resetScreen={resetScreen}
-            setResetScreen={setResetScreen}
-            navigation={navigation}
-          />
-        )}
-      </DateToVisitsContext.Provider>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Header date={currentDateDisplayed} setInitDate={setInitDate} navigation={navigation} />
+        <DateToVisitsContext.Provider value={dateToVisitsMap}>
+          {!resetScreen && (
+            <ScrollableScreen
+              renderingDataForFlatList={renderingDataForFlatList}
+              setRenderingDataForFlatList={setRenderingDataForFlatList}
+              createRenderingDataForFlatList={createRenderingDataForFlatList}
+              setCurrentDateDisplayed={setCurrentDateDisplayed}
+              resetScreen={resetScreen}
+              setResetScreen={setResetScreen}
+              navigation={navigation}
+            />
+          )}
+        </DateToVisitsContext.Provider>
+      </View>
+    </SafeAreaView>
   );
 }
 
