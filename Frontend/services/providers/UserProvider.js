@@ -1,6 +1,6 @@
 import UserContext from '../context/UserContext';
 
 // Create a component that will provide the context
-export default function UserProvider({ children, user }) {
-  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+export default function UserProvider({ children, user, setUser }) {
+  return <UserContext.Provider value={{user, setUser}}>{children}</UserContext.Provider>;
 }

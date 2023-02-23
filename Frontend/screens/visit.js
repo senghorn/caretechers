@@ -22,7 +22,7 @@ export default function Visit({ route, navigation }) {
 
   const [selected, setSelected] = useState('Tasks');
 
-  const user = useContext(UserContext);
+  const {user} = useContext(UserContext);
 
   const [, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
   const [, setRefreshVisit] = useContext(VisitRefreshContext);

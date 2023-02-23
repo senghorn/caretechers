@@ -14,7 +14,7 @@ export default function Settings({ navigation, route }) {
     const [email, setEmail] = useState('johndoe@fakemail.com');
     const [photo, setPhoto] = useState(require('../assets/favicon.png'));
 
-    const user = useContext(UserContext);
+    const {user} = useContext(UserContext);
     useEffect(() => {
         if (user) {
             setUsername(user.first_name + " " + user.last_name);

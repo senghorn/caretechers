@@ -16,7 +16,9 @@ const axios = require('axios').default;
 const Tab = createMaterialBottomTabNavigator();
 
 export default function BottomNavigation({ route, navigation, setUser }) {
+
   useEffect(() => {
+
     async function fetchData(id, setUser) {
       try {
         let connection_string = config.backend_server + '/user/groupId/' + id;
@@ -27,7 +29,9 @@ export default function BottomNavigation({ route, navigation, setUser }) {
         console.log('Fetching user data unsuccessful.');
       }
     }
+
     if (route && route.params && route.params.user) fetchData(route.params.user.email, setUser);
+
   }, [route.params]);
 
   return (

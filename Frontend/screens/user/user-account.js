@@ -1,23 +1,25 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { Appbar, Avatar, TextInput, Button, Text } from "react-native-paper";
+import { Appbar, Avatar, TextInput, Button, Text, ActivityIndicator } from "react-native-paper";
 import colors from "../../constants/colors"
 import UserContext from "../../services/context/UserContext";
 import { useState, useContext, useEffect } from "react";
+import { UpdateUserData } from '../../services/api/user';
 
 export default function UserAccount({ navigation, route, newUser }) {
 
-    const user = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
     const [profile, setProfile] = useState(require('../../assets/favicon.png'));
     const [firstName, setFirstName] = useState('John');
     const [lastName, setLastName] = useState('Doe')
     const [phone, setPhone] = useState('123-321-3211');
     const [email, setEmail] = useState('johndoe@user.com');
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        resetData();
+        initData();
     }, [user, newUser]);
 
-    const resetData = () => {
+    const initData = () => {
         if (user && !newUser) {
             setFirstName(user.first_name);
             setLastName(user.last_name);
@@ -27,8 +29,24 @@ export default function UserAccount({ navigation, route, newUser }) {
         }
     };
 
-    const handleSave = () => {
-        console.log("handling save");
+    const handleSave = async () => {
+        setSaving(true);
+        if (user && phone.length == 12 && firstName.length > 0 && lastName.length > 0) {
+            await (async () => {
+                const update = await UpdateUserData(email, firstName, lastName, phone, user.group_id, user.profile_pic);
+                if (update) {
+                    setUser({
+                        "email": user.email, "first_name": firstName,
+                        "last_name": lastName, "group_id": user.group_id,
+                        "profile_pic": user.profile_pic, "phone_num": phone
+                    });
+                }
+            })();
+
+        } else {
+            alert("Make sure your phone number, first and last name are valid.");
+        }
+        setSaving(false);
     };
 
     const formatPhoneNumber = (text) => {
@@ -74,7 +92,6 @@ export default function UserAccount({ navigation, route, newUser }) {
                 outlineColor={colors.darkblue}
                 onChangeText={(text) => {
                     setFirstName(text);
-
                 }}
             />
             <TextInput
@@ -107,29 +124,33 @@ export default function UserAccount({ navigation, route, newUser }) {
             />
         </View>
         {!newUser && (
-            <View style={styles.buttonRow}>
-                <Button
-                    mode='contained'
-                    color={colors.yellow}
-                    icon='progress-check'
-                    style={styles.createButton}
-                    labelStyle={styles.createButtonText}
-                    onPress={handleSave}
-                >
-                    Save
-                </Button>
-                <Button
-                    mode='contained'
-                    color={colors.gray}
-                    icon='cancel'
-                    style={styles.createButton}
-                    labelStyle={styles.createButtonText}
-                    onPress={() => {
-                        resetData();
-                    }}
-                >
-                    Cancel
-                </Button>
+            <View >
+                {saving ? (<ActivityIndicator size="large" color="#2196f3" style={styles.loader} />) : (
+                    <View style={styles.buttonRow}>
+                        <Button
+                            mode='contained'
+                            color={colors.yellow}
+                            icon='progress-check'
+                            style={styles.createButton}
+                            labelStyle={styles.createButtonText}
+                            onPress={handleSave}
+                        >
+                            Save
+                        </Button>
+                        <Button
+                            mode='contained'
+                            color={colors.gray}
+                            icon='cancel'
+                            style={styles.createButton}
+                            labelStyle={styles.createButtonText}
+                            onPress={() => {
+                                initData();
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                    </View>
+                )}
             </View>
         )}
     </View>)

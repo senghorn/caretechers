@@ -98,3 +98,30 @@ export async function addUserToGroup(email, groupId, password) {
 
   return false;
 }
+
+export async function UpdateUserData(email, first_name, last_name, phone, group_id, profile_pic) {
+  const data = {
+    email: email,
+    firstName: first_name,
+    lastName: last_name,
+    phoneNum: phone,
+    groupId: group_id,
+    profilePic: profile_pic
+  };
+  try {
+    let connection_string = config.backend_server + '/user/' + email;
+    return await axios
+      .patch(connection_string, data)
+      .then(function (response) {
+        return true;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return false;
+      });
+  } catch (error) {
+    console.log('join group error ', error.message);
+  }
+
+  return false;
+}

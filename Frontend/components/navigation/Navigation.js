@@ -38,8 +38,10 @@ export default function Navigation() {
   const [refreshVisitTasks, setRefreshVisitTasks] = useState(() => initRefreshTasks);
   const [refreshVisit, setRefreshVisit] = useState(() => initRefreshVisit);
   return (
-    <UserProvider user={user}>
-      <CalendarRefreshContext.Provider value={[refreshCalendar, setRefreshCalendar]}>
+    <UserProvider user={user} setUser={setUser}>
+      <CalendarRefreshContext.Provider
+        value={[refreshCalendar, setRefreshCalendar]}
+      >
         <TasksRefreshContext.Provider value={[refreshTasks, setRefreshTasks]}>
           <VisitRefreshContext.Provider value={[refreshVisit, setRefreshVisit]}>
             <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>

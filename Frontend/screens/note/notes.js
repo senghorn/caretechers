@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
-import { View, StyleSheet, RefreshControl, ScrollView } from 'react-native';
+import { View, StyleSheet, RefreshControl, ScrollView, SafeAreaView } from 'react-native';
 import { Button, ActivityIndicator } from 'react-native-paper';
 import Note from '../../components/notes/note';
 import COLORS from '../../constants/colors';
@@ -14,7 +14,7 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Notes({ navigation }) {
   // Grab user data from UserContext
-  const user = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const { refresh, sort } = useContext(RefreshContext);
 
   const { data, isLoading, error, mutate } = useSWR(
@@ -106,9 +106,13 @@ export default function Notes({ navigation }) {
     </View>
   );
 }
-
+/**
+ * Sorts the given notes and returns the sorted notes
+ * @param {JSON} notes 
+ * @param {Boolean} ascending 
+ * @returns 
+ */
 function sortNotesByTitle(notes, ascending = true) {
-  console.log(ascending);
   // Sort the notes by title in ascending or descending order
   notes.sort(function (a, b) {
     var titleA = a.title.toUpperCase();
