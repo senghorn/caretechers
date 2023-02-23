@@ -12,7 +12,7 @@ export default function Messages({ navigation }) {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
-  const user_i = useContext(UserContext);
+  const {user} = useContext(UserContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
