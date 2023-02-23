@@ -28,7 +28,7 @@ export default function BottomNavigation({ route, navigation, setUser }) {
   }, [route.params]);
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator barStyle={{ backgroundColor: '#2D78E9' }}>
       <Tab.Screen
         name="Notes"
         component={Notes}
