@@ -9,10 +9,7 @@ import colors from './constants/colors';
 export default function App() {
   return (
     <NavigationContainer>
-      <SafeAreaView />
-      <SafeAreaView style={styles.container}>
-        <Navigation />
-      </SafeAreaView>
+      <Navigation />
       <StatusBar style="auto" />
     </NavigationContainer>
   );
