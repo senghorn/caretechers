@@ -15,7 +15,7 @@ export default function Tasks({ navigation }) {
   const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
 
-  const user = useContext(UserContext);
+  const {user} = useContext(UserContext);
 
   const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}`;
 

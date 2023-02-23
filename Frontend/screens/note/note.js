@@ -15,7 +15,7 @@ export default function Note({ navigation, route }) {
   const [noteTitle, setNoteTitle] = useState('');
   const [editing, setEditing] = useState(false);
   const [editTime, setEditTime] = useState('');
-  const user = useContext(UserContext);
+  const {user} = useContext(UserContext);
   const { toggleRefresh } = useContext(RefreshContext);
 
   useEffect(() => {
@@ -27,10 +27,10 @@ export default function Note({ navigation, route }) {
       const dayOfWeek = format(date, 'E');
       setEditTime(
         dayOfWeek +
-          ', ' +
-          date.toLocaleDateString() +
-          ' ' +
-          date.toLocaleTimeString()
+        ', ' +
+        date.toLocaleDateString() +
+        ' ' +
+        date.toLocaleTimeString()
       );
     }
   }, [note]);

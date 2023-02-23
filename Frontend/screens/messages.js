@@ -1,34 +1,30 @@
-import { StyleSheet, SafeAreaView, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
-import * as ImagePicker from 'expo-image-picker';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { ActivityIndicator } from 'react-native-paper';
 import COLORS from '../constants/colors';
-import TopBar from '../components/messages/top-bar';
 import Header from '../components/notes/header';
 import { FetchMessages, FetchUsers } from '../services/api/messages';
 import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
 
-export default function Messages({ route, navigation }) {
-  // TODO:Need to get rid of this user
-  const { user } = route.params;
+export default function Messages({ navigation }) {
   const [this_user, setThisUser] = useState(null);
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
-  const user_i = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
-    if (user_i && !(Object.keys(user).length === 0)) {
+    if (user && !(Object.keys(user).length === 0)) {
       setThisUser({
-        _id: user['user'].email,
-        name: user['user'].name,
-        avatar: user['user'].picture,
-        groupId: user_i.group_id,
+        _id: user.email,
+        name: user.first_name + user.last_name,
+        avatar: user.profile_pic,
+        groupId: user.group_id,
       });
     }
-  }, [user_i]);
+  }, [user]);
 
   useEffect(() => {
     if (this_user) {
@@ -87,7 +83,7 @@ export default function Messages({ route, navigation }) {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == user['user'].email ? 'right' : 'left'}
+        position={message_sender_id == user.email ? 'right' : 'left'}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.orange,
@@ -104,7 +100,7 @@ export default function Messages({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header title={"Message"} navigation={navigation}/>
+      <Header title={"Message"} navigation={navigation} />
       <GiftedChat
         renderBubble={renderBubble}
         showUserAvatar={true}

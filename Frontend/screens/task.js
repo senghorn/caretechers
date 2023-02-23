@@ -30,7 +30,7 @@ export default function Task({ route, navigation }) {
 
   const [refreshVisitTasks] = useContext(VisitTasksRefreshContext);
 
-  const user = useContext(UserContext);
+  const {user} = useContext(UserContext);
 
   const [titleState, setTitleState] = useState(title);
 

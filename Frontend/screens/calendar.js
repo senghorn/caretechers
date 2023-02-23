@@ -41,7 +41,7 @@ export default function Calendar({ navigation }) {
 
   const [resetScreen, setResetScreen] = useState(false);
 
-  const user = useContext(UserContext);
+  const {user} = useContext(UserContext);
 
   const [, setRefreshCalendar] = useContext(CalendarRefreshContext);
 

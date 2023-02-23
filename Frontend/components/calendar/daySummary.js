@@ -15,7 +15,7 @@ export default function DaySummary({
   errorOverride = false,
 }) {
   const dateToVisitsMap = useContext(DateToVisitsContext);
-  const user = useContext(UserContext);
+  const {user} = useContext(UserContext);
   const key = format(date, 'yyyy-MM-dd');
 
   const [isLoading, setIsLoading] = useState(isLoadingOverride);
