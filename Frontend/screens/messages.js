@@ -15,6 +15,7 @@ export default function Messages({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
   const user_i = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user_i && !(Object.keys(user).length === 0)) {
@@ -100,7 +101,7 @@ export default function Messages({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header title={'Message'} navigation={navigation} />
+      <Header title={'Messages'} navigation={navigation} pin />
       <GiftedChat
         renderBubble={renderBubble}
         wrapInSafeArea={false}

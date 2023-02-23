@@ -85,7 +85,7 @@ export default function Calendar({ navigation }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Header date={currentDateDisplayed} setInitDate={setInitDate} />
+        <Header date={currentDateDisplayed} setInitDate={setInitDate} navigation={navigation} />
         <DateToVisitsContext.Provider value={dateToVisitsMap}>
           {!resetScreen && (
             <ScrollableScreen
