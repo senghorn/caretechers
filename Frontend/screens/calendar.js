@@ -23,6 +23,7 @@ import ScrollableScreen from '../components/calendar/scrollableScreen';
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
+import { getDateString } from '../utils/date';
 
 const DateToVisitsContext = createContext();
 
@@ -36,8 +37,8 @@ export default function Calendar({ navigation }) {
   const [currentDateDisplayed, setCurrentDateDisplayed] = useState(initDate);
   const [dateToVisitsMap, setDateToVisitsMap] = useState(undefined);
 
-  const startDateString = format(subWeeks(startDate, 2), 'yyyy-MM-dd');
-  const endDateString = format(addWeeks(endDate, 2), 'yyyy-MM-dd');
+  const startDateString = getDateString(subWeeks(startDate, 2));
+  const endDateString = getDateString(addWeeks(endDate, 2));
 
   const [resetScreen, setResetScreen] = useState(false);
 

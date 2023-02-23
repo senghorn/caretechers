@@ -9,9 +9,10 @@ module.exports.query = async (query) => {
     database: 'carecoord',
     password: 'Capstone1234!',
     multipleStatements: true,
+    dateStrings: true,
   });
 
-  const [result] = await connection.execute(query.sql, query.values);
+  const [result] = await connection.query(query.sql, query.values);
   connection.end();
   return result;
 };

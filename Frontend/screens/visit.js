@@ -12,13 +12,13 @@ import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
 import VisitRefreshContext from '../services/context/VisitRefreshContext';
+import { getDateFromDateString } from '../utils/date';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Visit({ route, navigation }) {
-  const { date } = route.params;
-
-  const dateString = format(date, 'yyyy-MM-dd');
+  const { dateString } = route.params;
+  const date = getDateFromDateString(dateString);
 
   const [selected, setSelected] = useState('Tasks');
 
@@ -92,7 +92,7 @@ export default function Visit({ route, navigation }) {
         <Tasks
           tasks={tasks}
           tasksURL={tasksURL}
-          date={date}
+          dateString={dateString}
           navigation={navigation}
           isLoading={tasksLoading}
           error={tasksError}
