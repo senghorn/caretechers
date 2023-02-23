@@ -8,6 +8,7 @@ import Visit from '../../screens/visit';
 import Task from '../../screens/task';
 import Settings from '../../screens/settings';
 import UserAccount from '../../screens/user/user-account';
+import GroupSettings from '../../screens/group/group-setting';
 import { useState } from 'react';
 import UserProvider from '../../services/providers/UserProvider';
 import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
@@ -63,6 +64,7 @@ export default function Navigation() {
                   <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
                   <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
                   <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
+                  <Stack.Screen name="GroupSettings" component={GroupSettings} options={{ headerShown: false }} />
                 </Stack.Navigator>
               </RefreshProvider>
             </VisitTasksRefreshContext.Provider>
