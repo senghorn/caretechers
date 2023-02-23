@@ -53,7 +53,7 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
                   week_of_month: null,
                   day_of_month: null,
                   month_of_year: null,
-                  recurring_type: 'daily',
+                  recurring_type: 'Daily',
                   task_id: id,
                 });
               }}
@@ -72,7 +72,7 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
                   week_of_month: null,
                   day_of_month: -1,
                   month_of_year: null,
-                  recurring_type: 'weekly',
+                  recurring_type: 'Weekly',
                   task_id: id,
                 });
               }}
@@ -91,7 +91,7 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
                   week_of_month: null,
                   day_of_month: getDate(dateToUse),
                   month_of_year: getMonth(dateToUse),
-                  recurring_type: 'yearly',
+                  recurring_type: 'Annually',
                   task_id: id,
                 });
               }}
