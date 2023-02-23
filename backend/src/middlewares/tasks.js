@@ -33,7 +33,7 @@ module.exports.getTasksByGroup = asyncHandler(async (req, _res, next) => {
 module.exports.deleteTask = asyncHandler(async (req, _res, next) => {
   const taskInfoQuery = sql`SELECT start_date FROM TaskMeta WHERE id = ${req.params.taskId}`;
   const [task] = await db.query(taskInfoQuery);
-  const shouldDelete = task.start_date === req.query.end_date;
+  const shouldDelete = task.start_date >= req.query.end_date;
   const query =
     req.query.end_date && !shouldDelete
       ? sql`UPDATE TaskMeta SET end_date = ${req.query.end_date} WHERE id = ${req.params.taskId};`
@@ -96,11 +96,12 @@ module.exports.createTask = asyncHandler(async (req, _res, next) => {
   next();
 });
 
-module.exports.editTask = asyncHandler(async (req, _res, next) => {
+module.exports.editTaskDeprecated = asyncHandler(async (req, _res, next) => {
   const query = sql`UPDATE TaskMeta SET title=${req.body.title}, description=${req.body.description}, start_date=${req.body.start_date} WHERE id=${req.params.taskId};`;
 
   const deleteQuery = sql`DELETE FROM RecurringPattern WHERE task_id = ${req.params.taskId};`;
   await db.query(deleteQuery);
+  console.log(req.body.repeat_pattern);
   if (req.body.repeat_pattern) {
     const insertQuery = sql`INSERT INTO RecurringPattern (task_id, separation_count, 
                      day_of_week, week_of_month, day_of_month, month_of_year, recurring_type) VALUES (${req.params.taskId}, ${req.body.repeat_pattern.separation_count},
@@ -110,6 +111,22 @@ module.exports.editTask = asyncHandler(async (req, _res, next) => {
   }
 
   req.result = await db.query(query);
+  next();
+});
+
+module.exports.editTask = asyncHandler(async (req, _res, next) => {
+  const attemptDelete = sql`DELETE FROM TaskMeta WHERE id=${req.params.taskId} AND start_date >= ${req.query.end_date};`;
+  await db.query(attemptDelete);
+  const query = sql`UPDATE IGNORE TaskMeta SET end_date=${req.query.end_date} WHERE id=${req.params.taskId};
+                    INSERT INTO TaskMeta (group_id, title, description, start_date) VALUES (${req.body.groupId}, ${req.body.title}, ${req.body.description}, ${req.body.start_date});`;
+  req.result = (await db.query(query))[1];
+  if (req.body.repeat_pattern) {
+    const insertQuery = sql`INSERT INTO RecurringPattern (task_id, separation_count,
+                      day_of_week, week_of_month, day_of_month, month_of_year, recurring_type) VALUES (${req.result.insertId}, ${req.body.repeat_pattern.separation_count},
+                      ${req.body.repeat_pattern.day_of_week}, ${req.body.repeat_pattern.week_of_month}, ${req.body.repeat_pattern.day_of_month}, ${req.body.repeat_pattern.month_of_year},
+                      ${req.body.repeat_pattern.recurring_type});`;
+    await db.query(insertQuery);
+  }
   next();
 });
 

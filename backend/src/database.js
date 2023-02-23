@@ -12,7 +12,7 @@ module.exports.query = async (query) => {
     dateStrings: true,
   });
 
-  const [result] = await connection.execute(query.sql, query.values);
+  const [result] = await connection.query(query.sql, query.values);
   connection.end();
   return result;
 };

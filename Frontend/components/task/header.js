@@ -7,6 +7,7 @@ import CalendarRefreshContext from '../../services/context/CalendarRefreshContex
 import TasksRefreshContext from '../../services/context/TasksRefreshContext';
 import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
+import { getCurrentDateString } from '../../utils/date';
 
 export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
   const [refreshTasks] = useContext(TasksRefreshContext);
@@ -49,7 +50,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
               color="#D11A2A"
               onPress={() => {
                 Alert.alert(
-                  'Delete this task from future visits?',
+                  'Delete this task from upcoming visits?',
                   '', // <- this part is optional, you can pass an empty string
                   [
                     {
@@ -83,7 +84,7 @@ const headers = {
 };
 
 const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refreshCalendar) => {
-  const currDate = format(new Date(), 'yyyy-MM-dd');
+  const currDate = getCurrentDateString();
   const url = `${config.backend_server}/tasks/${id}?end_date=${currDate}`;
   const method = 'DELETE';
   try {
