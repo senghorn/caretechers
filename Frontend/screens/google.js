@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
@@ -10,53 +10,43 @@ const axios = require('axios').default;
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleLogin({ navigation }) {
-  const [accessToken, setAccessToken] = React.useState(null);
-  const [userInfo, setUserInfo] = React.useState(null);
+  const [accessToken, setAccessToken] = useState(null);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId:
-      '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
-    iosClientId:
-      '899499604143-5oqn70f2r4uu7lp1mbajpkv15ks3p368.apps.googleusercontent.com',
-    androidClientId:
-      '899499604143-q5b803tsomq5k9tu0vv0fjb0ap1551gm.apps.googleusercontent.com',
-    webClientId:
-      '899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com',
+    expoClientId: '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
+    iosClientId: '899499604143-5oqn70f2r4uu7lp1mbajpkv15ks3p368.apps.googleusercontent.com',
+    androidClientId: '899499604143-q5b803tsomq5k9tu0vv0fjb0ap1551gm.apps.googleusercontent.com',
+    webClientId: '899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
     } else {
     }
   }, [response]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (accessToken != null) {
       getUserData();
     }
   }, [accessToken]);
 
   async function getUserData() {
-    let userInfoResponse = await fetch(
-      'https://www.googleapis.com/userinfo/v2/me',
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-    await userInfoResponse.json().then(async (data) => {
-      setUserInfo(data);
-      const user_group = await getUserGroupByID(data['email']);
-      if (user_group) {
-        if (user_group.data.group_id) {
-          navigation.navigate('Home', { user: data });
-        } else {
-          navigation.navigate('Group', { user: data });
-        }
-      } else {
-        navigation.navigate('RegisterUser', { user: data });
-      }
+    let userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
+    const data = await userInfoResponse.json();
+    const user_group = await getUserGroupByID(data['email']);
+    if (user_group) {
+      if (user_group.data.group_id) {
+        navigation.navigate('Home', { user: data });
+      } else {
+        navigation.navigate('Group', { user: data });
+      }
+    } else {
+      navigation.navigate('RegisterUser', { user: data });
+    }
   }
 
   return (
@@ -70,14 +60,11 @@ export default function GoogleLogin({ navigation }) {
             <Text style={styles.subWelcomeText}>Let's get started.</Text>
           </View>
           <View style={styles.row}>
-            <Image
-              style={styles.image}
-              source={require('../assets/caretaker.png')}
-            />
+            <Image style={styles.image} source={require('../assets/caretaker.png')} />
           </View>
           <FontAwesome.Button
-            name='google'
-            backgroundColor='#FFFFFF'
+            name="google"
+            backgroundColor="#FFFFFF"
             size={35}
             iconStyle={styles.icon}
             onPress={() => {
@@ -88,9 +75,7 @@ export default function GoogleLogin({ navigation }) {
           </FontAwesome.Button>
         </View>
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Proudly presented by the Caretechers
-          </Text>
+          <Text style={styles.footerText}>Proudly presented by the Caretechers</Text>
         </View>
       </View>
     </SafeAreaView>
