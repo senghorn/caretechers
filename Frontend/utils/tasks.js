@@ -21,9 +21,8 @@ export const getLabel = (recurringType, dateToUse) => {
 };
 
 export const getRepeatBehaviorObject = (recurringType, dateToUse, id) => {
-  console.log(recurringType, dateToUse, id);
   switch (recurringType) {
-    case getLabel(REPEAT_CODES.DAY, dateToUse):
+    case REPEAT_CODES.DAY:
       return {
         separation_count: 0,
         day_of_week: null,
@@ -33,17 +32,17 @@ export const getRepeatBehaviorObject = (recurringType, dateToUse, id) => {
         recurring_type: REPEAT_CODES.DAY,
         task_id: id,
       };
-    case getLabel(REPEAT_CODES.WEEK, dateToUse):
+    case REPEAT_CODES.WEEK:
       return {
         separation_count: 0,
-        day_of_week: getDay(dateToUse),
+        day_of_week: getDay(dateToUse) + 1,
         week_of_month: null,
         day_of_month: -1,
         month_of_year: null,
         recurring_type: REPEAT_CODES.WEEK,
         task_id: id,
       };
-    case getLabel(REPEAT_CODES.ANNUAL, dateToUse):
+    case REPEAT_CODES.ANNUAL:
       return {
         separation_count: 0,
         day_of_week: -1,

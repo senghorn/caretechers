@@ -5,7 +5,7 @@ import { ActivityIndicator, List } from 'react-native-paper';
 import RepeatItem from './repeatItem';
 import { getLabel, getRepeatBehaviorObject, REPEAT_CODES, translateRepeatBehaviorToString } from '../../utils/tasks';
 import { getDateFromDateString } from '../../utils/date';
-import { max } from 'date-fns';
+import { format, getDay, max } from 'date-fns';
 
 export default function RepeatBehavior({
   id,
@@ -18,10 +18,10 @@ export default function RepeatBehavior({
   setEditRepeatTitle,
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [title, setTitle] = useState(!isLoading ? translateRepeatBehaviorToString(data[0], dateToUse) : 'Loading...');
   const [dateToUse, setDateToUse] = useState(
     !isLoading && data.length > 0 ? getDateFromDateString(data[0].start_date) : new Date()
   );
+  const [title, setTitle] = useState(!isLoading ? translateRepeatBehaviorToString(data[0], dateToUse) : 'Loading...');
 
   useEffect(() => {
     if (!editMode) {
@@ -43,7 +43,10 @@ export default function RepeatBehavior({
     } else {
       if (editMode) {
         setTitle(editRepeatTitle);
-      } else setTitle(translateRepeatBehaviorToString(data[0], dateToUse));
+      } else {
+        setEditRepeatTitle(translateRepeatBehaviorToString(data[0], dateToUse));
+        setTitle(translateRepeatBehaviorToString(data[0], dateToUse));
+      }
     }
   }, [isLoading, editMode, editRepeatTitle, dateToUse]);
 
@@ -96,7 +99,9 @@ export default function RepeatBehavior({
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.WEEK, dateToUse, id));
+                const newRepeat = getRepeatBehaviorObject(REPEAT_CODES.WEEK, dateToUse, id);
+                console.log(newRepeat);
+                setEditRepeat(newRepeat);
               }}
               setExpanded={setExpanded}
             />

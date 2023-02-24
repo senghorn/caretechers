@@ -146,6 +146,7 @@ export default function Task({ route, navigation }) {
             color="#1664a1"
             icon={id === 'new' ? 'checkbox-marked-circle-plus-outline' : 'content-save-all'}
             onPress={async () => {
+              console.log(editRepeat);
               const body = {
                 title: editTitle,
                 description: editDescription,
