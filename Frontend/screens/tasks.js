@@ -56,12 +56,14 @@ export default function Tasks({ navigation }) {
 
   const [sort, setSort] = useState(SORT_LABELS.due);
 
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
     setRefreshTasks(() => mutate);
   }, [mutate]);
 
   const renderTasks = (tasks) => {
-    const filteredTasks = getFilteredTasks(tasks, filter);
+    const filteredTasks = getFilteredTasks(tasks, filter).filter((task) => task.title.includes(query));
     switch (sort) {
       case SORT_LABELS.alphabet:
         filteredTasks.sort((task1, task2) => task1.title.localeCompare(task2.title));
@@ -87,16 +89,16 @@ export default function Tasks({ navigation }) {
     if (!isLoading && data) {
       renderTasks(data);
     }
-  }, [isLoading, data, error, filter, sort]);
+  }, [isLoading, data, error, filter, sort, query]);
 
   return (
     <Provider>
-      <Header navigation={navigation} sortOptions={sortOptions} setSort={setSort} />
+      <Header navigation={navigation} sortOptions={sortOptions} setSort={setSort} query={query} setQuery={setQuery} />
       <View style={styles.container}>
         <View style={styles.controlContainer}>
           <ViewSetter setFilter={setFilter} />
         </View>
-        <ScrollView style={styles.tasksScrollContainer}>
+        <ScrollView style={styles.tasksScrollContainer} keyboardShouldPersistTaps="always">
           {isLoading ? (
             <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
           ) : (
