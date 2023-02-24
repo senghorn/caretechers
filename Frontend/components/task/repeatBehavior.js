@@ -1,15 +1,57 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ActivityIndicator, List } from 'react-native-paper';
 import RepeatItem from './repeatItem';
-import { format, getDate, getDay, getMonth } from 'date-fns';
+import { getLabel, getRepeatBehaviorObject, REPEAT_CODES, translateRepeatBehaviorToString } from '../../utils/tasks';
+import { getDateFromDateString } from '../../utils/date';
+import { format, max } from 'date-fns';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-export default function RepeatBehavior({ id, data, isLoading, editMode, editRepeatTitle, setEditRepeat, setEditRepeatTitle }) {
+export default function RepeatBehavior({
+  id,
+  data,
+  isLoading,
+  editMode,
+  editStartDate,
+  setEditStartDate,
+  editRepeatTitle,
+  setEditRepeatTitle,
+  editRepeat,
+  setEditRepeat,
+}) {
   const [expanded, setExpanded] = useState(false);
-  const [title, setTitle] = useState('Does not repeat');
+  const [dateToUse, setDateToUse] = useState(
+    !isLoading && data.length > 0 ? getDateFromDateString(data[0].start_date) : new Date()
+  );
+  const [title, setTitle] = useState(!isLoading ? translateRepeatBehaviorToString(data[0], dateToUse) : 'Loading...');
 
-  const dateToUse = !isLoading && data.length > 0 ? new Date(data[0].start_date) : new Date();
+  useEffect(() => {
+    if (!editMode) {
+      setExpanded(false);
+    }
+  }, [editMode]);
+
+  useEffect(() => {
+    if (editMode) {
+      setDateToUse(max([editStartDate, new Date()]));
+    } else {
+      setDateToUse(!isLoading && data.length > 0 ? getDateFromDateString(data[0].start_date) : new Date());
+    }
+  }, [editMode, editStartDate, isLoading, data]);
+
+  useEffect(() => {
+    if (isLoading) {
+      setTitle('Loading');
+    } else {
+      if (editMode) {
+        setTitle(editRepeatTitle);
+      } else {
+        setEditRepeatTitle(translateRepeatBehaviorToString(data[0], dateToUse));
+        setTitle(translateRepeatBehaviorToString(data[0], dateToUse));
+      }
+    }
+  }, [isLoading, editMode, editRepeatTitle, dateToUse]);
 
   return (
     <View style={styles.container}>
@@ -17,10 +59,35 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
         <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
       ) : (
         <Fragment>
+          <Text style={styles.header}>Schedule</Text>
+          <View style={styles.selectDateContainer}>
+            <Text style={styles.takesPlaceText}>
+              Starts {!editMode && format(getDateFromDateString(data[0].start_date), 'MMMM do, y')}
+            </Text>
+            {editMode && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={editMode ? editStartDate : getDateFromDateString(data[0].start_date)}
+                onChange={(event, date) => {
+                  setEditStartDate(date);
+                  const recurringType =
+                    (editRepeat && editRepeat.recurring_type) || (data && data[0].recurring_type) || REPEAT_CODES.NEVER;
+                  setEditRepeat(getRepeatBehaviorObject(recurringType, date, id));
+                  setEditRepeatTitle(getLabel(recurringType, date));
+                }}
+                mode={'date'}
+                display="default"
+                is24Hour={true}
+                minimumDate={new Date()}
+              />
+            )}
+          </View>
           <List.Accordion
-            title={editMode ? editRepeatTitle : title}
+            title={title}
             style={styles.descriptionBorder}
-            left={(props) => <List.Icon {...props} icon={title === 'Does not repeat' ? 'repeat-off' : 'repeat'} />}
+            left={(props) => (
+              <List.Icon {...props} icon={title === getLabel(REPEAT_CODES.NEVER, undefined) ? 'repeat-off' : 'repeat'} />
+            )}
             right={editMode ? null : (props) => <Text />}
             expanded={expanded}
             onPress={() => {
@@ -30,70 +97,46 @@ export default function RepeatBehavior({ id, data, isLoading, editMode, editRepe
             }}
           >
             <RepeatItem
-              title="Does not repeat"
+              title={getLabel(REPEAT_CODES.NEVER, dateToUse)}
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat(null);
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.NEVER, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
             <RepeatItem
-              title="Daily"
+              title={getLabel(REPEAT_CODES.DAY, dateToUse)}
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat({
-                  separation_count: 0,
-                  day_of_week: null,
-                  week_of_month: null,
-                  day_of_month: null,
-                  month_of_year: null,
-                  recurring_type: 'daily',
-                  task_id: id,
-                });
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.DAY, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
             <RepeatItem
-              title={`Weekly on ${format(dateToUse, 'EEEE')}`}
+              title={getLabel(REPEAT_CODES.WEEK, dateToUse)}
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat({
-                  separation_count: 0,
-                  day_of_week: getDay(dateToUse),
-                  week_of_month: null,
-                  day_of_month: -1,
-                  month_of_year: null,
-                  recurring_type: 'weekly',
-                  task_id: id,
-                });
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.WEEK, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
             <RepeatItem
-              title={`Annually on ${format(dateToUse, 'MMMM qo')}`}
+              title={getLabel(REPEAT_CODES.ANNUAL, dateToUse)}
               selected={title}
               setSelected={setTitle}
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat({
-                  separation_count: 0,
-                  day_of_week: -1,
-                  week_of_month: null,
-                  day_of_month: getDate(dateToUse),
-                  month_of_year: getMonth(dateToUse),
-                  recurring_type: 'yearly',
-                  task_id: id,
-                });
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.ANNUAL, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
@@ -134,5 +177,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginVertical: 12,
+  },
+  selectDateContainer: {
+    flex: 1,
+    flexDirection: 'row',
   },
 });

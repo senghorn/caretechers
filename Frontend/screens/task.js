@@ -13,6 +13,7 @@ import TasksRefreshContext from '../services/context/TasksRefreshContext';
 import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
 import { getCurrentDateString, getDateFromDateString, getDateString } from '../utils/date';
 import VisitRefreshContext from '../services/context/VisitRefreshContext';
+import { getLabel, REPEAT_CODES } from '../utils/tasks';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -33,7 +34,7 @@ export default function Task({ route, navigation }) {
 
   const [refreshVisit] = useContext(VisitRefreshContext);
 
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [titleState, setTitleState] = useState(title);
 
@@ -44,7 +45,14 @@ export default function Task({ route, navigation }) {
   const [editDescription, setEditDescription] = useState('');
   const [editStartDate, setEditStartDate] = useState(new Date());
   const [editRepeat, setEditRepeat] = useState(null);
-  const [editRepeatTitle, setEditRepeatTitle] = useState('Does not repeat');
+  const [editRepeatTitle, setEditRepeatTitle] = useState(getLabel(REPEAT_CODES.NEVER, undefined));
+
+  useEffect(() => {
+    if (!editMode) {
+      setEditRepeat(null);
+      setEditStartDate(new Date());
+    }
+  }, [editMode]);
 
   const {
     data: taskData,
@@ -104,9 +112,6 @@ export default function Task({ route, navigation }) {
           editMode={editMode}
           editDescription={editDescription}
           setEditDescription={setEditDescription}
-          editStartDate={editStartDate}
-          setEditStartDate={setEditStartDate}
-          hideStartDate={hideEditButtons}
         />
         {!hideEditButtons && (
           <RepeatBehavior
@@ -115,6 +120,8 @@ export default function Task({ route, navigation }) {
             isLoading={isRepeatsLoading}
             error={repeatsError}
             editMode={editMode}
+            editStartDate={editStartDate}
+            setEditStartDate={setEditStartDate}
             editRepeat={editRepeat}
             setEditRepeat={setEditRepeat}
             editRepeatTitle={editRepeatTitle}
@@ -145,6 +152,7 @@ export default function Task({ route, navigation }) {
             color="#1664a1"
             icon={id === 'new' ? 'checkbox-marked-circle-plus-outline' : 'content-save-all'}
             onPress={async () => {
+              console.log(editRepeat);
               const body = {
                 title: editTitle,
                 description: editDescription,
