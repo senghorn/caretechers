@@ -25,7 +25,8 @@ module.exports.getTasksByGroup = asyncHandler(async (req, _res, next) => {
           RP.task_id AS rp_id, RP.separation_count, RP.day_of_week, RP.week_of_month, RP.day_of_month, RP.month_of_year, RP.recurring_type
           FROM TaskMeta TM
 					LEFT JOIN RecurringPattern RP on TM.id = RP.task_id
-					WHERE TM.group_id = ${req.params.groupId} AND (TM.end_date IS NULL OR TM.end_date > ${req.query.after_date});`;
+					WHERE TM.group_id = ${req.params.groupId} AND (TM.start_date >= ${req.query.after_date} OR (RP.task_id IS NOT NULL AND TM.end_date IS NULL OR TM.end_date > ${req.query.after_date}))
+          ORDER BY TM.start_date;`;
   req.result = await db.query(query);
   next();
 });
