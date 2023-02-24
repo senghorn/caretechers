@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "swagger-autogen": "node ./src/swagger.js"
   },
   "author": "",
@@ -18,7 +18,11 @@
     "mysql2": "^2.3.3",
     "socket.io": "^4.5.4",
     "sql-template-strings": "^2.2.2",
+    "supertest": "^6.3.3",
     "swagger-autogen": "^2.23.0",
     "swagger-ui-express": "^4.1.4"
+  },
+  "devDependencies": {
+    "jest": "^29.4.3"
   }
 }
