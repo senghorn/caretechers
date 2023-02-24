@@ -73,7 +73,9 @@ export default function RepeatBehavior({
                 onChange={(event, date) => {
                   setEditStartDate(date);
                   const recurringType =
-                    (editRepeat && editRepeat.recurring_type) || (data && data[0].recurring_type) || REPEAT_CODES.NEVER;
+                    (editRepeat && editRepeat.recurring_type) ||
+                    (data && data.length > 0 && data[0].recurring_type) ||
+                    REPEAT_CODES.NEVER;
                   setEditRepeat(getRepeatBehaviorObject(recurringType, date, id));
                   setEditRepeatTitle(getLabel(recurringType, date));
                 }}

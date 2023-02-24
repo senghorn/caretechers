@@ -10,8 +10,21 @@ import UserContext from '../services/context/UserContext';
 import TasksRefreshContext from '../services/context/TasksRefreshContext';
 import { getCurrentDateString } from '../utils/date';
 import Header from '../components/tasks/header';
+import ViewSetter from '../components/tasks/viewSetter';
+import { REPEAT_CODES } from '../utils/tasks';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+const getFilteredTasks = (tasks, filter) => {
+  switch (filter) {
+    case REPEAT_CODES.NEVER:
+      return tasks.filter((task) => task.rp_id === null);
+    case null:
+      return tasks;
+    default:
+      return tasks.filter((task) => task.recurring_type === filter);
+  }
+};
 
 export default function Tasks({ navigation }) {
   const [selected, setSelected] = useState('every');
@@ -25,13 +38,15 @@ export default function Tasks({ navigation }) {
 
   const { data, isLoading, error, mutate } = useSWR(tasksURL, fetcher);
 
+  const [filter, setFilter] = useState(null);
+
   useEffect(() => {
     setRefreshTasks(() => mutate);
   }, [mutate]);
 
   const renderTasks = (tasks) => {
-    console.log(tasks[2]);
-    const renderedTasks = tasks.map((task) => (
+    const filteredTasks = getFilteredTasks(tasks, filter);
+    const renderedTasks = filteredTasks.map((task) => (
       <Task title={task.title} key={task.id} navigation={navigation} id={task.id} repeatBehavior={task} />
     ));
     setRenderedTasks(renderedTasks);
@@ -41,12 +56,15 @@ export default function Tasks({ navigation }) {
     if (!isLoading && data) {
       renderTasks(data);
     }
-  }, [isLoading, data, error, selected]);
+  }, [isLoading, data, error, selected, filter]);
 
   return (
     <Fragment>
       <Header navigation={navigation} />
       <View style={styles.container}>
+        <View style={styles.controlContainer}>
+          <ViewSetter setFilter={setFilter} />
+        </View>
         <ScrollView style={styles.tasksScrollContainer}>
           {isLoading ? (
             <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
@@ -65,13 +83,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
+  controlContainer: {
+    flex: 0,
+    flexDirection: 'row',
+    width: '100%',
+    marginTop: 4,
+    zIndex: 999,
+  },
   tasksScrollContainer: {
     flex: 1,
     width: '100%',
     paddingHorizontal: 24,
   },
   tasksContainer: {
-    marginTop: 16,
+    marginTop: 0,
   },
   loader: {
     marginTop: 96,

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
+import ViewSetter from './viewSetter';
 
 export default function Header({ navigation }) {
   const [searchMode, setSearchMode] = useState(false);
