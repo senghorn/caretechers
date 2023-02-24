@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ActivityIndicator, List } from 'react-native-paper';
 import RepeatItem from './repeatItem';
-import { getLabel, getRepeatBehaviorObject, REPEAT_CODES } from '../../utils/tasks';
+import { getLabel, getRepeatBehaviorObject, REPEAT_CODES, translateRepeatBehaviorToString } from '../../utils/tasks';
 import { getDateFromDateString } from '../../utils/date';
 import { max } from 'date-fns';
 
 export default function RepeatBehavior({
+  id,
   data,
   isLoading,
   editMode,
@@ -17,7 +18,7 @@ export default function RepeatBehavior({
   setEditRepeatTitle,
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [title, setTitle] = useState(getLabel(REPEAT_CODES.NEVER, undefined));
+  const [title, setTitle] = useState(!isLoading ? translateRepeatBehaviorToString(data[0], dateToUse) : 'Loading...');
   const [dateToUse, setDateToUse] = useState(
     !isLoading && data.length > 0 ? getDateFromDateString(data[0].start_date) : new Date()
   );
@@ -36,6 +37,16 @@ export default function RepeatBehavior({
     }
   }, [editMode, editStartDate, isLoading, data]);
 
+  useEffect(() => {
+    if (isLoading) {
+      setTitle('Loading');
+    } else {
+      if (editMode) {
+        setTitle(editRepeatTitle);
+      } else setTitle(translateRepeatBehaviorToString(data[0], dateToUse));
+    }
+  }, [isLoading, editMode, editRepeatTitle, dateToUse]);
+
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -43,9 +54,11 @@ export default function RepeatBehavior({
       ) : (
         <Fragment>
           <List.Accordion
-            title={editMode ? editRepeatTitle : title}
+            title={title}
             style={styles.descriptionBorder}
-            left={(props) => <List.Icon {...props} icon={title === 'Does not repeat' ? 'repeat-off' : 'repeat'} />}
+            left={(props) => (
+              <List.Icon {...props} icon={title === getLabel(REPEAT_CODES.NEVER, undefined) ? 'repeat-off' : 'repeat'} />
+            )}
             right={editMode ? null : (props) => <Text />}
             expanded={expanded}
             onPress={() => {
@@ -61,7 +74,7 @@ export default function RepeatBehavior({
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.NEVER, dateToUse));
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.NEVER, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
@@ -72,7 +85,7 @@ export default function RepeatBehavior({
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.DAY, dateToUse));
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.DAY, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
@@ -83,7 +96,7 @@ export default function RepeatBehavior({
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.WEEK, dateToUse));
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.WEEK, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
@@ -94,7 +107,7 @@ export default function RepeatBehavior({
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.ANNUAL, dateToUse));
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.ANNUAL, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />

@@ -20,7 +20,8 @@ export const getLabel = (recurringType, dateToUse) => {
   }
 };
 
-export const getRepeatBehaviorObject = (recurringType, dateToUse) => {
+export const getRepeatBehaviorObject = (recurringType, dateToUse, id) => {
+  console.log(recurringType, dateToUse, id);
   switch (recurringType) {
     case getLabel(REPEAT_CODES.DAY, dateToUse):
       return {
