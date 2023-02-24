@@ -58,6 +58,40 @@
         }
       }
     },
+    "/{graphId}": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "graphId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "graphId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/{limit}": {
       "get": {
         "description": "",
@@ -218,6 +252,24 @@
         }
       }
     },
+    "/search/{groupId}/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/group/{groupId}/task/{taskId}": {
       "get": {
         "description": "",
@@ -324,6 +376,11 @@
             "name": "taskId",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
             "type": "string"
           }
         ],
@@ -440,12 +497,18 @@
         }
       }
     },
-    "/{graphId}": {
-      "post": {
+    "/{graphId}/{timestamp}": {
+      "delete": {
         "description": "",
         "parameters": [
           {
             "name": "graphId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
             "in": "path",
             "required": true,
             "type": "string"
@@ -457,7 +520,7 @@
           }
         }
       },
-      "get": {
+      "patch": {
         "description": "",
         "parameters": [
           {
@@ -465,6 +528,24 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "measurement": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
