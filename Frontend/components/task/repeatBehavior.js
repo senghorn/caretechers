@@ -24,7 +24,9 @@ export default function RepeatBehavior({
   const [dateToUse, setDateToUse] = useState(
     !isLoading && data.length > 0 ? getDateFromDateString(data[0].start_date) : new Date()
   );
-  const [title, setTitle] = useState(!isLoading ? translateRepeatBehaviorToString(data[0], dateToUse) : 'Loading...');
+  const [title, setTitle] = useState(
+    !isLoading ? (editMode ? editRepeatTitle : translateRepeatBehaviorToString(data[0], dateToUse)) : 'Loading...'
+  );
 
   useEffect(() => {
     if (!editMode) {
@@ -42,7 +44,7 @@ export default function RepeatBehavior({
 
   useEffect(() => {
     if (isLoading) {
-      setTitle('Loading');
+      setTitle('Loading...');
     } else {
       if (editMode) {
         setTitle(editRepeatTitle);
@@ -71,7 +73,9 @@ export default function RepeatBehavior({
                 onChange={(event, date) => {
                   setEditStartDate(date);
                   const recurringType =
-                    (editRepeat && editRepeat.recurring_type) || (data && data[0].recurring_type) || REPEAT_CODES.NEVER;
+                    (editRepeat && editRepeat.recurring_type) ||
+                    (data && data.length > 0 && data[0].recurring_type) ||
+                    REPEAT_CODES.NEVER;
                   setEditRepeat(getRepeatBehaviorObject(recurringType, date, id));
                   setEditRepeatTitle(getLabel(recurringType, date));
                 }}

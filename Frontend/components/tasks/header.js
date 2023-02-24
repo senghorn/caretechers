@@ -1,30 +1,63 @@
-import { Button } from 'react-native-paper';
-import { StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Appbar } from 'react-native-paper';
+import ViewSetter from './viewSetter';
 
-export default function Header({ title, id, selected, setSelected }) {
-  const isSelected = id === selected;
+export default function Header({ navigation }) {
+  const [searchMode, setSearchMode] = useState(false);
   return (
-    <Button
-      mode={isSelected ? 'contained' : 'text'}
-      color="#2196f3"
-      onPress={() => setSelected(id)}
-      style={styles.header}
-      uppercase={false}
-    >
-      {title}
-    </Button>
+    <View style={styles.outerContainer}>
+      <Appbar.Header style={styles.container}>
+        <Appbar.Action
+          icon={'account-cog'}
+          onPress={() => {
+            navigation.navigate('Settings');
+          }}
+        />
+        <Appbar.Content title="Tasks" titleStyle={styles.titleText} />
+        {searchMode ? (
+          <Appbar.Action
+            icon="close"
+            onPress={() => {
+              setSearchMode(false);
+            }}
+          />
+        ) : (
+          <Appbar.Action
+            icon="magnify"
+            onPress={() => {
+              setSearchMode(true);
+            }}
+          />
+        )}
+        {!searchMode && (
+          <Appbar.Action
+            icon={'heart-plus'}
+            color="#2196f3"
+            onPress={() => {
+              navigation.navigate('Task', { title: '', id: 'new' });
+            }}
+          />
+        )}
+      </Appbar.Header>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginHorizontal: 8,
-    borderRadius: 8,
+  container: {
+    backgroundColor: '#fff',
+    flex: 0,
+    width: '100%',
   },
-  headerContainer: {
-    flexDirection: 'row',
-    flexBasis: 'auto',
+  titleText: {
+    fontWeight: '500',
+    fontSize: 20,
+  },
+  outerContainer: {
+    shadowOffset: { width: 0, height: -10 },
+    shadowColor: '#888',
+    shadowOpacity: 0.1,
+    zIndex: 999,
   },
 });
