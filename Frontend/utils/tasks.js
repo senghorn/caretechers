@@ -7,20 +7,20 @@ export const REPEAT_CODES = {
   NEVER: 'Does not repeat',
 };
 
-const getLabel = (recurringType, dateToUse) => {
+export const getLabel = (recurringType, dateToUse) => {
   switch (recurringType) {
     case REPEAT_CODES.DAY:
       return 'Daily';
     case REPEAT_CODES.WEEK:
       return `Weekly on ${format(dateToUse, 'EEEE')}`;
     case REPEAT_CODES.ANNUAL:
-      return `Annually on ${format(dateToUse, 'MMMM qo')}`;
+      return `Annually on ${format(dateToUse, 'MMMM do')}`;
     default:
       return REPEAT_CODES.NEVER;
   }
 };
 
-export const getRepeatBehaviorObject = (dateToUse, recurringType) => {
+export const getRepeatBehaviorObject = (recurringType, dateToUse) => {
   switch (recurringType) {
     case getLabel(REPEAT_CODES.DAY, dateToUse):
       return {

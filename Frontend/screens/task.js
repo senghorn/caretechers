@@ -33,7 +33,7 @@ export default function Task({ route, navigation }) {
 
   const [refreshVisit] = useContext(VisitRefreshContext);
 
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [titleState, setTitleState] = useState(title);
 
@@ -115,6 +115,7 @@ export default function Task({ route, navigation }) {
             isLoading={isRepeatsLoading}
             error={repeatsError}
             editMode={editMode}
+            editStartDate={editStartDate}
             editRepeat={editRepeat}
             setEditRepeat={setEditRepeat}
             editRepeatTitle={editRepeatTitle}
