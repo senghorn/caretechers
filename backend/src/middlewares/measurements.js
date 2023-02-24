@@ -33,3 +33,27 @@ module.exports.deleteMeasurement = asyncHandler(async(req, _res, next) => {
 	await db.query(query);
 	next();
 });
+
+module.exports.updateMeasurement = asyncHandler(async (req, _res, next) => {
+	let query = sql`UPDATE HealthMeasurements SET `;
+	if (!req.body.measurement) {
+		return next(newError('Measurement must be provided!', 400));
+	}
+
+	query.append(sql`measurement = ${req.body.measurement}`);
+	query.append(sql` WHERE graph_id = ${req.params.graphId}, and date = ${req.params.timestamp};`);
+	await db.query(query);
+	next();
+});
+
+module.exports.getMeasurementByDateAndGraphId = asyncHandler(async (req, _res, next) => {
+	const query = sql`SELECT * FROM HealthMeasurements WHERE graph_id = ${req.params.graphId} and date = ${req.params.timestamp}`;
+	const [result] = await db.query(query);
+
+	if (!result) {
+		return next(newError(`Measurement (${req.params.noteId}, ${req.params.timestamp}) does not exist!`, 404));
+	}
+
+	req.result = result;
+	next();
+});

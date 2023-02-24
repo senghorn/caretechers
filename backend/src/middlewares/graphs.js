@@ -74,3 +74,42 @@ module.exports.checkIfGraphExists = asyncHandler(async (req, res, next) => {
 
 	next();
 });
+
+module.exports.deleteGraph = asyncHandler(async (req, _res, next) => {
+	let query = sql`DELETE FROM HealthGraphs WHERE id = ${req.params.graphId};`;
+	await db.query(query);
+	next();
+});
+
+module.exports.updateGraph = asyncHandler(async (req, _res, next) => {
+	let query = sql`UPDATE HealthGraphs SET `;
+	if (!req.body.title && !req.body.units) {
+		return next(newError('Graph title or units must be provided!', 400));
+	}
+	if (req.body.title && req.body.units) {
+		query.append(sql`title = ${req.body.title}, units = ${req.body.units}`);
+	} else {
+		if (req.body.title) {
+			query.append(sql`title = ${req.body.title}`);
+		}
+		if (req.body.units) {
+			query.append(sql`units = ${req.body.units}`);
+		}
+	}
+
+	query.append(sql` WHERE id = ${req.params.graphId};`);
+	await db.query(query);
+	next();
+});
+
+module.exports.getGraphByGraphId = asyncHandler(async (req, _res, next) => {
+	const query = sql`SELECT * FROM HealthGraphs WHERE id = ${req.params.graphId}`;
+	const [result] = await db.query(query);
+
+	if (!result) {
+		return next(newError(`Graph (${req.params.graphId}) does not exist!`, 404));
+	}
+
+	req.result = result;
+	next();
+});
