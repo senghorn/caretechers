@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { View, StyleSheet, RefreshControl, ScrollView } from 'react-native';
-import { FAB, ActivityIndicator, IconButton } from 'react-native-paper';
+import { FAB, ActivityIndicator } from 'react-native-paper';
 import Note from '../../components/notes/note';
 import COLORS from '../../constants/colors';
 import Header from '../../components/notes/header';
@@ -17,18 +17,10 @@ export default function Notes({ navigation }) {
   const { user } = useContext(UserContext);
   const { refresh, sort } = useContext(RefreshContext);
 
-  const { data, isLoading, error, mutate } = useSWR(
-    config.backend_server + '/notes/group/' + user.group_id,
-    fetcher
-  );
+  const { data, isLoading, error, mutate } = useSWR(config.backend_server + '/notes/group/' + user.group_id, fetcher);
 
   useEffect(() => {
-    if (
-      user != null &&
-      !(Object.keys(user).length === 0) &&
-      !isLoading &&
-      data
-    ) {
+    if (user != null && !(Object.keys(user).length === 0) && !isLoading && data) {
       if (sort != 'none') {
         setNotes(sortNotesByTitle(data, sort));
       } else {
@@ -70,26 +62,15 @@ export default function Notes({ navigation }) {
   return (
     <View style={styles.container}>
       <Header title={'Notes'} sort={true} navigation={navigation} />
-      <ScrollView
-        style={styles.tasksContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
+      <ScrollView style={styles.tasksContainer} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {isLoading || notes === null ? (
-          <ActivityIndicator
-            size='large'
-            color='#2196f3'
-            style={styles.loader}
-          />
+          <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
         ) : (
-          notes.map((note) => (
-            <Note key={note.id} note={note} navigation={navigation} />
-          ))
+          notes.map((note) => <Note key={note.id} note={note} navigation={navigation} />)
         )}
       </ScrollView>
       <FAB
-        icon='note-plus-outline'
+        icon="note-plus-outline"
         style={styles.fab}
         color={'white'}
         onPress={() => {

@@ -30,15 +30,6 @@ export default function Header({ navigation }) {
             }}
           />
         )}
-        {!searchMode && (
-          <Appbar.Action
-            icon={'heart-plus'}
-            color="#2196f3"
-            onPress={() => {
-              navigation.navigate('Task', { title: '', id: 'new' });
-            }}
-          />
-        )}
       </Appbar.Header>
     </View>
   );

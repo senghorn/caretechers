@@ -1,6 +1,6 @@
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, FAB } from 'react-native-paper';
 import { Button } from 'react-native-paper';
 import HeaderDep from '../components/tasks/headerdep';
 import Task from '../components/tasks/task';
@@ -12,6 +12,7 @@ import { getCurrentDateString } from '../utils/date';
 import Header from '../components/tasks/header';
 import ViewSetter from '../components/tasks/viewSetter';
 import { REPEAT_CODES } from '../utils/tasks';
+import colors from '../constants/colors';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -73,6 +74,14 @@ export default function Tasks({ navigation }) {
           )}
         </ScrollView>
       </View>
+      <FAB
+        icon="heart-plus-outline"
+        style={styles.fab}
+        color="#fff"
+        onPress={() => {
+          navigation.navigate('Task', { title: '', id: 'new' });
+        }}
+      />
     </Fragment>
   );
 }
@@ -87,7 +96,9 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: 'row',
     width: '100%',
-    marginTop: 4,
+    marginTop: 16,
+    marginBottom: 8,
+    marginLeft: 16,
     zIndex: 999,
   },
   tasksScrollContainer: {
@@ -100,5 +111,12 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginTop: 96,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.primary,
   },
 });
