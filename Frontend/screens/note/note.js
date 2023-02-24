@@ -201,13 +201,14 @@ const styles = StyleSheet.create({
   },
   content: {
     height: 'auto',
-    backgroundColor: colors.grayLight,
-    fontSize: 18,
+    backgroundColor: '#ededed',
+    fontSize: 16,
     padding: 15,
     margin: 10,
     marginTop: 20,
     minHeight: '10%',
     borderRadius: 4,
+    paddingTop: 20,
   },
   time: {
     fontSize: 12,

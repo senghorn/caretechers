@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
-import { View, StyleSheet, RefreshControl, ScrollView, SafeAreaView } from 'react-native';
-import { Button, ActivityIndicator } from 'react-native-paper';
+import { View, StyleSheet, RefreshControl, ScrollView } from 'react-native';
+import { FAB, ActivityIndicator, IconButton } from 'react-native-paper';
 import Note from '../../components/notes/note';
 import COLORS from '../../constants/colors';
 import Header from '../../components/notes/header';
@@ -88,29 +88,24 @@ export default function Notes({ navigation }) {
           ))
         )}
       </ScrollView>
-      <Button
-        mode='contained'
-        uppercase={false}
-        color='#2196f3'
-        icon='checkbox-marked-circle-plus-outline'
-        style={styles.createButton}
-        labelStyle={styles.createButtonText}
+      <FAB
+        icon='note-plus-outline'
+        style={styles.fab}
+        color={'white'}
         onPress={() => {
           navigation.navigate('Note', {
             note: { id: 'new', title: '', content: '' },
           });
         }}
-      >
-        Add New Note
-      </Button>
+      />
     </View>
   );
 }
 /**
  * Sorts the given notes and returns the sorted notes
- * @param {JSON} notes 
- * @param {Boolean} ascending 
- * @returns 
+ * @param {JSON} notes
+ * @param {Boolean} ascending
+ * @returns
  */
 function sortNotesByTitle(notes, ascending = true) {
   // Sort the notes by title in ascending or descending order
@@ -156,5 +151,12 @@ const styles = StyleSheet.create({
   },
   createButtonText: {
     fontSize: 14,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: COLORS.primary,
   },
 });
