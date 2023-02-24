@@ -1,4 +1,14 @@
-import { format, getDate, getDay, getMonth } from 'date-fns';
+import {
+  addWeeks,
+  addYears,
+  differenceInCalendarWeeks,
+  differenceInCalendarYears,
+  format,
+  getDate,
+  getDay,
+  getMonth,
+  max,
+} from 'date-fns';
 
 export const REPEAT_CODES = {
   DAY: 'Daily',
@@ -59,4 +69,20 @@ export const getRepeatBehaviorObject = (recurringType, dateToUse, id) => {
 
 export const translateRepeatBehaviorToString = (repeatBehavior, dateToUse) => {
   return getLabel(repeatBehavior.recurring_type, dateToUse);
+};
+
+export const getNextDateFromRepeatBehavior = (recurringType, startDate) => {
+  const today = new Date();
+  switch (recurringType) {
+    case REPEAT_CODES.DAY:
+      return max([today, startDate]);
+    case REPEAT_CODES.WEEK:
+      const diffInWeeks = differenceInCalendarWeeks(today, startDate);
+      return max([addWeeks(startDate, diffInWeeks), startDate]);
+    case REPEAT_CODES.ANNUAL:
+      const diffInYears = differenceInCalendarYears(today, startDate);
+      return max([addYears(startDate, diffInYears), startDate]);
+    default:
+      return startDate;
+  }
 };

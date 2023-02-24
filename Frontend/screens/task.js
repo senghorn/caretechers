@@ -149,8 +149,8 @@ export default function Task({ route, navigation }) {
             loading={loading}
             disabled={loading}
             uppercase={false}
-            color="#1664a1"
-            icon={id === 'new' ? 'checkbox-marked-circle-plus-outline' : 'content-save-all'}
+            color="#2196f3"
+            icon={id === 'new' ? 'heart-plus' : 'content-save-all'}
             onPress={async () => {
               console.log(editRepeat);
               const body = {

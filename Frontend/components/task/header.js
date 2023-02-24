@@ -40,7 +40,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
           <Fragment>
             <Appbar.Action
               icon="pencil-box-multiple"
-              color="#1664a1"
+              color="#2196f3"
               onPress={() => {
                 setEditMode(!editMode);
               }}
