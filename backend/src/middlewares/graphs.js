@@ -30,9 +30,36 @@ module.exports.createNewHealthGraph = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.getGraphsByGroupId = asyncHandler(async(req, _res, next) => {
-	const query = sql`SELECT * FROM HealthGraphs WHERE HealthGraphs.group_id = ${req.params.groupId}`;
+	const query = sql`SELECT HG.id, HG.title, HG.units, HM.measurement, HM.date FROM \`Groups\`
+						JOIN HealthGraphs HG on \`Groups\`.id = HG.group_id
+						JOIN HealthMeasurements HM on HG.id = HM.graph_id
+						WHERE Groups.id = ${req.params.groupId}
+						ORDER BY HG.id, HM.date DESC;`;
 
-	req.result = await db.query(query);
+	const result = await db.query(query);
+	let graphs = {};
+	
+	for (const row of result) {
+		if (!graphs[row.id]) {
+			graphs[row.id] = {
+				title: row.title,
+				units: row.units,
+				data: []
+			}
+		}
+		if (!req.query.limit || graphs[row.id].data.length < parseInt(req.query.limit)) {
+			graphs[row.id].data.push({
+				timestamp: row.date,
+				measurement: parseFloat(row.measurement)
+			});
+		}
+	}
+
+	for (const id of Object.keys(graphs)) {
+		graphs[id].data = graphs[id].data.reverse();
+	}
+
+	req.result = graphs;
 	next();
 });
 
