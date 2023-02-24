@@ -1,6 +1,6 @@
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { ActivityIndicator, FAB } from 'react-native-paper';
+import { ActivityIndicator, FAB, Provider } from 'react-native-paper';
 import { Button } from 'react-native-paper';
 import HeaderDep from '../components/tasks/headerdep';
 import Task from '../components/tasks/task';
@@ -26,6 +26,18 @@ const getFilteredTasks = (tasks, filter) => {
       return tasks.filter((task) => task.recurring_type === filter);
   }
 };
+
+const SORT_LABELS = {
+  due: 'Due Date',
+  alphabet: 'Alphabetical',
+  repeat: 'Repeat Behavior',
+};
+
+const sortOptions = Object.values(SORT_LABELS).map((value) => {
+  return { label: value, value };
+});
+
+console.log(sortOptions);
 
 export default function Tasks({ navigation }) {
   const [selected, setSelected] = useState('every');
@@ -60,8 +72,8 @@ export default function Tasks({ navigation }) {
   }, [isLoading, data, error, selected, filter]);
 
   return (
-    <Fragment>
-      <Header navigation={navigation} />
+    <Provider>
+      <Header navigation={navigation} sortOptions={sortOptions} />
       <View style={styles.container}>
         <View style={styles.controlContainer}>
           <ViewSetter setFilter={setFilter} />
@@ -82,7 +94,7 @@ export default function Tasks({ navigation }) {
           navigation.navigate('Task', { title: '', id: 'new' });
         }}
       />
-    </Fragment>
+    </Provider>
   );
 }
 
@@ -98,7 +110,7 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 16,
     marginBottom: 8,
-    marginLeft: 16,
+    marginLeft: 48,
     zIndex: 999,
   },
   tasksScrollContainer: {
