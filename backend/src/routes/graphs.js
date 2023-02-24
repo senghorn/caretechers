@@ -18,4 +18,16 @@ router.post("/", [
 	  sharedMiddleware.sendResult
   ]);
 
+  router.delete('/:graphId', [
+    graphMiddleware.deleteGraph,
+    sharedMiddleware.sendNoResult
+  ]);
+
+  router.patch('/:graphId', [
+    graphMiddleware.checkIfGraphExists,
+    graphMiddleware.updateGraph,
+    graphMiddleware.getGraphByGraphId,
+    sharedMiddleware.sendResult
+  ]);
+
   module.exports = router;
