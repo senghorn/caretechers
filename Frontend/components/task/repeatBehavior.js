@@ -5,7 +5,8 @@ import { ActivityIndicator, List } from 'react-native-paper';
 import RepeatItem from './repeatItem';
 import { getLabel, getRepeatBehaviorObject, REPEAT_CODES, translateRepeatBehaviorToString } from '../../utils/tasks';
 import { getDateFromDateString } from '../../utils/date';
-import { format, getDay, max } from 'date-fns';
+import { format, max } from 'date-fns';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function RepeatBehavior({
   id,
@@ -13,9 +14,11 @@ export default function RepeatBehavior({
   isLoading,
   editMode,
   editStartDate,
+  setEditStartDate,
   editRepeatTitle,
-  setEditRepeat,
   setEditRepeatTitle,
+  editRepeat,
+  setEditRepeat,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [dateToUse, setDateToUse] = useState(
@@ -56,6 +59,29 @@ export default function RepeatBehavior({
         <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
       ) : (
         <Fragment>
+          <Text style={styles.header}>Schedule</Text>
+          <View style={styles.selectDateContainer}>
+            <Text style={styles.takesPlaceText}>
+              Starts {!editMode && format(getDateFromDateString(data[0].start_date), 'MMMM do, y')}
+            </Text>
+            {editMode && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={editMode ? editStartDate : getDateFromDateString(data[0].start_date)}
+                onChange={(event, date) => {
+                  setEditStartDate(date);
+                  const recurringType =
+                    (editRepeat && editRepeat.recurring_type) || (data && data[0].recurring_type) || REPEAT_CODES.NEVER;
+                  setEditRepeat(getRepeatBehaviorObject(recurringType, date, id));
+                  setEditRepeatTitle(getLabel(recurringType, date));
+                }}
+                mode={'date'}
+                display="default"
+                is24Hour={true}
+                minimumDate={new Date()}
+              />
+            )}
+          </View>
           <List.Accordion
             title={title}
             style={styles.descriptionBorder}
@@ -99,9 +125,7 @@ export default function RepeatBehavior({
               editMode={editMode}
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
-                const newRepeat = getRepeatBehaviorObject(REPEAT_CODES.WEEK, dateToUse, id);
-                console.log(newRepeat);
-                setEditRepeat(newRepeat);
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.WEEK, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
@@ -153,5 +177,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginVertical: 12,
+  },
+  selectDateContainer: {
+    flex: 1,
+    flexDirection: 'row',
   },
 });
