@@ -17,4 +17,10 @@ router.get("/:graphId", [
 	  sharedMiddleware.sendResult
   ]);
 
-  module.exports = router;
+router.delete('/:graphId/:timestamp', [
+  graphMiddleware.checkIfGraphExists,
+  measurementMiddleware.deleteMeasurement,
+  sharedMiddleware.sendNoResult
+]);
+
+module.exports = router;
