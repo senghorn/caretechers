@@ -8,10 +8,10 @@ import config from '../constants/config';
 import useSWR from 'swr';
 import UserContext from '../services/context/UserContext';
 import TasksRefreshContext from '../services/context/TasksRefreshContext';
-import { getCurrentDateString } from '../utils/date';
+import { getCurrentDateString, getDateFromDateString } from '../utils/date';
 import Header from '../components/tasks/header';
 import ViewSetter from '../components/tasks/viewSetter';
-import { REPEAT_CODES } from '../utils/tasks';
+import { getNextDateFromRepeatBehavior, REPEAT_CODES } from '../utils/tasks';
 import colors from '../constants/colors';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
@@ -37,10 +37,11 @@ const sortOptions = Object.values(SORT_LABELS).map((value) => {
   return { label: value, value };
 });
 
-console.log(sortOptions);
+const getNextDate = (task) => {
+  return getNextDateFromRepeatBehavior(task.recurring_type, getDateFromDateString(task.start_date));
+};
 
 export default function Tasks({ navigation }) {
-  const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
 
   const { user } = useContext(UserContext);
@@ -53,12 +54,29 @@ export default function Tasks({ navigation }) {
 
   const [filter, setFilter] = useState(null);
 
+  const [sort, setSort] = useState(SORT_LABELS.due);
+
   useEffect(() => {
     setRefreshTasks(() => mutate);
   }, [mutate]);
 
   const renderTasks = (tasks) => {
     const filteredTasks = getFilteredTasks(tasks, filter);
+    switch (sort) {
+      case SORT_LABELS.alphabet:
+        filteredTasks.sort((task1, task2) => task1.title.localeCompare(task2.title));
+        break;
+      case SORT_LABELS.repeat:
+        filteredTasks.sort((task1, task2) => {
+          if (task1.recurring_type === null) return -1;
+          else if (task2.recurring_type === null) return 1;
+          return task1.recurring_type.localeCompare(task2.recurring_type);
+        });
+        break;
+      default:
+        filteredTasks.sort((task1, task2) => getNextDate(task1) - getNextDate(task2));
+        break;
+    }
     const renderedTasks = filteredTasks.map((task) => (
       <Task title={task.title} key={task.id} navigation={navigation} id={task.id} repeatBehavior={task} />
     ));
@@ -69,11 +87,11 @@ export default function Tasks({ navigation }) {
     if (!isLoading && data) {
       renderTasks(data);
     }
-  }, [isLoading, data, error, selected, filter]);
+  }, [isLoading, data, error, filter, sort]);
 
   return (
     <Provider>
-      <Header navigation={navigation} sortOptions={sortOptions} />
+      <Header navigation={navigation} sortOptions={sortOptions} setSort={setSort} />
       <View style={styles.container}>
         <View style={styles.controlContainer}>
           <ViewSetter setFilter={setFilter} />

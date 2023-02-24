@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Appbar, Menu, Provider } from 'react-native-paper';
 import MenuItemWrapper from './menu/MenuItemWrapper';
 
-export default function SortAction({ sortOptions = [] }) {
+export default function SortAction({ sortOptions = [], setSort }) {
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
@@ -16,7 +16,7 @@ export default function SortAction({ sortOptions = [] }) {
       setLabel={() => {}}
       closeMenu={closeMenu}
       value={option.value}
-      setValue={() => {}}
+      setValue={setSort}
     />
   ));
 

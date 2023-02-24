@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import SortAction from '../generic/sortAction';
-import ViewSetter from './viewSetter';
 
-export default function Header({ navigation, sortOptions }) {
+export default function Header({ navigation, sortOptions, setSort }) {
   const [searchMode, setSearchMode] = useState(false);
   return (
     <View style={styles.outerContainer}>
@@ -32,7 +31,7 @@ export default function Header({ navigation, sortOptions }) {
             }}
           />
         )}
-        {!searchMode && <SortAction sortOptions={sortOptions} />}
+        {!searchMode && <SortAction sortOptions={sortOptions} setSort={setSort} />}
       </Appbar.Header>
     </View>
   );
