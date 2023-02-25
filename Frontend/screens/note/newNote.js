@@ -14,7 +14,7 @@ import {
 import { Appbar, TextInput } from 'react-native-paper';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 import { CreateNote, RemoveNote, UpdateNote } from '../../services/api/notes';
-import { RefreshContext } from '../../services/context/RefreshContext';
+import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
 import UserContext from '../../services/context/UserContext';
 
 const { height } = Dimensions.get('window');
@@ -41,7 +41,7 @@ export default function NewNote({ navigation, route }) {
   }, [note]);
   const { user } = useContext(UserContext);
   const richText = useRef();
-  const { toggleRefresh } = useContext(RefreshContext);
+  const { toggleRefresh } = useContext(NotesRefreshContext);
   return (
     <Fragment>
       <SafeAreaView style={styles.container}>

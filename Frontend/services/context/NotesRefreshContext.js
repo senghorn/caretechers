@@ -1,8 +1,8 @@
 import React, { createContext, useState } from 'react';
 
-export const RefreshContext = createContext();
+export const NotesRefreshContext = createContext();
 
-export const RefreshProvider = ({ children }) => {
+export const NotesRefreshProvider = ({ children }) => {
   const [refresh, setRefresh] = useState(false);
   const [sort, setSort] = useState('none');
 
@@ -22,10 +22,10 @@ export const RefreshProvider = ({ children }) => {
   };
 
   return (
-    <RefreshContext.Provider
+    <NotesRefreshContext.Provider
       value={{ refresh, toggleRefresh, setRefresh, sort, sortRefresh }}
     >
       {children}
-    </RefreshContext.Provider>
+    </NotesRefreshContext.Provider>
   );
 };

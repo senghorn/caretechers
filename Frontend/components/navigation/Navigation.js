@@ -15,7 +15,7 @@ import CalendarRefreshContext from '../../services/context/CalendarRefreshContex
 import TasksRefreshContext from '../../services/context/TasksRefreshContext';
 import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
 import VisitRefreshContext from '../../services/context/VisitRefreshContext';
-import { RefreshProvider } from '../../services/context/RefreshContext';
+import { NotesRefreshProvider } from '../../services/context/NotesRefreshContext';
 import Note from '../../screens/note/note';
 import NewNote from '../../screens/note/newNote';
 
@@ -45,7 +45,7 @@ export default function Navigation() {
         <TasksRefreshContext.Provider value={[refreshTasks, setRefreshTasks]}>
           <VisitRefreshContext.Provider value={[refreshVisit, setRefreshVisit]}>
             <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>
-              <RefreshProvider>
+              <NotesRefreshProvider>
                 <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
                   <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
                   <Stack.Screen name={'Home'} options={{ headerShown: false, gestureEnabled: false }}>
@@ -66,7 +66,7 @@ export default function Navigation() {
                   <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
                   <Stack.Screen name="GroupSettings" component={GroupSettings} options={{ headerShown: false }} />
                 </Stack.Navigator>
-              </RefreshProvider>
+              </NotesRefreshProvider>
             </VisitTasksRefreshContext.Provider>
           </VisitRefreshContext.Provider>
         </TasksRefreshContext.Provider>
