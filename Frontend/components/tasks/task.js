@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { Fragment } from 'react';
 import { getLabel, getNextDateFromRepeatBehavior, REPEAT_CODES } from '../../utils/tasks';
-import { getDateFromDateString } from '../../utils/date';
+import { getDateFromDateString, getHumanReadableDate } from '../../utils/date';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { Feather } from '@expo/vector-icons';
@@ -33,9 +33,8 @@ const noRepeat = getLabel(REPEAT_CODES.NEVER, undefined);
 
 function RepeatBehaviorSubHeader({ repeatBehavior }) {
   if (repeatBehavior) {
-    const upcomingDay = format(
-      getNextDateFromRepeatBehavior(repeatBehavior.recurring_type, getDateFromDateString(repeatBehavior.start_date)),
-      'E, LLL do, yyy'
+    const upcomingDay = getHumanReadableDate(
+      getNextDateFromRepeatBehavior(repeatBehavior.recurring_type, getDateFromDateString(repeatBehavior.start_date))
     );
     const repeatLabel = getLabel(repeatBehavior.recurring_type, getDateFromDateString(repeatBehavior.start_date));
     return (
