@@ -24,7 +24,10 @@ router.post('/', [
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Group'
+ *             properties:
+ *               groupId:
+ *                 type: string
+ *                 example: any 
  *     responses:
  *       204:
  *         description: The POST was successful, no content returned
@@ -32,6 +35,8 @@ router.post('/', [
  *         description: Body is formatted incorrectly
  *
  */
+
+  
 
 router.get('/:limit',[
 	groupMiddleware.getGroups,
