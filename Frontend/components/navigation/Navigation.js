@@ -17,6 +17,7 @@ import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshCo
 import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 import { RefreshProvider } from '../../services/context/RefreshContext';
 import Note from '../../screens/note/note';
+import NewNote from '../../screens/note/newNote';
 
 const initRefreshCalendar = () => {
   console.log('calendar refresh not set');
@@ -40,9 +41,7 @@ export default function Navigation() {
   const [refreshVisit, setRefreshVisit] = useState(() => initRefreshVisit);
   return (
     <UserProvider user={user} setUser={setUser}>
-      <CalendarRefreshContext.Provider
-        value={[refreshCalendar, setRefreshCalendar]}
-      >
+      <CalendarRefreshContext.Provider value={[refreshCalendar, setRefreshCalendar]}>
         <TasksRefreshContext.Provider value={[refreshTasks, setRefreshTasks]}>
           <VisitRefreshContext.Provider value={[refreshVisit, setRefreshVisit]}>
             <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>
@@ -62,6 +61,7 @@ export default function Navigation() {
                   <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
                   <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
                   <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
+                  <Stack.Screen name="New Note" component={NewNote} options={{ headerShown: false }} />
                   <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
                   <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
                   <Stack.Screen name="GroupSettings" component={GroupSettings} options={{ headerShown: false }} />

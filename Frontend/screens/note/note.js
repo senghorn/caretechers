@@ -1,12 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import {
-  StyleSheet,
-  Keyboard,
-  View,
-  TextInput,
-  Text,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import { StyleSheet, Keyboard, View, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
 import { TextInput as TextInputBox } from 'react-native-paper';
 import { Appbar } from 'react-native-paper';
 import { UpdateNote, RemoveNote, CreateNote } from '../../services/api/notes';
@@ -14,6 +7,7 @@ import { format } from 'date-fns';
 import { RefreshContext } from '../../services/context/RefreshContext';
 import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
+import NewNote from './newNote';
 
 export default function Note({ navigation, route }) {
   const { note } = route.params;
@@ -32,13 +26,7 @@ export default function Note({ navigation, route }) {
       setNoteTitle(note.title);
       const date = new Date(note.last_edited);
       const dayOfWeek = format(date, 'E');
-      setEditTime(
-        dayOfWeek +
-          ', ' +
-          date.toLocaleDateString() +
-          ' ' +
-          date.toLocaleTimeString()
-      );
+      setEditTime(dayOfWeek + ', ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString());
     }
   }, [note]);
 
@@ -49,7 +37,7 @@ export default function Note({ navigation, route }) {
         <View style={styles.container}>
           <Appbar.Header style={styles.headerContainer}>
             <Appbar.Action
-              icon='chevron-left'
+              icon="chevron-left"
               onPress={() => {
                 navigation.goBack();
               }}
@@ -57,7 +45,7 @@ export default function Note({ navigation, route }) {
             <Appbar.Content title={noteTitle} titleStyle={styles.titleText} />
             {editing && (
               <Appbar.Action
-                icon='check'
+                icon="check"
                 onPress={async () => {
                   Keyboard.dismiss();
                   setEditing(false);
@@ -72,7 +60,7 @@ export default function Note({ navigation, route }) {
             )}
             {!editing && (
               <Appbar.Action
-                icon='trash-can'
+                icon="trash-can"
                 onPress={async () => {
                   await RemoveNote(noteId);
                   toggleRefresh();
@@ -100,24 +88,19 @@ export default function Note({ navigation, route }) {
         <View style={styles.container}>
           <Appbar.Header style={styles.headerContainer}>
             <Appbar.Action
-              icon='chevron-left'
+              icon="chevron-left"
               onPress={() => {
                 navigation.goBack();
               }}
             />
             <Appbar.Content title={'New Note'} titleStyle={styles.titleText} />
             <Appbar.Action
-              icon='content-save-check'
+              icon="content-save-check"
               onPress={async () => {
                 Keyboard.dismiss();
                 setEditing(false);
                 toggleRefresh();
-                await addNote(
-                  noteTitle,
-                  noteContent,
-                  user.group_id,
-                  navigation
-                );
+                await addNote(noteTitle, noteContent, user.group_id, navigation);
               }}
             />
           </Appbar.Header>
@@ -129,9 +112,9 @@ export default function Note({ navigation, route }) {
             onFocus={() => {
               setEditing(true);
             }}
-            label='Note Title'
+            label="Note Title"
             style={styles.titleInputBox}
-            mode='outlined'
+            mode="outlined"
           />
           <TextInputBox
             multiline

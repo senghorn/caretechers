@@ -74,7 +74,7 @@ export default function Notes({ navigation }) {
         style={styles.fab}
         color={'white'}
         onPress={() => {
-          navigation.navigate('Note', {
+          navigation.navigate('New Note', {
             note: { id: 'new', title: '', content: '' },
           });
         }}
