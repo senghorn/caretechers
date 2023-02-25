@@ -87,7 +87,6 @@ module.exports.getNotesBySearchString = asyncHandler(async (req, _res, next) => 
 	AND group_id = ${req.params.groupId}`;
 	req.result = await db.query(query);
 	next();
-	next();
 });
 
 module.exports.checkIfSearchIsValid = asyncHandler(async (req, _res, next) => {
