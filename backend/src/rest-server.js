@@ -1,6 +1,6 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
-const swaggerFile = require('../swagger-output.json');
+const swaggerFile = require('./swagger-output.json');
 
 function CreateRESTServer() {
   const app = express();
