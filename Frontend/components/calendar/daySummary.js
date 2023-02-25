@@ -6,6 +6,7 @@ import { AntDesign } from '@expo/vector-icons';
 import UserContext from '../../services/context/UserContext';
 import config from '../../constants/config';
 import { getDateString } from '../../utils/date';
+import { FadeInView } from '../generic/FadeInView';
 
 export default function DaySummary({
   date,
@@ -217,35 +218,3 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 });
-
-const FadeInView = (props) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [fadeAnim]);
-
-  return (
-    <Animated.View // Special animatable View
-      style={{
-        ...props.style,
-        opacity: fadeAnim, // Bind opacity to animated value
-      }}
-    >
-      {props.children}
-    </Animated.View>
-  );
-};

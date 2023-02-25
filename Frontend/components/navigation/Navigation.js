@@ -18,6 +18,7 @@ import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 import { NotesRefreshProvider } from '../../services/context/NotesRefreshContext';
 import Note from '../../screens/note/note';
 import NewNote from '../../screens/note/newNote';
+import RecordVisit from '../../screens/recordVisit';
 
 const initRefreshCalendar = () => {
   console.log('calendar refresh not set');
@@ -59,6 +60,7 @@ export default function Navigation() {
                     options={{ headerShown: false, gestureEnabled: false }}
                   />
                   <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
+                  <Stack.Screen name="Record Visit" component={RecordVisit} options={{ headerShown: false }} />
                   <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
                   <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
                   <Stack.Screen name="New Note" component={NewNote} options={{ headerShown: false }} />
