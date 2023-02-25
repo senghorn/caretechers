@@ -39,7 +39,7 @@ function RepeatBehaviorSubHeader({ repeatBehavior }) {
     const repeatLabel = getLabel(repeatBehavior.recurring_type, getDateFromDateString(repeatBehavior.start_date));
     return (
       <View style={styles.repeatContainer}>
-        <Text style={styles.subText}>{upcomingDay}</Text>
+        <Text style={styles.subText}>{upcomingDay.charAt(0).toUpperCase() + upcomingDay.slice(1)}</Text>
         {repeatLabel !== noRepeat && (
           <View style={styles.repeatPattern}>
             <Feather name="repeat" size={14} color="black" />
