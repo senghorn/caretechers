@@ -5,7 +5,7 @@ import MenuItemWrapper from './menu/MenuItemWrapper';
 
 export default function SortAction({ sortOptions = [], setSort }) {
   const [visible, setVisible] = useState(false);
-
+  
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
@@ -13,7 +13,7 @@ export default function SortAction({ sortOptions = [], setSort }) {
     <MenuItemWrapper
       key={index}
       label={option.label}
-      setLabel={() => {}}
+      setLabel={() => { }}
       closeMenu={closeMenu}
       value={option.value}
       setValue={setSort}

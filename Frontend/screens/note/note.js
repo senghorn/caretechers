@@ -4,7 +4,7 @@ import { TextInput as TextInputBox } from 'react-native-paper';
 import { Appbar } from 'react-native-paper';
 import { UpdateNote, RemoveNote, CreateNote } from '../../services/api/notes';
 import { format } from 'date-fns';
-import { RefreshContext } from '../../services/context/RefreshContext';
+import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
 import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
 import NewNote from './newNote';
@@ -17,7 +17,7 @@ export default function Note({ navigation, route }) {
   const [editing, setEditing] = useState(false);
   const [editTime, setEditTime] = useState('');
   const { user } = useContext(UserContext);
-  const { toggleRefresh } = useContext(RefreshContext);
+  const { toggleRefresh } = useContext(NotesRefreshContext);
 
   useEffect(() => {
     if (note && note.last_edited) {

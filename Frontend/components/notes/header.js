@@ -2,20 +2,24 @@ import { StyleSheet, View, Text } from 'react-native';
 import { useState, useContext } from 'react';
 import { TextInput } from 'react-native-paper';
 import { Appbar } from 'react-native-paper';
-import { RefreshContext } from '../../services/context/RefreshContext';
+import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
+import SortAction from '../generic/sortAction';
 
 export default function Header({ navigation, route, title, sort, pin = false }) {
-  // Sort drop down values
-  const data = [
-    { label: 'Date', value: '1' },
-    { label: 'Alphabets', value: '2' },
-    { label: 'Relevant', value: '3' },
-  ];
+  const SORT_LABELS = {
+    ascending: 'Ascending',
+    descending: 'Descending',
+    latest_date: 'Latest Date',
+    earliest_date: 'Earliest Date'
+  };
+  const sortOptions = Object.values(SORT_LABELS).map((value) => {
+    return { label: value, value };
+  });
 
-  const { sortRefresh } = useContext(RefreshContext);
+  const { sortRefresh } = useContext(NotesRefreshContext);
 
   // If true, sorts the notes ascending lexicographical order, otherwise descending
-  const [sortAscending, sortSortAscending] = useState(true);
+  const [sortType, setSortType] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMode, setSearchMode] = useState(false);
   return (
@@ -44,30 +48,15 @@ export default function Header({ navigation, route, title, sort, pin = false }) 
         ) : (
           <Appbar.Content title={title} titleStyle={styles.title} />
         )}
-        {searchMode ? (
-          <Appbar.Action
-            icon="close"
-            onPress={() => {
-              setSearchMode(false);
-            }}
-          />
-        ) : (
-          <Appbar.Action
-            icon="magnify"
-            onPress={() => {
-              setSearchMode(true);
-            }}
-          />
-        )}
         {!searchMode && sort && (
-          <Appbar.Action
-            icon={'sort-alphabetical-variant'}
-            onPress={() => {
-              sortSortAscending(!sortAscending);
-              sortRefresh(sortAscending ? 'ascending' : 'descending');
-            }}
-          />
+          <SortAction sortOptions={sortOptions} setSort={sortRefresh} />
         )}
+        <Appbar.Action
+          icon={searchMode ? "close" : "magnify"}
+          onPress={() => {
+            setSearchMode(!searchMode);
+          }}
+        />
         {!searchMode && pin && (
           <Appbar.Action
             icon="pin"
@@ -85,6 +74,12 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 0,
     backgroundColor: '#fff',
+  },
+  outerContainer: {
+    shadowOffset: { width: 0, height: -10 },
+    shadowColor: '#888',
+    shadowOpacity: 0.1,
+    zIndex: 999,
   },
   title: {
     fontWeight: '500',
