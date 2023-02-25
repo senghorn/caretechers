@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, isToday, isTomorrow } from 'date-fns';
 
 export const getDateFromDateString = (dateString) => {
   const year = dateString.substring(0, 4);
@@ -13,4 +13,9 @@ export const getDateString = (date) => {
 
 export const getCurrentDateString = () => {
   return format(new Date(), 'yyyy-MM-dd');
+};
+
+export const getHumanReadableDate = (date, noTodayOrTomorrow) => {
+  if (noTodayOrTomorrow) return format(date, 'MMMM do, y');
+  return (isTomorrow(date) && 'tomorrow') || (isToday(date) && 'today') || format(date, 'MMMM do, y');
 };

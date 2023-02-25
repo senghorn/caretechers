@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Appbar } from 'react-native-paper';
-import ViewSetter from './viewSetter';
+import { Keyboard, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Appbar, TextInput } from 'react-native-paper';
+import colors from '../../constants/colors';
+import SortAction from '../generic/sortAction';
 
-export default function Header({ navigation }) {
+export default function Header({ navigation, sortOptions, setSort, query, setQuery }) {
   const [searchMode, setSearchMode] = useState(false);
   return (
     <View style={styles.outerContainer}>
@@ -14,28 +15,36 @@ export default function Header({ navigation }) {
             navigation.navigate('Settings');
           }}
         />
-        <Appbar.Content title="Tasks" titleStyle={styles.titleText} />
+        {searchMode ? (
+          <TextInput
+            style={styles.titleInput}
+            label="Search Tasks"
+            value={query}
+            autoFocus
+            activeOutlineColor={colors.primary}
+            onChangeText={(text) => {
+              setQuery(text);
+            }}
+            mode="outlined"
+          />
+        ) : (
+          <Appbar.Content title="Tasks" titleStyle={styles.titleText} />
+        )}
+        {!searchMode && <SortAction sortOptions={sortOptions} setSort={setSort} />}
         {searchMode ? (
           <Appbar.Action
             icon="close"
             onPress={() => {
+              setQuery('');
               setSearchMode(false);
             }}
           />
         ) : (
           <Appbar.Action
             icon="magnify"
+            color="#000"
             onPress={() => {
               setSearchMode(true);
-            }}
-          />
-        )}
-        {!searchMode && (
-          <Appbar.Action
-            icon={'heart-plus'}
-            color="#2196f3"
-            onPress={() => {
-              navigation.navigate('Task', { title: '', id: 'new' });
             }}
           />
         )}
@@ -59,5 +68,12 @@ const styles = StyleSheet.create({
     shadowColor: '#888',
     shadowOpacity: 0.1,
     zIndex: 999,
+  },
+  titleInput: {
+    flexGrow: 1,
+    height: 40,
+    marginRight: 16,
+    marginBottom: 4,
+    fontSize: 18,
   },
 });

@@ -1,6 +1,6 @@
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, FAB, Provider } from 'react-native-paper';
 import { Button } from 'react-native-paper';
 import HeaderDep from '../components/tasks/headerdep';
 import Task from '../components/tasks/task';
@@ -8,10 +8,11 @@ import config from '../constants/config';
 import useSWR from 'swr';
 import UserContext from '../services/context/UserContext';
 import TasksRefreshContext from '../services/context/TasksRefreshContext';
-import { getCurrentDateString } from '../utils/date';
+import { getCurrentDateString, getDateFromDateString } from '../utils/date';
 import Header from '../components/tasks/header';
 import ViewSetter from '../components/tasks/viewSetter';
-import { REPEAT_CODES } from '../utils/tasks';
+import { getNextDateFromRepeatBehavior, REPEAT_CODES } from '../utils/tasks';
+import colors from '../constants/colors';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -26,8 +27,21 @@ const getFilteredTasks = (tasks, filter) => {
   }
 };
 
+const SORT_LABELS = {
+  due: 'Due Date',
+  alphabet: 'Alphabetical',
+  repeat: 'Repeat Behavior',
+};
+
+const sortOptions = Object.values(SORT_LABELS).map((value) => {
+  return { label: value, value };
+});
+
+const getNextDate = (task) => {
+  return getNextDateFromRepeatBehavior(task.recurring_type, getDateFromDateString(task.start_date));
+};
+
 export default function Tasks({ navigation }) {
-  const [selected, setSelected] = useState('every');
   const [renderedTasks, setRenderedTasks] = useState(null);
 
   const { user } = useContext(UserContext);
@@ -40,12 +54,31 @@ export default function Tasks({ navigation }) {
 
   const [filter, setFilter] = useState(null);
 
+  const [sort, setSort] = useState(SORT_LABELS.due);
+
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
     setRefreshTasks(() => mutate);
   }, [mutate]);
 
   const renderTasks = (tasks) => {
-    const filteredTasks = getFilteredTasks(tasks, filter);
+    const filteredTasks = getFilteredTasks(tasks, filter).filter((task) => task.title.includes(query));
+    switch (sort) {
+      case SORT_LABELS.alphabet:
+        filteredTasks.sort((task1, task2) => task1.title.localeCompare(task2.title));
+        break;
+      case SORT_LABELS.repeat:
+        filteredTasks.sort((task1, task2) => {
+          if (task1.recurring_type === null) return -1;
+          else if (task2.recurring_type === null) return 1;
+          return task1.recurring_type.localeCompare(task2.recurring_type);
+        });
+        break;
+      default:
+        filteredTasks.sort((task1, task2) => getNextDate(task1) - getNextDate(task2));
+        break;
+    }
     const renderedTasks = filteredTasks.map((task) => (
       <Task title={task.title} key={task.id} navigation={navigation} id={task.id} repeatBehavior={task} />
     ));
@@ -56,16 +89,16 @@ export default function Tasks({ navigation }) {
     if (!isLoading && data) {
       renderTasks(data);
     }
-  }, [isLoading, data, error, selected, filter]);
+  }, [isLoading, data, error, filter, sort, query]);
 
   return (
-    <Fragment>
-      <Header navigation={navigation} />
+    <Provider>
+      <Header navigation={navigation} sortOptions={sortOptions} setSort={setSort} query={query} setQuery={setQuery} />
       <View style={styles.container}>
         <View style={styles.controlContainer}>
           <ViewSetter setFilter={setFilter} />
         </View>
-        <ScrollView style={styles.tasksScrollContainer}>
+        <ScrollView style={styles.tasksScrollContainer} keyboardShouldPersistTaps="always">
           {isLoading ? (
             <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
           ) : (
@@ -73,7 +106,15 @@ export default function Tasks({ navigation }) {
           )}
         </ScrollView>
       </View>
-    </Fragment>
+      <FAB
+        icon="heart-plus-outline"
+        style={styles.fab}
+        color="#fff"
+        onPress={() => {
+          navigation.navigate('Task', { title: '', id: 'new' });
+        }}
+      />
+    </Provider>
   );
 }
 
@@ -87,7 +128,9 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: 'row',
     width: '100%',
-    marginTop: 4,
+    marginTop: 16,
+    marginBottom: 8,
+    marginLeft: 48,
     zIndex: 999,
   },
   tasksScrollContainer: {
@@ -100,5 +143,12 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginTop: 96,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.primary,
   },
 });

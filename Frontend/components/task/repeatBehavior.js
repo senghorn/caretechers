@@ -3,9 +3,15 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ActivityIndicator, List } from 'react-native-paper';
 import RepeatItem from './repeatItem';
-import { getLabel, getRepeatBehaviorObject, REPEAT_CODES, translateRepeatBehaviorToString } from '../../utils/tasks';
-import { getDateFromDateString } from '../../utils/date';
-import { format, max } from 'date-fns';
+import {
+  getLabel,
+  getNextDateFromRepeatBehavior,
+  getRepeatBehaviorObject,
+  REPEAT_CODES,
+  translateRepeatBehaviorToString,
+} from '../../utils/tasks';
+import { getDateFromDateString, getHumanReadableDate } from '../../utils/date';
+import { format, isSameDay, isToday, isTomorrow, max } from 'date-fns';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function RepeatBehavior({
@@ -55,6 +61,19 @@ export default function RepeatBehavior({
     }
   }, [isLoading, editMode, editRepeatTitle, dateToUse]);
 
+  const isData = !editMode && !isLoading && data && data.length > 0;
+
+  const startDate = isData ? getDateFromDateString(data[0].start_date) : undefined;
+  const upcoming = isData ? getNextDateFromRepeatBehavior(data[0].recurring_type, startDate) : undefined;
+  const showUpcomingDate = isData ? !editMode && data[0].recurring_type !== null : false;
+
+  let startLabel = 'Starts';
+  if (!editMode && isData) {
+    if (data[0].recurring_type === null) {
+      startLabel = 'Takes place';
+    }
+  }
+
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -62,14 +81,15 @@ export default function RepeatBehavior({
       ) : (
         <Fragment>
           <Text style={styles.header}>Schedule</Text>
+          {showUpcomingDate && <Text style={styles.takesPlaceText}>Upcoming visit - {getHumanReadableDate(upcoming)}</Text>}
           <View style={styles.selectDateContainer}>
             <Text style={styles.takesPlaceText}>
-              Starts {!editMode && format(getDateFromDateString(data[0].start_date), 'MMMM do, y')}
+              {startLabel} {!editMode && getHumanReadableDate(startDate, showUpcomingDate)}
             </Text>
             {editMode && (
               <DateTimePicker
                 testID="dateTimePicker"
-                value={editMode ? editStartDate : getDateFromDateString(data[0].start_date)}
+                value={editMode ? editStartDate : startDate}
                 onChange={(event, date) => {
                   setEditStartDate(date);
                   const recurringType =
@@ -152,9 +172,6 @@ export default function RepeatBehavior({
             /> */}
             {/* <RepeatItem title="Custom" selected={title} setSelected={setTitle} setExpanded={setExpanded} /> */}
           </List.Accordion>
-          {/* {title !== 'Does not repeat' && data[0].end_date && (
-            <Text style={styles.takesPlaceText}>Until {format(new Date(data[0].end_date), 'MMMM do, y')}</Text>
-          )} */}
         </Fragment>
       )}
     </View>
