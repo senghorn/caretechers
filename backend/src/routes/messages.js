@@ -18,4 +18,11 @@ router.get('/users/:groupId', [
 	sharedMiddleware.sendResult
 ]);
 
+router.get('/search/:groupId/', [
+	groupMiddleware.checkIfGroupExists,
+	messagesMiddleware.checkIfSearchIsValid,
+	messagesMiddleware.getMessagesBySearchString,
+	sharedMiddleware.sendResult
+]);
+
 module.exports = router;
