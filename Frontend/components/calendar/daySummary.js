@@ -12,6 +12,7 @@ import CalendarRefreshContext from '../../services/context/CalendarRefreshContex
 import { ActivityIndicator } from 'react-native-paper';
 import colors from '../../constants/colors';
 import { volunteerForVisit } from '../../services/api/visits';
+import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
 
 export default function DaySummary({
   date,
@@ -33,6 +34,8 @@ export default function DaySummary({
 
   const [refreshCalendar] = useContext(CalendarRefreshContext);
   const [refreshVisit] = useContext(VisitRefreshContext);
+
+  const { refreshTodaysVisitor } = useContext(TodaysVisitorContext);
 
   useEffect(() => {
     if (isLoadingOverride) {
@@ -97,6 +100,7 @@ export default function DaySummary({
             await refreshCalendar();
             refreshVisit();
           }
+          refreshTodaysVisitor();
           setVolunteerLoading(false);
         }}
         style={styles.buttonContainer}

@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import DaySummary from '../components/calendar/daySummary';
 import { AntDesign } from '@expo/vector-icons';
 import SectionSelector from '../components/visit/sectionSelector';
-import { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import Tasks from '../components/visit/tasks';
 
 import config from '../constants/config';
@@ -17,6 +17,8 @@ import colors from '../constants/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { deleteVisit } from '../services/api/visits';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
+import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
+import { ActivityIndicator } from 'react-native-paper';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -47,6 +49,10 @@ export default function Visit({ route, navigation }) {
   }, [visitMutate]);
 
   const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR(tasksURL, fetcher);
+
+  const { refreshTodaysVisitor } = useContext(TodaysVisitorContext);
+
+  const [isDropping, setIsDropping] = useState(false);
 
   useEffect(() => {
     setRefreshVisitTasks(() => taskMutate);
@@ -93,15 +99,26 @@ export default function Visit({ route, navigation }) {
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
+              setIsDropping(true);
               await deleteVisit(visit.visitId);
               await visitMutate();
+              setIsDropping(false);
               refreshCalendar();
+              refreshTodaysVisitor();
             }}
             style={styles.touchProperties}
           >
             <View style={styles.cancelButton}>
-              <MaterialCommunityIcons name="trash-can" size={20} color={colors.danger} />
-              <Text style={styles.cancelButtonText}>Drop Visit</Text>
+              {isDropping ? (
+                <Fragment>
+                  <ActivityIndicator color={colors.danger} size="small" />
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <MaterialCommunityIcons name="trash-can" size={16} color={colors.danger} />
+                  <Text style={styles.cancelButtonText}>Drop Visit</Text>
+                </Fragment>
+              )}
             </View>
           </TouchableHighlight>
         )}
@@ -192,7 +209,8 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 0,
-    padding: 8,
+    height: 32,
+    width: 120,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
@@ -201,7 +219,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     marginLeft: 8,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     color: colors.danger,
   },
