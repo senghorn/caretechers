@@ -12,7 +12,9 @@ import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
 import VisitRefreshContext from '../services/context/VisitRefreshContext';
-import { getDateFromDateString } from '../utils/date';
+import { getDateFromDateString, getDateString } from '../utils/date';
+import colors from '../constants/colors';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -22,7 +24,7 @@ export default function Visit({ route, navigation }) {
 
   const [selected, setSelected] = useState('Tasks');
 
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
   const [, setRefreshVisit] = useContext(VisitRefreshContext);
@@ -62,7 +64,7 @@ export default function Visit({ route, navigation }) {
         />
       </View>
       <View style={styles.messageContainer}>
-        {visit && (
+        {visit && visit.visitor && visit.visitor !== user.email && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
@@ -79,6 +81,21 @@ export default function Visit({ route, navigation }) {
             <View style={styles.messageButton}>
               <AntDesign name="message1" size={20} color="#199b1e" />
               <Text style={styles.messageButtonText}>Message {visit.first_name}</Text>
+            </View>
+          </TouchableHighlight>
+        )}
+        {visit && visit.visitor === user.email && visit.date >= getDateString(new Date()) && (
+          <TouchableHighlight
+            underlayColor="#ededed"
+            onPress={async () => {
+              // delete visit
+              navigation.goBack();
+            }}
+            style={styles.touchProperties}
+          >
+            <View style={styles.cancelButton}>
+              <MaterialCommunityIcons name="trash-can" size={20} color={colors.danger} />
+              <Text style={styles.cancelButtonText}>Drop Visit</Text>
             </View>
           </TouchableHighlight>
         )}
@@ -166,5 +183,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#199b1e',
+  },
+  cancelButton: {
+    flex: 0,
+    padding: 8,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+  },
+  cancelButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.danger,
   },
 });

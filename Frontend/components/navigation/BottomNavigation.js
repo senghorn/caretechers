@@ -9,16 +9,13 @@ import { useEffect } from 'react';
 import config from '../../constants/config';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
-import colors from '../../constants/colors';
 
 const axios = require('axios').default;
 
 const Tab = createMaterialBottomTabNavigator();
 
 export default function BottomNavigation({ route, navigation, setUser }) {
-
   useEffect(() => {
-
     async function fetchData(id, setUser) {
       try {
         let connection_string = config.backend_server + '/user/groupId/' + id;
@@ -31,7 +28,6 @@ export default function BottomNavigation({ route, navigation, setUser }) {
     }
 
     if (route && route.params && route.params.user) fetchData(route.params.user.email, setUser);
-
   }, [route.params]);
 
   return (
@@ -59,6 +55,7 @@ export default function BottomNavigation({ route, navigation, setUser }) {
           navigation={navigation}
           options={{
             tabBarIcon: ({ color }) => <MaterialCommunityIcons name="calendar-heart" color={color} size={26} />,
+            tabBarBadge: true,
           }}
         />
         <Tab.Screen
