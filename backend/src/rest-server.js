@@ -1,6 +1,7 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
-const swaggerFile = require('./swagger-output.json');
+const swaggerJsdoc = require("swagger-jsdoc");
+//const swaggerFile = require('./swagger-output.json');
 
 function CreateRESTServer() {
   const app = express();
@@ -22,8 +23,25 @@ function CreateRESTServer() {
   app.use('/measurements', require('./routes/measurements'));
 
   // API AUTO GENERATION
-  app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+  //app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
   // ------------------
+
+  // API AUTO GENERATION PT 2
+  const options = {
+    definition: {
+      openapi: "3.0.0",
+      info: {
+        title: "Caretechers CareCoord API",
+        version: "1.0.0",
+        description:
+        "The API used by the CareCoord App"
+      }
+    },
+    apis: ["./src/routes/*.js"],
+  };
+
+  const specs = swaggerJsdoc(options);
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs) );
 
   app.use((err, req, res, next) => {
     console.error({

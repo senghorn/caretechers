@@ -14,12 +14,14 @@
     "ajv": "^8.11.2",
     "express": "^4.18.2",
     "express-async-handler": "^1.2.0",
+    "express-jsdoc-swagger": "^1.8.0",
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
     "socket.io": "^4.5.4",
     "sql-template-strings": "^2.2.2",
     "supertest": "^6.3.3",
     "swagger-autogen": "^2.23.0",
+    "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
