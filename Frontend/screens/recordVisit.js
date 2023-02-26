@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Appbar } from 'react-native-paper';
+import { Alert, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Appbar, Button } from 'react-native-paper';
 import SectionSelector from '../components/visit/sectionSelector';
 import Tasks from '../components/visit/tasks';
 import { getDateString, getHumanReadableDate } from '../utils/date';
@@ -9,6 +9,8 @@ import UserContext from '../services/context/UserContext';
 import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
 import VisitRefreshContext from '../services/context/VisitRefreshContext';
 import config from '../constants/config';
+import VisitNotes from '../components/visit/notes';
+import colors from '../constants/colors';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -44,6 +46,8 @@ export default function RecordVisit({ navigation }) {
 
   const visit = visits && visits[0];
 
+  const [editContent, setEditContent] = useState('');
+
   const humanReadable = getHumanReadableDate(date, true);
   return (
     <View style={styles.outerContainer}>
@@ -55,6 +59,38 @@ export default function RecordVisit({ navigation }) {
           }}
         />
         <Appbar.Content title={'Record Visit'} titleStyle={styles.titleText} />
+        <Appbar.Action />
+        <Button
+          icon="heart"
+          color={colors.primary}
+          uppercase={false}
+          mode={'contained'}
+          onPress={() => {
+            Alert.alert(
+              'Finish Visit?',
+              'By clicking "Confirm", you affirm that you have visited the recipient today', // <- this part is optional, you can pass an empty string
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Confirm',
+                  onPress: async () => {
+                    navigation.goBack();
+                  },
+                  style: 'destructive',
+                },
+              ],
+              {
+                cancelable: true,
+              }
+            );
+          }}
+          style={{ marginRight: 8 }}
+        >
+          Finish
+        </Button>
       </Appbar.Header>
       <View style={styles.contentContainer}>
         <Text style={styles.dateLabel}>{humanReadable}</Text>
@@ -74,6 +110,11 @@ export default function RecordVisit({ navigation }) {
               error={tasksError}
               canCheck={true}
             />
+          )}
+          {selected === 'Notes' && (
+            <SafeAreaView style={styles.taskAndNotesContainer}>
+              <VisitNotes editMode editContent={editContent} setEditContent={setEditContent} />
+            </SafeAreaView>
           )}
         </View>
       </View>
