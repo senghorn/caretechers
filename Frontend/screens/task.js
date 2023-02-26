@@ -161,6 +161,8 @@ export default function Task({ route, navigation }) {
                 groupId: user.group_id,
               };
 
+              console.log(body);
+
               await saveTask(
                 id,
                 body,

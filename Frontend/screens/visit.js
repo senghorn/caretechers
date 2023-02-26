@@ -15,6 +15,8 @@ import VisitRefreshContext from '../services/context/VisitRefreshContext';
 import { getDateFromDateString, getDateString } from '../utils/date';
 import colors from '../constants/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { deleteVisit } from '../services/api/visits';
+import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -28,6 +30,8 @@ export default function Visit({ route, navigation }) {
 
   const [, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
   const [, setRefreshVisit] = useContext(VisitRefreshContext);
+
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
 
   const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
 
@@ -61,6 +65,7 @@ export default function Visit({ route, navigation }) {
           visitInfoOverride={visit}
           errorOverride={visitError}
           isLoadingOverride={visitLoading}
+          visitFirst
         />
       </View>
       <View style={styles.messageContainer}>
@@ -88,8 +93,9 @@ export default function Visit({ route, navigation }) {
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
-              // delete visit
-              navigation.goBack();
+              await deleteVisit(visit.visitId);
+              await visitMutate();
+              refreshCalendar();
             }}
             style={styles.touchProperties}
           >

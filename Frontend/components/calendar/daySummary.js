@@ -1,5 +1,5 @@
 import { format, isBefore, isEqual, startOfDay } from 'date-fns';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import { Text, View, StyleSheet, Animated, TouchableHighlight, Touchable, Image } from 'react-native';
 import { DateToVisitsContext } from '../../screens/calendar';
 import { AntDesign } from '@expo/vector-icons';
@@ -7,6 +7,11 @@ import UserContext from '../../services/context/UserContext';
 import config from '../../constants/config';
 import { getDateString } from '../../utils/date';
 import { FadeInView } from '../generic/FadeInView';
+import VisitRefreshContext from '../../services/context/VisitRefreshContext';
+import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
+import { ActivityIndicator } from 'react-native-paper';
+import colors from '../../constants/colors';
+import { volunteerForVisit } from '../../services/api/visits';
 
 export default function DaySummary({
   date,
@@ -15,14 +20,19 @@ export default function DaySummary({
   visitInfoOverride = undefined,
   isLoadingOverride = true,
   errorOverride = false,
+  visitFirst = false,
 }) {
   const dateToVisitsMap = useContext(DateToVisitsContext);
-  const user = useContext(UserContext).user;
+  const { user } = useContext(UserContext);
   const key = getDateString(date);
 
   const [isLoading, setIsLoading] = useState(isLoadingOverride);
   const [visitInfo, setVisitInfo] = useState(visitInfoOverride);
   const [error, setError] = useState(errorOverride);
+  const [volunteerLoading, setVolunteerLoading] = useState(false);
+
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
+  const [refreshVisit] = useContext(VisitRefreshContext);
 
   useEffect(() => {
     if (isLoadingOverride) {
@@ -77,17 +87,31 @@ export default function DaySummary({
   if (!visitInfo.visitor && (!inThePast || isCurrentDay)) {
     return (
       <TouchableHighlight
-        onPress={() => {
-          volunteerForVisit(key, user);
-          setVisitInfo({ ...visitInfo, visitor: user.email, first_name: user.first_name, profile_pic: user.profile_pic });
+        onPress={async () => {
+          setVolunteerLoading(true);
+          await volunteerForVisit(key, user);
+          if (visitFirst) {
+            await refreshVisit();
+            refreshCalendar();
+          } else {
+            await refreshCalendar();
+            refreshVisit();
+          }
+          setVolunteerLoading(false);
         }}
         style={styles.buttonContainer}
         underlayColor="#ededed"
         disabled={false}
       >
         <View style={styles.volunteerButton}>
-          <AntDesign name="pluscircleo" size={16} color="#2196f3" />
-          <Text style={styles.volunteerButtonText}>{`Volunteer to Visit`}</Text>
+          {volunteerLoading ? (
+            <ActivityIndicator color={colors.primary} />
+          ) : (
+            <Fragment>
+              <AntDesign name="pluscircleo" size={16} color="#2196f3" />
+              <Text style={styles.volunteerButtonText}>Volunteer to Visit</Text>
+            </Fragment>
+          )}
         </View>
       </TouchableHighlight>
     );
@@ -126,29 +150,6 @@ export default function DaySummary({
     </TouchableHighlight>
   );
 }
-
-const headers = {
-  'Content-Type': 'application/json',
-};
-
-const volunteerForVisit = async (date, user) => {
-  const newVisit = {
-    date,
-    userEmail: user.email,
-  };
-
-  try {
-    await fetch(`${config.backend_server}/visits/group/${user.group_id}`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(newVisit),
-    });
-  } catch (error) {
-    console.log(error);
-  } finally {
-    console.log('finished volunteering');
-  }
-};
 
 const styles = StyleSheet.create({
   container: {

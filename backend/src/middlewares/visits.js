@@ -12,6 +12,16 @@ module.exports.createVisit = asyncHandler(async (req, _res, next) => {
   next();
 });
 
+module.exports.deleteVisit = asyncHandler(async (req, _res, next) => {
+  const { visitId } = req.params;
+  console.log(visitId);
+
+  const query = sql`DELETE FROM Visits WHERE id=${visitId}`;
+
+  await db.query(query);
+  next();
+});
+
 module.exports.getVisitsByDateRange = asyncHandler(async (req, _res, next) => {
   const { groupId } = req.params;
   const { start, end } = req.query;

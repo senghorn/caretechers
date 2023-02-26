@@ -14,4 +14,6 @@ router.get('/group/:groupId', [
   sharedMiddleware.sendResult,
 ]);
 
+router.delete('/:visitId', [visitsMiddleware.deleteVisit, sharedMiddleware.sendNoResult]);
+
 module.exports = router;
