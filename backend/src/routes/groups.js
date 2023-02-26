@@ -11,45 +11,19 @@ router.post('/', [
 	sharedMiddleware.sendResult
 ]);
 
-  /**
- * @swagger
- * tags:
- *   name: Groups
- * /groups:
- *   post:
- *     summary: Create a new group
- *     tags: [Groups]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             properties:
- *               groupId:
- *                 type: string
- *                 example: any 
- *     responses:
- *       204:
- *         description: The POST was successful, no content returned
- *       400:
- *         description: Body is formatted incorrectly
- *
- */
-
-  
-
 router.get('/:limit',[
 	groupMiddleware.getGroups,
 	sharedMiddleware.sendResult
 ]);
-// testing fdajfljdalfdjal;fljs
+
 module.exports = router;
 
+// SCHEMA DEFINITION
   /**
  * @swagger
  * components:
  *   schemas:
- *     Group:
+ *     Groups:
  *       type: object
  *       required:
  *         - id
@@ -72,4 +46,48 @@ module.exports = router;
  *         password:
  *           type: string
  *           description: The password used to join the group
+ */
+
+// Route Definitions
+
+  /**
+ * @swagger
+ * tags:
+ *   name: Groups
+ * /groups:
+ *   post:
+ *     summary: Create a new group
+ *     tags: [Groups]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               groupid:
+ *                 type: integer
+ *                 example: 9
+ *     responses:
+ *       204:
+ *         description: The POST was successful, no content returned
+ * /groups/{limit}:
+ *   get:
+ *     summary: Gets all groups
+ *     tags: [Groups]
+ *     parameters: 
+ *       - in: path
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Number of groups to be returned
+ *     responses:
+ *       200:
+ *         description: The list of Groups
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Groups'
  */
