@@ -1,5 +1,5 @@
-import { Fragment, useContext, useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { ActivityIndicator, FAB, Provider } from 'react-native-paper';
 import { Button } from 'react-native-paper';
 import HeaderDep from '../components/tasks/headerdep';
@@ -91,6 +91,16 @@ export default function Tasks({ navigation }) {
     }
   }, [isLoading, data, error, filter, sort, query]);
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    if (user != null && user !== {}) {
+      setRefreshing(true);
+      await mutate();
+      setRefreshing(false);
+    }
+  }, [user, mutate]);
+
   return (
     <Provider>
       <Header navigation={navigation} sortOptions={sortOptions} setSort={setSort} query={query} setQuery={setQuery} />
@@ -98,7 +108,11 @@ export default function Tasks({ navigation }) {
         <View style={styles.controlContainer}>
           <ViewSetter setFilter={setFilter} />
         </View>
-        <ScrollView style={styles.tasksScrollContainer} keyboardShouldPersistTaps="always">
+        <ScrollView
+          style={styles.tasksScrollContainer}
+          keyboardShouldPersistTaps="always"
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
           {isLoading ? (
             <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
           ) : (
