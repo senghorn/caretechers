@@ -134,20 +134,20 @@ export default function Settings({ navigation, route }) {
             </View>
           </View>
         </View>
-        <Button
-          mode='contained'
-          uppercase={true}
-          color={colors.pinkishRed}
-          icon='logout'
-          style={styles.logout}
-          labelStyle={styles.logoutButtonText}
-          onPress={() => {
-            console.log('Log out pressed');
-          }}
-        >
-          Logout
-        </Button>
       </ScrollView>
+      <Button
+        mode='contained'
+        uppercase={true}
+        color={colors.pinkishRed}
+        icon='logout'
+        style={styles.logout}
+        labelStyle={styles.logoutButtonText}
+        onPress={() => {
+          console.log('Log out pressed');
+        }}
+      >
+        Logout
+      </Button>
     </View>
   );
 }
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   logout: {
-    marginTop: '50%',
+    bottom: 0,
     height: 50,
     alignContent: 'center',
     justifyContent: 'center',

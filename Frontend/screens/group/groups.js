@@ -19,7 +19,7 @@ export default function Groups({ navigation, route }) {
             navigation.navigate('CreateGroup', { user });
           }}
           style={styles.header}
-          color='lightblue'
+          color={colors.primary}
         >
           Create Group
         </Button>
@@ -29,8 +29,8 @@ export default function Groups({ navigation, route }) {
             right={<TextInput.Icon icon='home-heart' />}
             value={groupName}
             label={'Group ID'}
-            activeUnderlineColor='lightblue'
-            underlineColor='lightblue'
+            activeUnderlineColor={colors.primary}
+            underlineColor='grey'
             onChangeText={(text) => {
               setGroupName(text);
             }}
@@ -40,8 +40,8 @@ export default function Groups({ navigation, route }) {
             value={password}
             secureTextEntry={true}
             label={'Group Code'}
-            activeUnderlineColor='lightblue'
-            underlineColor='lightblue'
+            activeUnderlineColor={colors.primary}
+            underlineColor='grey'
             onChangeText={(text) => {
               setPassword(text);
             }}
@@ -57,7 +57,7 @@ export default function Groups({ navigation, route }) {
             joinGroupHandler(user, groupName, password, navigation)
           }
           style={styles.createButton}
-          color='lightblue'
+          color={colors.primary}
         >
           Join
         </Button>
