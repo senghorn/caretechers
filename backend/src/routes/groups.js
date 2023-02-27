@@ -11,8 +11,16 @@ router.post('/', [
 	sharedMiddleware.sendResult
 ]);
 
-router.get('/:limit',[
-	groupMiddleware.getGroups,
+router.get('/password/:groupId',[
+	groupMiddleware.checkIfGroupExists,
+	groupMiddleware.getGroupPassword,
+	sharedMiddleware.sendResult
+]);
+
+router.patch('/passreset/:groupId',[
+	groupMiddleware.checkIfGroupExists,
+	groupMiddleware.resetPassword,
+	groupMiddleware.getGroupPassword,
 	sharedMiddleware.sendResult
 ]);
 
@@ -70,24 +78,42 @@ module.exports = router;
  *     responses:
  *       204:
  *         description: The POST was successful, no content returned
- * /groups/{limit}:
+ * /groups/password/{groupId}:
  *   get:
- *     summary: Gets all groups
+ *     summary: Gets the group password
  *     tags: [Groups]
  *     parameters: 
  *       - in: path
- *         name: limit
+ *         name: groupId
  *         schema:
  *           type: integer
  *         required: true
- *         description: Number of groups to be returned
  *     responses:
  *       200:
- *         description: The list of Groups
+ *         description: The group password
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Groups'
+ *               properties:
+ *                 password:
+ *                   type: string
+* /groups/passreset/{groupId}:
+ *   patch:
+ *     summary: Updates the group password
+ *     tags: [Groups]
+ *     parameters: 
+ *       - in: path
+ *         name: groupId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: The group password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 password:
+ *                   type: string
  */
