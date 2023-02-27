@@ -3,29 +3,33 @@ import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import UserContext from '../../services/context/UserContext';
 import { FadeInView } from '../generic/FadeInView';
 import colors from '../../constants/colors';
+import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
 
 export default function RecordVisitPrompt({ navigation }) {
   const { user } = useContext(UserContext);
-  return (
-    <TouchableHighlight
-      onPress={() => {
-        navigation.navigate('Record Visit');
-      }}
-    >
-      <View style={styles.metaContainer}>
-        <FadeInView opacityLowerBound={0.7}>
-          <View style={styles.container} />
-        </FadeInView>
-        <View style={styles.overlayContainer}>
-          {user && <Image source={{ uri: user.profile_pic }} style={styles.pictureContainer} />}
-          <View>
-            <Text style={styles.message}>{user ? user.first_name + ', ' : ''}it's your turn to visit today 🙂</Text>
-            <Text style={styles.message}>Click here to start recording your visit!</Text>
+  const { isVisitorToday } = useContext(TodaysVisitorContext);
+  if (isVisitorToday)
+    return (
+      <TouchableHighlight
+        onPress={() => {
+          navigation.navigate('Record Visit');
+        }}
+      >
+        <View style={styles.metaContainer}>
+          <FadeInView opacityLowerBound={0.7}>
+            <View style={styles.container} />
+          </FadeInView>
+          <View style={styles.overlayContainer}>
+            {user && <Image source={{ uri: user.profile_pic }} style={styles.pictureContainer} />}
+            <View>
+              <Text style={styles.message}>{user ? user.first_name + ', ' : ''}it's your turn to visit today 🙂</Text>
+              <Text style={styles.message}>Click here to start recording your visit!</Text>
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableHighlight>
-  );
+      </TouchableHighlight>
+    );
+  return null;
 }
 
 const styles = StyleSheet.create({
