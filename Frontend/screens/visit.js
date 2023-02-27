@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert } from 'react-native';
 import Header from '../components/visit/header';
 import useSWR from 'swr';
 import { format } from 'date-fns';
@@ -120,13 +120,32 @@ export default function Visit({ route, navigation }) {
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
-              setIsDropping(true);
-              await deleteVisit(visit.visitId);
-              taskMutate();
-              refreshCalendar();
-              refreshTodaysVisitor();
-              await visitMutate();
-              setIsDropping(false);
+              Alert.alert(
+                'Retract visit sign-up?',
+                'If so, you may want to ask another caretaker to pick up your slack', // <- this part is optional, you can pass an empty string
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Confirm',
+                    onPress: async () => {
+                      setIsDropping(true);
+                      await deleteVisit(visit.visitId);
+                      taskMutate();
+                      refreshCalendar();
+                      refreshTodaysVisitor();
+                      await visitMutate();
+                      setIsDropping(false);
+                    },
+                    style: 'destructive',
+                  },
+                ],
+                {
+                  cancelable: true,
+                }
+              );
             }}
             style={styles.touchProperties}
           >
