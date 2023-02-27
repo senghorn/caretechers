@@ -61,6 +61,8 @@ export default function Visit({ route, navigation }) {
 
   const visit = visits && visits[0];
 
+  const { isVisitorToday } = useContext(TodaysVisitorContext);
+
   return (
     <View style={styles.container}>
       <Header date={date} navigation={navigation} />
@@ -93,6 +95,24 @@ export default function Visit({ route, navigation }) {
             <View style={styles.messageButton}>
               <AntDesign name="message1" size={20} color="#199b1e" />
               <Text style={styles.messageButtonText}>Message {visit.first_name}</Text>
+            </View>
+          </TouchableHighlight>
+        )}
+        {isVisitorToday && visit.date === getDateString(new Date()) && (
+          <TouchableHighlight
+            underlayColor="#ededed"
+            onPress={async () => {
+              navigation.navigate('Record Visit');
+            }}
+            style={[styles.touchProperties, styles.marginRight]}
+          >
+            <View style={styles.recordButton}>
+              {isDropping ? null : (
+                <Fragment>
+                  <MaterialCommunityIcons name="calendar-edit" size={16} color="green" />
+                  <Text style={styles.recordButtonText}>Record Visit</Text>
+                </Fragment>
+              )}
             </View>
           </TouchableHighlight>
         )}
@@ -222,5 +242,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: colors.danger,
+  },
+  recordButton: {
+    flex: 0,
+    height: 32,
+    width: 120,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#199b1e42',
+  },
+  recordButtonText: {
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'green',
+  },
+  marginRight: {
+    marginRight: 16,
   },
 });

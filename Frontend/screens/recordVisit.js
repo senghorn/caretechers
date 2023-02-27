@@ -64,7 +64,7 @@ export default function RecordVisit({ navigation }) {
         <Appbar.Action
           icon="chevron-left"
           onPress={() => {
-            navigation.navigate('Home');
+            navigation.goBack();
           }}
         />
         <Appbar.Content title={'Record Visit'} titleStyle={styles.titleText} />
