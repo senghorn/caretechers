@@ -113,8 +113,8 @@ export default function Inputs({ route, navigation }) {
         onChangeText={handleNameChange}
         autoCorrect={false}
         error={nameMissing}
-        underlineColor='lightblue'
-        activeUnderlineColor='lightblue'
+        underlineColor='grey'
+        activeUnderlineColor='blue'
       />
       <TextInput
         right={<TextInput.Icon icon='account' />}
@@ -124,8 +124,8 @@ export default function Inputs({ route, navigation }) {
         onChangeText={handleLastNameChange}
         autoCorrect={false}
         error={missLastName}
-        underlineColor='lightblue'
-        activeUnderlineColor='lightblue'
+        underlineColor='grey'
+        activeUnderlineColor='blue'
       />
       <TextInput
         right={<TextInput.Icon icon='phone' />}
@@ -135,8 +135,8 @@ export default function Inputs({ route, navigation }) {
         value={phoneNumber}
         onChangeText={(text) => formatPhoneNumber(text)}
         error={phoneMissing}
-        underlineColor='lightblue'
-        activeUnderlineColor='lightblue'
+        underlineColor='grey'
+        activeUnderlineColor='blue'
       />
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
         <Text style={styles.submitButtonText}> Join Caring Group </Text>
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     margin: 12,
   },
   submitButton: {
-    backgroundColor: colors.lightBlue,
+    backgroundColor: colors.primary,
     padding: 10,
     margin: 15,
     marginTop: 30,

@@ -5,7 +5,6 @@ import colors from '../../constants/colors';
 import { createNewGroup } from '../../services/api/groups';
 import { addUserToGroup } from '../../services/api/user';
 
-
 export default function CreateGroup({ navigation, route }) {
   const { user } = route.params;
   const [groupName, setGroupName] = useState('');
@@ -44,8 +43,8 @@ export default function CreateGroup({ navigation, route }) {
           value={groupName}
           onChangeText={(text) => setGroupName(text)}
           label={'Group Name'}
-          activeUnderlineColor='lightblue'
-          underlineColor='lightblue'
+          activeUnderlineColor={colors.primary}
+          underlineColor='grey'
         />
       </View>
       <Text style={styles.text}>
@@ -56,7 +55,7 @@ export default function CreateGroup({ navigation, route }) {
         mode='contained'
         onPress={() => createGroup(groupName, user, navigation)}
         style={styles.createButton}
-        color='lightblue'
+        color={colors.primary}
       >
         Create Group
       </Button>
@@ -67,15 +66,20 @@ export default function CreateGroup({ navigation, route }) {
 /**
  * Creates a new group given the name, timezone and visit frequency.
  * Then, adds user to the created group.
- * @param {string} groupName 
- * @param {json} user 
+ * @param {string} groupName
+ * @param {json} user
  */
 const createGroup = async (groupName, user, navigation) => {
   // TODO: get visit frequency and group password below
-  const timezone = "America/Denver";
+  const timezone = 'America/Denver';
   const result = await createNewGroup(groupName, timezone, 4);
   if (result.groupId != null) {
-    const joinGroupWithRetry = async (userEmail, groupId, maxAttempts = 3, attempt = 1) => {
+    const joinGroupWithRetry = async (
+      userEmail,
+      groupId,
+      maxAttempts = 3,
+      attempt = 1
+    ) => {
       const joined = await addUserToGroup(userEmail, groupId, 1);
       if (joined) {
         navigation.navigate('Home', { user: user });
@@ -83,23 +87,29 @@ const createGroup = async (groupName, user, navigation) => {
         console.log(`Join group failed on attempt ${attempt}`);
         if (attempt < maxAttempts) {
           setTimeout(async () => {
-            await joinGroupWithRetry(userEmail, groupId, maxAttempts, attempt + 1);
+            await joinGroupWithRetry(
+              userEmail,
+              groupId,
+              maxAttempts,
+              attempt + 1
+            );
           }, 2000);
         } else {
-          console.log(`Maximum attempts (${maxAttempts}) reached. Join group failed.`);
+          console.log(
+            `Maximum attempts (${maxAttempts}) reached. Join group failed.`
+          );
         }
       }
     };
 
     joinGroupWithRetry(user.email, result.groupId, 3);
-
   }
 };
 
 const styles = StyleSheet.create({
   container: {},
   appbar: {
-    backgroundColor: colors.lightBlue,
+    backgroundColor: colors.bgColor,
   },
   form: {
     marginTop: 20,
