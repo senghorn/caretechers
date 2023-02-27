@@ -36,7 +36,7 @@ router.delete('/:noteId', [
 	sharedMiddleware.sendNoResult
 ]);
 
-router.get('/search/:groupId/', [
+router.get('/search/:groupId/:searchString', [
 	groupMiddleware.checkIfGroupExists,
 	notesMiddleware.checkIfSearchIsValid,
 	notesMiddleware.getNotesBySearchString,
