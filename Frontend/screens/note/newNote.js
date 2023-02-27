@@ -136,6 +136,7 @@ export default function NewNote({ navigation, route }) {
               initialHeight={height}
               disabled={!editMode}
               initialContentHTML={editContent}
+              initialFocus={true}
             />
           </ScrollView>
           {editMode && (

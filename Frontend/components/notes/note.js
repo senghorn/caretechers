@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     borderWidth: 1.2,
     borderColor: COLORS.gray,
-    backgroundColor: COLORS.grayLight,
+    backgroundColor: COLORS.lighterYellow,
     borderRadius: 8,
     borderStyle: 'dashed',
   },

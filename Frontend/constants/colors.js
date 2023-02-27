@@ -17,6 +17,7 @@ export default {
   orange: '#f77f00',
   yellow: '#fcbf49',
   lightYellow: '#fcbf4995',
+  lighterYellow: '#fcbf4975',
   darkblue: '#003049',
   pinkishRed: '#ef233c',
   profileCard: '#e0e1dd',
