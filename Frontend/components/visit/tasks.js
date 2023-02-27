@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { Checkbox } from 'react-native-paper';
+import RecordVisitContext from '../../services/context/RecordVisitContext';
 import Task from '../tasks/task';
 
 export default function Tasks({ tasks, dateString, isLoading, navigation, canCheck = false }) {
@@ -18,16 +19,25 @@ export default function Tasks({ tasks, dateString, isLoading, navigation, canChe
 }
 
 function TaskWrapper({ task, navigation, dateString, canCheck }) {
-  const [status, setStatus] = useState(task.taskCompleted ? 'checked' : 'unchecked');
+  const { visitTasks, setVisitTasks } = useContext(RecordVisitContext);
+
   return (
     <View style={styles.checkboxContainer}>
       <View>
         {!canCheck ? (
-          <Checkbox.Android status={status} color="#199b1e" disabled={true} />
+          <Checkbox.Android status={task.taskCompleted ? 'checked' : 'unchecked'} color="#199b1e" disabled={true} />
         ) : (
           <Checkbox.Android
-            status={status}
-            onPress={() => setStatus(status === 'checked' ? 'unchecked' : 'checked')}
+            status={!visitTasks[task.id] ? 'unchecked' : 'checked'}
+            onPress={() => {
+              const state = visitTasks[task.id];
+              if (state !== null) {
+                const newVisitTasks = { ...visitTasks, [task.id]: !state };
+                setVisitTasks(newVisitTasks);
+              } else {
+                visitTasks[task.id] = true;
+              }
+            }}
             color="#199b1e"
           />
         )}

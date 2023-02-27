@@ -14,11 +14,29 @@ module.exports.createVisit = asyncHandler(async (req, _res, next) => {
 
 module.exports.deleteVisit = asyncHandler(async (req, _res, next) => {
   const { visitId } = req.params;
-  console.log(visitId);
 
   const query = sql`DELETE FROM Visits WHERE id=${visitId}`;
 
   await db.query(query);
+  next();
+});
+
+module.exports.recordVisit = asyncHandler(async (req, _res, next) => {
+  const { visitId } = req.params;
+
+  const tasksQuery = sql``;
+
+  req.body.tasks.forEach((task) => {
+    tasksQuery.append(`INSERT IGNORE INTO Tasks (meta_id, occurence_date, completed, visit_id)
+                        VALUES (${task}, '${req.body.date}', 1, ${visitId});`);
+  });
+
+  await db.query(tasksQuery);
+
+  const completeVisitQuery = sql`UPDATE Visits SET completed = 1, visit_notes = ${req.body.notes} WHERE id=${visitId};`;
+
+  await db.query(completeVisitQuery);
+
   next();
 });
 

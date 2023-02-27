@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert } from 'react-native';
 import Header from '../components/visit/header';
 import useSWR from 'swr';
 import { format } from 'date-fns';
@@ -19,6 +19,7 @@ import { deleteVisit } from '../services/api/visits';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
 import { ActivityIndicator } from 'react-native-paper';
+import VisitNotes from '../components/visit/notes';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -60,6 +61,8 @@ export default function Visit({ route, navigation }) {
 
   const visit = visits && visits[0];
 
+  const { isVisitorToday } = useContext(TodaysVisitorContext);
+
   return (
     <View style={styles.container}>
       <Header date={date} navigation={navigation} />
@@ -95,16 +98,50 @@ export default function Visit({ route, navigation }) {
             </View>
           </TouchableHighlight>
         )}
+        {!isDropping && isVisitorToday && visit.date === getDateString(new Date()) && (
+          <TouchableHighlight
+            underlayColor="#ededed"
+            onPress={async () => {
+              navigation.navigate('Record Visit');
+            }}
+            style={[styles.touchProperties, styles.marginRight]}
+          >
+            <View style={styles.recordButton}>
+              <MaterialCommunityIcons name="calendar-edit" size={16} color="green" />
+              <Text style={styles.recordButtonText}>Record Visit</Text>
+            </View>
+          </TouchableHighlight>
+        )}
         {visit && visit.visitor === user.email && visit.date >= getDateString(new Date()) && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
-              setIsDropping(true);
-              await deleteVisit(visit.visitId);
-              await visitMutate();
-              setIsDropping(false);
-              refreshCalendar();
-              refreshTodaysVisitor();
+              Alert.alert(
+                'Retract visit sign-up?',
+                'If so, you may want to ask another caretaker to pick up your slack', // <- this part is optional, you can pass an empty string
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Confirm',
+                    onPress: async () => {
+                      setIsDropping(true);
+                      await deleteVisit(visit.visitId);
+                      taskMutate();
+                      refreshCalendar();
+                      refreshTodaysVisitor();
+                      await visitMutate();
+                      setIsDropping(false);
+                    },
+                    style: 'destructive',
+                  },
+                ],
+                {
+                  cancelable: true,
+                }
+              );
             }}
             style={styles.touchProperties}
           >
@@ -139,9 +176,9 @@ export default function Visit({ route, navigation }) {
         />
       )}
       {selected === 'Notes' && (
-        <ScrollView style={styles.visitNotesContainer}>
-          <Text style={styles.visitNotes}>{visit.visit_notes}</Text>
-        </ScrollView>
+        <View style={styles.visitNotesContainer}>
+          <VisitNotes editMode={false} editContent={visit.visit_notes} />
+        </View>
       )}
     </View>
   );
@@ -153,12 +190,10 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   visitNotesContainer: {
-    backgroundColor: '#ededed',
+    flex: 1,
     marginHorizontal: 16,
-    marginTop: 10,
-    padding: 12,
-    borderRadius: 8,
     marginBottom: 40,
+    backgroundColor: 'red',
   },
   visitNotes: {
     fontSize: 14,
@@ -222,5 +257,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: colors.danger,
+  },
+  recordButton: {
+    flex: 0,
+    height: 32,
+    width: 120,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#199b1e42',
+  },
+  recordButtonText: {
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'green',
+  },
+  marginRight: {
+    marginRight: 16,
   },
 });
