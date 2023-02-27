@@ -98,7 +98,7 @@ export default function Visit({ route, navigation }) {
             </View>
           </TouchableHighlight>
         )}
-        {isVisitorToday && visit.date === getDateString(new Date()) && (
+        {!isDropping && isVisitorToday && visit.date === getDateString(new Date()) && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
@@ -107,12 +107,8 @@ export default function Visit({ route, navigation }) {
             style={[styles.touchProperties, styles.marginRight]}
           >
             <View style={styles.recordButton}>
-              {isDropping ? null : (
-                <Fragment>
-                  <MaterialCommunityIcons name="calendar-edit" size={16} color="green" />
-                  <Text style={styles.recordButtonText}>Record Visit</Text>
-                </Fragment>
-              )}
+              <MaterialCommunityIcons name="calendar-edit" size={16} color="green" />
+              <Text style={styles.recordButtonText}>Record Visit</Text>
             </View>
           </TouchableHighlight>
         )}
