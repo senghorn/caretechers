@@ -50,8 +50,23 @@ module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
 	next();
 });
 
-module.exports.getGroups = asyncHandler(async (req, res, next) => {
+module.exports.getGroupsDeprecated = asyncHandler(async (req, res, next) => {
 	const query = sql`SELECT * FROM \`Groups\` G LIMIT ${req.params.limit}`;
 	req.result = await db.query(query);
+	next();
+});
+
+module.exports.getGroupPassword = asyncHandler(async (req, res, next) => {
+	const query = sql`SELECT password FROM \`Groups\` G
+	WHERE id = ${req.params.groupId}`;
+	req.result = await db.query(query);
+	next();
+});
+
+module.exports.resetPassword = asyncHandler(async (req, _res, next) => {
+	let query = sql`UPDATE \`Groups\` G SET G.password = SUBSTR(MD5(RAND()), 1, 15)
+	WHERE G.id = ${req.params.groupId}`;
+	
+	await db.query(query);
 	next();
 });
