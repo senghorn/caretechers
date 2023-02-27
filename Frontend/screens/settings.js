@@ -48,7 +48,7 @@ export default function Settings({ navigation, route }) {
               <AntDesign
                 name='phone'
                 size={20}
-                color={colors.orange}
+                color={colors.primary}
                 style={styles.infoIcon}
               />
               <Text style={styles.phone}>{phone}</Text>
@@ -57,7 +57,7 @@ export default function Settings({ navigation, route }) {
               <AntDesign
                 name='mail'
                 size={20}
-                color={colors.orange}
+                color={colors.primary}
                 style={styles.infoIcon}
               />
               <Text style={styles.phone}>{email}</Text>
@@ -108,7 +108,7 @@ export default function Settings({ navigation, route }) {
                 {notificationOn ? 'On' : 'Off'}
               </Text>
               <Switch
-                color={colors.orange}
+                color={colors.primary}
                 value={notificationOn}
                 onValueChange={() => {
                   setNotificationOn(!notificationOn);
@@ -125,7 +125,7 @@ export default function Settings({ navigation, route }) {
             <View style={styles.switchLabel}>
               <Text style={styles.switchValue}>{darkOn ? 'On' : 'Off'}</Text>
               <Switch
-                color={colors.orange}
+                color={colors.primary}
                 value={darkOn}
                 onValueChange={() => {
                   setDarkOn(!darkOn);
