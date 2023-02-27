@@ -1,9 +1,13 @@
 import { StyleSheet, View, Text } from 'react-native';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { TextInput } from 'react-native-paper';
 import { Appbar } from 'react-native-paper';
 import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
 import SortAction from '../generic/sortAction';
+import colors from '../../constants/colors';
+import { SearchNotes } from '../../services/api/notes';
+import UserContext from '../../services/context/UserContext';
+
 
 export default function Header({ navigation, route, title, sort, pin = false }) {
   const SORT_LABELS = {
@@ -16,12 +20,11 @@ export default function Header({ navigation, route, title, sort, pin = false }) 
     return { label: value, value };
   });
 
-  const { sortRefresh } = useContext(NotesRefreshContext);
-
-  // If true, sorts the notes ascending lexicographical order, otherwise descending
-  const [sortType, setSortType] = useState(true);
+  const { sortRefresh, setSearchResult, setSearchMode } = useContext(NotesRefreshContext);
+  const { user } = useContext(UserContext);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchMode, setSearchMode] = useState(false);
+  const [iconSearchMode, setIconSearchMode] = useState(false);
+
   return (
     <View>
       <Appbar.Header style={styles.headerContainer}>
@@ -31,7 +34,7 @@ export default function Header({ navigation, route, title, sort, pin = false }) 
             navigation.navigate('Settings');
           }}
         />
-        {searchMode ? (
+        {iconSearchMode ? (
           <TextInput
             style={styles.titleInput}
             label="Search"
@@ -40,24 +43,30 @@ export default function Header({ navigation, route, title, sort, pin = false }) 
               setSearchQuery(text);
               console.log(text);
             }}
-            onEndEditing={() => {
-              console.log('Search queried of text:', searchQuery);
+            onEndEditing={async () => {
+              if (user && user.group_id) {
+                const result = await SearchNotes(searchQuery, user.group_id);
+                setSearchResult(result);
+              }
             }}
+            autoFocus
+            activeOutlineColor={colors.primary}
             mode="outlined"
           />
         ) : (
           <Appbar.Content title={title} titleStyle={styles.title} />
         )}
-        {!searchMode && sort && (
+        {!iconSearchMode && sort && (
           <SortAction sortOptions={sortOptions} setSort={sortRefresh} />
         )}
         <Appbar.Action
-          icon={searchMode ? "close" : "magnify"}
+          icon={iconSearchMode ? "close" : "magnify"}
           onPress={() => {
-            setSearchMode(!searchMode);
+            setIconSearchMode(!iconSearchMode);
+            setSearchMode(!iconSearchMode);
           }}
         />
-        {!searchMode && pin && (
+        {!iconSearchMode && pin && (
           <Appbar.Action
             icon="pin"
             onPress={() => {
