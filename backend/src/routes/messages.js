@@ -18,7 +18,7 @@ router.get('/users/:groupId', [
 	sharedMiddleware.sendResult
 ]);
 
-router.get('/search/:groupId/', [
+router.get('/search/:groupId/:searchString', [
 	groupMiddleware.checkIfGroupExists,
 	messagesMiddleware.checkIfSearchIsValid,
 	messagesMiddleware.getMessagesBySearchString,
@@ -108,7 +108,7 @@ module.exports = router;
  *                   type: integer
  *                 profile_pic:  
  *                   type: string    
- * /messages/search/{groupId}:
+ * /messages/search/{groupId}/{searchString}:
  *   get:
  *     summary: Gets all messages that contain the searchString
  *     tags: [Messages]
@@ -118,15 +118,11 @@ module.exports = router;
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID of the graph this measurement belongs to
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             properties:
- *               searchString:
- *                 type: string
+ *       - in: path
+ *         name: searchString
+ *         schema:
+ *           type: string
+ *         required: true
  *     responses:
  *       200:
  *         description: The updated measurement
