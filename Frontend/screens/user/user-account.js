@@ -183,7 +183,7 @@ export default function UserAccount({ navigation, route, newUser }) {
           value={email}
           style={styles.email}
           outlineColor={colors.darkblue}
-          activeOutlineColor={colors.orange}
+          activeOutlineColor={colors.primary}
           disabled
         />
       </View>

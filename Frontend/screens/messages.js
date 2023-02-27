@@ -12,7 +12,7 @@ export default function Messages({ navigation }) {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,7 +50,9 @@ export default function Messages({ navigation }) {
       });
 
       socket.on('message', (msg) => {
-        setMessages((previousMessages) => GiftedChat.append(previousMessages, msg));
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, msg)
+        );
       });
 
       socket.on('disconnect', (reason) => {
@@ -86,7 +88,7 @@ export default function Messages({ navigation }) {
         position={message_sender_id == user.email ? 'right' : 'left'}
         wrapperStyle={{
           right: {
-            backgroundColor: COLORS.orange,
+            backgroundColor: COLORS.primary,
             marginVertical: 5,
           },
           left: {

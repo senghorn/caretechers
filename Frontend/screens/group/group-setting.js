@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {
   Appbar,
@@ -17,14 +18,18 @@ import {
 import { useState, useEffect, useContext } from 'react';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
+import {
+  getGroupInfo,
+  getGroupPassword,
+  resetGroupPassword,
+} from '../../services/api/groups';
 
 export default function GroupSettings({ navigation }) {
   const [showAlert, setShowAlert] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
-  const [members, setMembers] = useState([
-    { name: 'Seng Rith' },
-    { name: 'Aaron Heo' },
-  ]);
+  const [password, setPassword] = useState('');
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState({
     name: 'Misty Family',
     password: 'secret1234',
@@ -33,7 +38,18 @@ export default function GroupSettings({ navigation }) {
   const { user } = useContext(UserContext);
 
   useEffect(() => {
+    const fetchGroupInfo = async () => {
+      const result = await getGroupInfo(user.group_id);
+      setMembers(result);
+    };
+    const fetchGroupPass = async () => {
+      const pass = await getGroupPassword(user.group_id);
+      setPassword(pass);
+      setLoading(false);
+    };
     if (user && user.group_id) {
+      fetchGroupInfo();
+      fetchGroupPass();
     }
   }, [user]);
 
@@ -83,7 +99,7 @@ export default function GroupSettings({ navigation }) {
         <View style={styles.buttonList}>
           <TextInput
             secureTextEntry={passwordVisible}
-            value={group.password}
+            value={password}
             right={
               <TextInput.Icon
                 name={passwordVisible ? 'eye' : 'eye-off'}
@@ -93,8 +109,13 @@ export default function GroupSettings({ navigation }) {
             left={
               <TextInput.Icon
                 name={'lock-reset'}
-                onPress={() => {
-                  console.log('reset pass pressed');
+                onPress={async () => {
+                  if (user && user.group_id) {
+                    setLoading(true);
+                    const newpass = await resetGroupPassword(user.group_id);
+                    setPassword(newpass);
+                    setLoading(false);
+                  }
                 }}
               />
             }
@@ -114,7 +135,14 @@ export default function GroupSettings({ navigation }) {
         </View>
         <View style={styles.memberListBox}>
           <Text style={styles.membersTitle}>Members</Text>
-          <GroupMemberList members={members} />
+          {loading && (
+            <ActivityIndicator
+              size='large'
+              color='#2196f3'
+              style={styles.loader}
+            />
+          )}
+          {!loading && <GroupMemberList members={members} />}
         </View>
       </View>
       {showAlert &&
@@ -143,7 +171,7 @@ const GroupMemberList = ({ members }) => {
   return (
     <ScrollView style={styles.listContainer}>
       {members.map((member) => (
-        <MemberItem user={member} key={member.name} />
+        <MemberItem user={member} key={member.first_name} />
       ))}
     </ScrollView>
   );
@@ -156,8 +184,10 @@ const MemberItem = ({ user }) => {
   return (
     <View>
       <TouchableOpacity style={styles.memberItem} onPress={userPressedHandler}>
-        <Avatar.Image size={24} />
-        <Text style={styles.username}>{user.name}</Text>
+        <Avatar.Image size={24} source={{ uri: user.profile_pic }} />
+        <Text style={styles.username}>
+          {user.first_name + ' ' + user.last_name}
+        </Text>
       </TouchableOpacity>
       <Divider
         style={{
