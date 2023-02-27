@@ -5,6 +5,8 @@ export const NotesRefreshContext = createContext();
 export const NotesRefreshProvider = ({ children }) => {
   const [refresh, setRefresh] = useState(false);
   const [sort, setSort] = useState('none');
+  const [searchMode, setSearchMode] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
 
   /**
    * Toggles the refreshing context
@@ -23,7 +25,7 @@ export const NotesRefreshProvider = ({ children }) => {
 
   return (
     <NotesRefreshContext.Provider
-      value={{ refresh, toggleRefresh, setRefresh, sort, sortRefresh }}
+      value={{ refresh, toggleRefresh, setRefresh, sort, sortRefresh, searchMode, setSearchMode, searchResult, setSearchResult }}
     >
       {children}
     </NotesRefreshContext.Provider>

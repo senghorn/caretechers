@@ -13,11 +13,10 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Notes({ navigation, route }) {
     const { user } = useContext(UserContext);
-    const { refresh, sort } = useContext(NotesRefreshContext);
+    const { refresh, sort, searchMode, searchResult } = useContext(NotesRefreshContext);
     const { data, isLoading, error, mutate } = useSWR(config.backend_server + '/notes/group/' + user.group_id, fetcher);
     const [refreshing, setRefreshing] = useState(false);
     const [notesList, setNotesList] = useState(null);
-
     const onRefresh = useCallback(async () => {
         if (user != null && user !== {}) {
             setRefreshing(true);
@@ -28,14 +27,20 @@ export default function Notes({ navigation, route }) {
 
     useEffect(() => {
         if (user != null && !isLoading && data) {
-            const sortedNotes = sortNotes(data, sort);
+            let notes = data;
+            if (searchMode && searchResult) {
+                notes = searchResult;
+            }
+            const sortedNotes = sortNotes(notes, sort);
             setNotesList(
                 <ScrollView style={styles.tasksContainer} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
                     {sortedNotes.map((note) => <Note key={note.id} note={note} navigation={navigation} />)}
                 </ScrollView>
             )
         }
-    }, [user, data, isLoading, sort]);
+    }, [user, data, isLoading, sort, searchMode, searchResult]);
+
+
 
     useEffect(() => {
         mutate();
