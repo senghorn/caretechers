@@ -33,14 +33,14 @@ async function createNewMessage(message_data){
 }
 
 module.exports.checkIfSearchIsValid = asyncHandler(async (req, _res, next) => {
-	if (!req.body.searchString) {
+	if (!req.params.searchString) {
 		return next(newError('Search string needs to be provided', 400));
 	}
 	next();
 });
 
 module.exports.getMessagesBySearchString = asyncHandler(async (req, _res, next) => {
-	const search = '%' + req.body.searchString + '%';
+	const search = '%' + req.params.searchString + '%';
 	const query = sql`SELECT * FROM Messages WHERE content LIKE ${search}
 	AND group_id = ${req.params.groupId}`;
 	req.result = await db.query(query);

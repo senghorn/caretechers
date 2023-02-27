@@ -174,7 +174,7 @@ module.exports = router;
  *     responses:
  *       204:
  *         description: The DELETE was successful, no content returned
- * /notes/search/{groupId}:
+ * /notes/search/{groupId}/{searchString}:
  *   get:
  *     summary: Searches for a groups notes that contain searchString
  *     tags: [Notes]
@@ -184,14 +184,11 @@ module.exports = router;
  *         schema:
  *           type: integer
  *         required: true
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             properties:
- *               searchString:
- *                 type: string
+ *       - in: path
+ *         name: searchString
+ *         schema:
+ *           type: string
+ *         required: true
  *     responses:
  *       200:
  *         description: A list of notes containing the searchString
