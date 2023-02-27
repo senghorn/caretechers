@@ -16,10 +16,12 @@ router.get('/group/:groupId', [
 
 router.delete('/:visitId', [visitsMiddleware.deleteVisit, sharedMiddleware.sendNoResult]);
 
+router.post('/:visitId/record', [visitsMiddleware.recordVisit, sharedMiddleware.sendNoResult]);
+
 module.exports = router;
 
 // SCHEMA DEFINITION
-  /**
+/**
  * @swagger
  * components:
  *   schemas:
@@ -56,7 +58,7 @@ module.exports = router;
 
 // Route Definitions
 
-  /**
+/**
  * @swagger
  * tags:
  *   name: Visits
@@ -64,7 +66,7 @@ module.exports = router;
  *   get:
  *     summary: Gets all visits for a group in a date range
  *     tags: [Visits]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: groupId
  *         schema:
@@ -82,7 +84,7 @@ module.exports = router;
  *   post:
  *     summary: Creates a visit
  *     tags: [Visits]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: groupId
  *         schema:

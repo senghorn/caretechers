@@ -3,7 +3,7 @@ import { Alert, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 import SectionSelector from '../components/visit/sectionSelector';
 import Tasks from '../components/visit/tasks';
-import { getDateString, getHumanReadableDate } from '../utils/date';
+import { getCurrentDateString, getDateString, getHumanReadableDate } from '../utils/date';
 import useSWR from 'swr';
 import UserContext from '../services/context/UserContext';
 import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
@@ -11,6 +11,10 @@ import VisitRefreshContext from '../services/context/VisitRefreshContext';
 import config from '../constants/config';
 import VisitNotes from '../components/visit/notes';
 import colors from '../constants/colors';
+import RecordVisitContext from '../services/context/RecordVisitContext';
+import { recordVisit } from '../services/api/visits';
+import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
+import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -22,8 +26,9 @@ export default function RecordVisit({ navigation }) {
 
   const { user } = useContext(UserContext);
 
-  const [, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
-  const [, setRefreshVisit] = useContext(VisitRefreshContext);
+  const [refreshVisitTasks, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
+  const [refreshVisit, setRefreshVisit] = useContext(VisitRefreshContext);
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
 
   const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
 
@@ -46,7 +51,11 @@ export default function RecordVisit({ navigation }) {
 
   const visit = visits && visits[0];
 
-  const [editContent, setEditContent] = useState('');
+  const { visitNotes, setVisitNotes, visitTasks, setVisitTasks } = useContext(RecordVisitContext);
+
+  const { refreshTodaysVisitor } = useContext(TodaysVisitorContext);
+
+  const [recordingVisit, setRecordingVisit] = useState(false);
 
   const humanReadable = getHumanReadableDate(date, true);
   return (
@@ -65,6 +74,8 @@ export default function RecordVisit({ navigation }) {
           color={colors.primary}
           uppercase={false}
           mode={'contained'}
+          loading={recordingVisit}
+          disabled={recordingVisit}
           onPress={() => {
             Alert.alert(
               'Finish Visit?',
@@ -77,6 +88,15 @@ export default function RecordVisit({ navigation }) {
                 {
                   text: 'Confirm',
                   onPress: async () => {
+                    setRecordingVisit(true);
+                    await recordVisit(visit.visitId, getCurrentDateString(), visitTasks, visitNotes);
+                    refreshVisit();
+                    refreshVisitTasks();
+                    refreshTodaysVisitor();
+                    await refreshCalendar();
+                    setRecordingVisit(false);
+                    setVisitNotes('');
+                    setVisitTasks({});
                     navigation.goBack();
                   },
                   style: 'destructive',
@@ -113,7 +133,7 @@ export default function RecordVisit({ navigation }) {
           )}
           {selected === 'Notes' && (
             <SafeAreaView style={styles.taskAndNotesContainer}>
-              <VisitNotes editMode editContent={editContent} setEditContent={setEditContent} />
+              <VisitNotes editMode editContent={visitNotes} setEditContent={setVisitNotes} />
             </SafeAreaView>
           )}
         </View>

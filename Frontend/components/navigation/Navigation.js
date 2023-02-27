@@ -25,6 +25,7 @@ import { fetcher } from '../../utils/dataFetching';
 import { getDateString } from '../../utils/date';
 import config from '../../constants/config';
 import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
+import RecordVisitContext from '../../services/context/RecordVisitContext';
 
 const initRefreshCalendar = () => {
   console.log('calendar refresh not set');
@@ -58,10 +59,13 @@ export default function Navigation() {
   const [isVisitorToday, setIsVisitorToday] = useState(false);
 
   useEffect(() => {
-    if (data && data.length > 0 && data[0].visitor === user.email) {
+    if (data && data.length > 0 && data[0].visitor === user.email && !data[0].visitCompleted) {
       setIsVisitorToday(true);
     } else setIsVisitorToday(false);
   }, [data]);
+
+  const [visitNotes, setVisitNotes] = useState('');
+  const [visitTasks, setVisitTasks] = useState({});
 
   return (
     <UserProvider user={user} setUser={setUser}>
@@ -71,29 +75,31 @@ export default function Navigation() {
             <VisitRefreshContext.Provider value={[refreshVisit, setRefreshVisit]}>
               <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>
                 <NotesRefreshProvider>
-                  <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
-                    <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
-                    <Stack.Screen
-                      name={'Home'}
-                      component={BottomNavigation}
-                      options={{ headerShown: false, gestureEnabled: false }}
-                    />
-                    <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
-                    <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false }} />
-                    <Stack.Screen
-                      name={'CreateGroup'}
-                      component={CreateGroup}
-                      options={{ headerShown: false, gestureEnabled: false }}
-                    />
-                    <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
-                    <Stack.Screen name="Record Visit" component={RecordVisit} options={{ headerShown: false }} />
-                    <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
-                    <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
-                    <Stack.Screen name="New Note" component={NewNote} options={{ headerShown: false }} />
-                    <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
-                    <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
-                    <Stack.Screen name="GroupSettings" component={GroupSettings} options={{ headerShown: false }} />
-                  </Stack.Navigator>
+                  <RecordVisitContext.Provider value={{ visitNotes, setVisitNotes, visitTasks, setVisitTasks }}>
+                    <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
+                      <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
+                      <Stack.Screen
+                        name={'Home'}
+                        component={BottomNavigation}
+                        options={{ headerShown: false, gestureEnabled: false }}
+                      />
+                      <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
+                      <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false }} />
+                      <Stack.Screen
+                        name={'CreateGroup'}
+                        component={CreateGroup}
+                        options={{ headerShown: false, gestureEnabled: false }}
+                      />
+                      <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
+                      <Stack.Screen name="Record Visit" component={RecordVisit} options={{ headerShown: false }} />
+                      <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
+                      <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
+                      <Stack.Screen name="New Note" component={NewNote} options={{ headerShown: false }} />
+                      <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+                      <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
+                      <Stack.Screen name="GroupSettings" component={GroupSettings} options={{ headerShown: false }} />
+                    </Stack.Navigator>
+                  </RecordVisitContext.Provider>
                 </NotesRefreshProvider>
               </VisitTasksRefreshContext.Provider>
             </VisitRefreshContext.Provider>

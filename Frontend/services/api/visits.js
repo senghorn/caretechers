@@ -5,6 +5,15 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
+export const recordVisit = async (visitId, date, completedTasks, notes) => {
+  try {
+    const tasks = Object.keys(completedTasks).filter((taskId) => completedTasks[taskId]);
+    await axios.post(`${config.backend_server}/visits/${visitId}/record`, { tasks, notes, date }, { headers });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const deleteVisit = async (visitId) => {
   try {
     await axios.delete(`${config.backend_server}/visits/${visitId}`);

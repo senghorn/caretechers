@@ -19,6 +19,7 @@ import { deleteVisit } from '../services/api/visits';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
 import { ActivityIndicator } from 'react-native-paper';
+import VisitNotes from '../components/visit/notes';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -101,10 +102,11 @@ export default function Visit({ route, navigation }) {
             onPress={async () => {
               setIsDropping(true);
               await deleteVisit(visit.visitId);
-              await visitMutate();
-              setIsDropping(false);
+              taskMutate();
               refreshCalendar();
               refreshTodaysVisitor();
+              await visitMutate();
+              setIsDropping(false);
             }}
             style={styles.touchProperties}
           >
@@ -139,9 +141,9 @@ export default function Visit({ route, navigation }) {
         />
       )}
       {selected === 'Notes' && (
-        <ScrollView style={styles.visitNotesContainer}>
-          <Text style={styles.visitNotes}>{visit.visit_notes}</Text>
-        </ScrollView>
+        <View style={styles.visitNotesContainer}>
+          <VisitNotes editMode={false} editContent={visit.visit_notes} />
+        </View>
       )}
     </View>
   );
@@ -153,12 +155,10 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   visitNotesContainer: {
-    backgroundColor: '#ededed',
+    flex: 1,
     marginHorizontal: 16,
-    marginTop: 10,
-    padding: 12,
-    borderRadius: 8,
     marginBottom: 40,
+    backgroundColor: 'red',
   },
   visitNotes: {
     fontSize: 14,
