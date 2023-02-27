@@ -127,12 +127,12 @@ export default function UserAccount({ navigation, route, newUser }) {
               icon='account'
               style={styles.iconStyle}
               size={20}
-              color={colors.orange}
+              color={colors.primary}
             />
           }
           value={firstName}
           style={styles.phone}
-          activeOutlineColor={colors.orange}
+          activeOutlineColor={colors.primary}
           outlineColor={colors.darkblue}
           onChangeText={(text) => {
             setFirstName(text);
@@ -145,12 +145,12 @@ export default function UserAccount({ navigation, route, newUser }) {
               icon='account'
               style={styles.iconStyle}
               size={20}
-              color={colors.orange}
+              color={colors.primary}
             />
           }
           value={lastName}
           style={styles.phone}
-          activeOutlineColor={colors.orange}
+          activeOutlineColor={colors.primary}
           outlineColor={colors.darkblue}
           onChangeText={(text) => {
             setLastName(text);
@@ -163,12 +163,12 @@ export default function UserAccount({ navigation, route, newUser }) {
               icon='phone'
               style={styles.iconStyle}
               size={20}
-              color={colors.orange}
+              color={colors.primary}
             />
           }
           value={phone}
           style={styles.phone}
-          activeOutlineColor={colors.orange}
+          activeOutlineColor={colors.primary}
           outlineColor={colors.darkblue}
           onChangeText={(text) => {
             formatPhoneNumber(text);
@@ -200,7 +200,7 @@ export default function UserAccount({ navigation, route, newUser }) {
             <View style={styles.buttonRow}>
               <Button
                 mode='contained'
-                color={colors.yellow}
+                color={colors.primary}
                 icon='progress-check'
                 style={styles.createButton}
                 labelStyle={styles.createButtonText}
