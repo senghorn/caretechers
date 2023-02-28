@@ -43,23 +43,42 @@ const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   const [user, setUser] = useState({});
-  const [refreshCalendar, setRefreshCalendar] = useState(() => initRefreshCalendar);
+  const [refreshCalendar, setRefreshCalendar] = useState(
+    () => initRefreshCalendar
+  );
   const [refreshTasks, setRefreshTasks] = useState(() => initRefreshTasks);
-  const [refreshVisitTasks, setRefreshVisitTasks] = useState(() => initRefreshTasks);
+  const [refreshVisitTasks, setRefreshVisitTasks] = useState(
+    () => initRefreshTasks
+  );
   const [refreshVisit, setRefreshVisit] = useState(() => initRefreshVisit);
-
   const [dateString, setDateString] = useState(getDateString(new Date()));
-
+  const [groupId, setGroupId] = useState('');
   const { data, error, isLoading, mutate } = useSWR(
-    `${config.backend_server}/visits/group/${user.group_id}?start=${dateString}&end=${dateString}`,
+    `${config.backend_server}/visits/group/${groupId}?start=${dateString}&end=${dateString}`,
     fetcher
   );
+  useEffect(() => {
+    if (user && user.group_id) {
+      setGroupId(user.group_id);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (groupId) {
+      mutate();
+    }
+  }, [groupId]);
 
   const [refreshTodaysVisitor] = useState(() => mutate);
   const [isVisitorToday, setIsVisitorToday] = useState(false);
 
   useEffect(() => {
-    if (data && data.length > 0 && data[0].visitor === user.email && !data[0].visitCompleted) {
+    if (
+      data &&
+      data.length > 0 &&
+      data[0].visitor === user.email &&
+      !data[0].visitCompleted
+    ) {
       setIsVisitorToday(true);
     } else setIsVisitorToday(false);
   }, [data]);
@@ -69,35 +88,97 @@ export default function Navigation() {
 
   return (
     <UserProvider user={user} setUser={setUser}>
-      <TodaysVisitorContext.Provider value={{ isVisitorToday, refreshTodaysVisitor }}>
-        <CalendarRefreshContext.Provider value={[refreshCalendar, setRefreshCalendar]}>
+      <TodaysVisitorContext.Provider
+        value={{ isVisitorToday, refreshTodaysVisitor }}
+      >
+        <CalendarRefreshContext.Provider
+          value={[refreshCalendar, setRefreshCalendar]}
+        >
           <TasksRefreshContext.Provider value={[refreshTasks, setRefreshTasks]}>
-            <VisitRefreshContext.Provider value={[refreshVisit, setRefreshVisit]}>
-              <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>
+            <VisitRefreshContext.Provider
+              value={[refreshVisit, setRefreshVisit]}
+            >
+              <VisitTasksRefreshContext.Provider
+                value={[refreshVisitTasks, setRefreshVisitTasks]}
+              >
                 <NotesRefreshProvider>
-                  <RecordVisitContext.Provider value={{ visitNotes, setVisitNotes, visitTasks, setVisitTasks }}>
-                    <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
-                      <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
+                  <RecordVisitContext.Provider
+                    value={{
+                      visitNotes,
+                      setVisitNotes,
+                      visitTasks,
+                      setVisitTasks,
+                    }}
+                  >
+                    <Stack.Navigator
+                      screenOptions={{}}
+                      initialRouteName={'Login'}
+                    >
+                      <Stack.Screen
+                        name={'Login'}
+                        component={GoogleLogin}
+                        options={{ headerShown: false }}
+                      />
                       <Stack.Screen
                         name={'Home'}
                         component={BottomNavigation}
                         options={{ headerShown: false, gestureEnabled: false }}
                       />
-                      <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
-                      <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false }} />
+                      <Stack.Screen
+                        name={'RegisterUser'}
+                        component={RegisterUser}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name={'Group'}
+                        component={Groups}
+                        options={{ headerShown: false, gestureEnabled: false }}
+                      />
                       <Stack.Screen
                         name={'CreateGroup'}
                         component={CreateGroup}
                         options={{ headerShown: false, gestureEnabled: false }}
                       />
-                      <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
-                      <Stack.Screen name="Record Visit" component={RecordVisit} options={{ headerShown: false }} />
-                      <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
-                      <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
-                      <Stack.Screen name="New Note" component={NewNote} options={{ headerShown: false }} />
-                      <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
-                      <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
-                      <Stack.Screen name="GroupSettings" component={GroupSettings} options={{ headerShown: false }} />
+                      <Stack.Screen
+                        name='Visit'
+                        component={Visit}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Record Visit'
+                        component={RecordVisit}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Task'
+                        component={Task}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Note'
+                        component={Note}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='New Note'
+                        component={NewNote}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Settings'
+                        component={Settings}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='UserAccount'
+                        component={UserAccount}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='GroupSettings'
+                        component={GroupSettings}
+                        options={{ headerShown: false }}
+                      />
                     </Stack.Navigator>
                   </RecordVisitContext.Provider>
                 </NotesRefreshProvider>

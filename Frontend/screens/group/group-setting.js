@@ -19,11 +19,8 @@ import {
 import { useState, useEffect, useContext } from 'react';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
-import {
-  getGroupInfo,
-  getGroupPassword,
-  resetGroupPassword,
-} from '../../services/api/groups';
+import { resetGroupPassword } from '../../services/api/groups';
+import { RemoveUserFromGroup } from '../../services/api/user';
 import config from '../../constants/config';
 import useSWR from 'swr';
 
@@ -60,7 +57,14 @@ export default function GroupSettings({ navigation }) {
   };
 
   const LeaveGroup = async () => {
-    console.log('user leaving group!');
+    if (user && user.email && user.group_id) {
+      const result = await RemoveUserFromGroup(user.email, user.group_id);
+      if (result == true) {
+        navigation.navigate('Group');
+      } else {
+        alert('Cannot leave group.');
+      }
+    }
   };
 
   const handleLeaveGroup = () => {

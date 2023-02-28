@@ -1,11 +1,12 @@
-import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import colors from '../../constants/colors';
-import { addUserToGroup } from '../../services/api/user';
+import { addUserToGroup, fetchUserByEmail } from '../../services/api/user';
+import UserContext from '../../services/context/UserContext';
 
-export default function Groups({ navigation, route }) {
-  const { user } = route.params;
+export default function Groups({ navigation }) {
+  const { setUser, user } = useContext(UserContext);
   const [groupName, setGroupName] = useState('');
   const [password, setPassword] = useState('');
 
@@ -53,9 +54,14 @@ export default function Groups({ navigation, route }) {
         <Button
           icon='check-all'
           mode='contained'
-          onPress={() =>
-            joinGroupHandler(user, groupName, password, navigation)
-          }
+          onPress={async () => {
+            const result = await joinGroupHandler(user, groupName, password);
+            if (result == true && user.email) {
+              const fetchedUser = await fetchUserByEmail(user.email);
+              setUser(fetchedUser);
+              navigation.navigate('Home');
+            }
+          }}
           style={styles.createButton}
           color={colors.primary}
         >
@@ -66,12 +72,15 @@ export default function Groups({ navigation, route }) {
   );
 }
 
-const joinGroupHandler = async (user, group, password, navigation) => {
+const joinGroupHandler = async (user, group, password) => {
+  console.log(user);
   const joined = await addUserToGroup(user.email, group, password);
+
   if (joined == true) {
-    navigation.navigate('Home', { user: user });
+    return true;
   } else {
     console.log('join group failed');
+    return false;
   }
 };
 
