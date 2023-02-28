@@ -20,6 +20,7 @@ import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
 import { ActivityIndicator } from 'react-native-paper';
 import VisitNotes from '../components/visit/notes';
+import { cancelPushNotification } from '../services/notifications/schedule';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -128,6 +129,7 @@ export default function Visit({ route, navigation }) {
                     text: 'Confirm',
                     onPress: async () => {
                       setIsDropping(true);
+                      cancelPushNotification(visit.notification_identifier);
                       await deleteVisit(visit.visitId);
                       taskMutate();
                       refreshCalendar();

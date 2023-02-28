@@ -1,9 +1,10 @@
-import { addHours, addSeconds } from 'date-fns';
+import { addHours } from 'date-fns';
 import * as Notifications from 'expo-notifications';
 import { getDateFromDateString } from '../../utils/date';
+import { setVisitNotificationIdentifier } from '../api/visits';
 
-export async function schedulePushNotification(name, dateString) {
-  const date = addSeconds(new Date(), 9);
+export async function schedulePushNotification(visitId, name, dateString) {
+  const date = addHours(getDateFromDateString(dateString), 9);
 
   const identifier = await Notifications.scheduleNotificationAsync({
     content: {
@@ -13,4 +14,10 @@ export async function schedulePushNotification(name, dateString) {
     },
     trigger: date,
   });
+
+  await setVisitNotificationIdentifier(visitId, identifier);
+}
+
+export async function cancelPushNotification(identifier) {
+  await Notifications.cancelScheduledNotificationAsync(identifier);
 }

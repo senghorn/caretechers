@@ -32,23 +32,24 @@ export const volunteerForVisit = async (date, user) => {
   };
 
   try {
-    await fetch(`${config.backend_server}/visits/group/${user.group_id}`, {
+    const result = await fetch(`${config.backend_server}/visits/group/${user.group_id}`, {
       method: 'POST',
       headers,
       body: JSON.stringify(newVisit),
     });
+    const data = await result.json();
+    const visitId = data.insertId;
+    if (date && user.first_name !== null) {
+      schedulePushNotification(visitId, user.first_name, date);
+    }
   } catch (error) {
     console.log(error);
-  } finally {
-    if (date && user.first_name !== null) {
-      schedulePushNotification(user.first_name, date);
-    }
   }
 };
 
 export const setVisitNotificationIdentifier = async (visitId, identifier) => {
   try {
-    await axios.put(`${config.backend_server}/visits/${visitId}`, { identifier }, { headers });
+    await axios.put(`${config.backend_server}/visits/${visitId}/identifier`, { identifier }, { headers });
   } catch (error) {
     console.log(error);
   }
