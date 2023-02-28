@@ -18,6 +18,8 @@ router.delete('/:visitId', [visitsMiddleware.deleteVisit, sharedMiddleware.sendN
 
 router.post('/:visitId/record', [visitsMiddleware.recordVisit, sharedMiddleware.sendNoResult]);
 
+router.put('/:visitId/identifier', [visitsMiddleware.setVisitIdentifier, sharedMiddleware.sendNoResult]);
+
 module.exports = router;
 
 // SCHEMA DEFINITION

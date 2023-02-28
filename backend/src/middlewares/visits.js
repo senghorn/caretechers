@@ -21,6 +21,15 @@ module.exports.deleteVisit = asyncHandler(async (req, _res, next) => {
   next();
 });
 
+module.exports.setVisitIdentifier = asyncHandler(async (req, _res, next) => {
+  const { visitId } = req.params;
+
+  const query = sql`UPDATE Visits SET notification_identifier = ${req.body.identifier} WHERE id = ${visitId};`;
+
+  await db.query(query);
+  next();
+});
+
 module.exports.recordVisit = asyncHandler(async (req, _res, next) => {
   const { visitId } = req.params;
 
