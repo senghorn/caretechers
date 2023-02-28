@@ -1,5 +1,6 @@
 import axios from 'axios';
 import config from '../../constants/config';
+import { schedulePushNotification } from '../notifications/schedule';
 
 const headers = {
   'Content-Type': 'application/json',
@@ -31,11 +32,24 @@ export const volunteerForVisit = async (date, user) => {
   };
 
   try {
-    await fetch(`${config.backend_server}/visits/group/${user.group_id}`, {
+    const result = await fetch(`${config.backend_server}/visits/group/${user.group_id}`, {
       method: 'POST',
       headers,
       body: JSON.stringify(newVisit),
     });
+    const data = await result.json();
+    const visitId = data.insertId;
+    if (date && user.first_name !== null) {
+      schedulePushNotification(visitId, user.first_name, date);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const setVisitNotificationIdentifier = async (visitId, identifier) => {
+  try {
+    await axios.put(`${config.backend_server}/visits/${visitId}/identifier`, { identifier }, { headers });
   } catch (error) {
     console.log(error);
   }
