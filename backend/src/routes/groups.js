@@ -24,6 +24,12 @@ router.patch('/passreset/:groupId',[
 	sharedMiddleware.sendResult
 ]);
 
+router.get('/info/:groupId',[
+	groupMiddleware.checkIfGroupExists,
+	groupMiddleware.getGroupInfo,
+	sharedMiddleware.sendResult
+]);
+
 module.exports = router;
 
 // SCHEMA DEFINITION

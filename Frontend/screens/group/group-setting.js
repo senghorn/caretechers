@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   Alert,
+  Share,
 } from 'react-native';
 import {
   Appbar,
@@ -13,32 +14,57 @@ import {
   Divider,
   Text,
   TextInput,
+  ActivityIndicator,
 } from 'react-native-paper';
 import { useState, useEffect, useContext } from 'react';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
+import { resetGroupPassword } from '../../services/api/groups';
+import { RemoveUserFromGroup } from '../../services/api/user';
+import config from '../../constants/config';
+import useSWR from 'swr';
+
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function GroupSettings({ navigation }) {
+  const { user } = useContext(UserContext);
+  const { data, isLoading, error, mutate } = useSWR(
+    config.backend_server + '/groups/info/' + user.group_id,
+    fetcher
+  );
   const [showAlert, setShowAlert] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
-  const [members, setMembers] = useState([
-    { name: 'Seng Rith' },
-    { name: 'Aaron Heo' },
-  ]);
+  const [password, setPassword] = useState('');
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(isLoading);
   const [group, setGroup] = useState({
-    name: 'Misty Family',
-    password: 'secret1234',
-    timezone: 'America/Chicago',
+    name: '',
   });
-  const { user } = useContext(UserContext);
 
   useEffect(() => {
-    if (user && user.group_id) {
+    if (user != null && !isLoading && data) {
+      setMembers(data);
+      if (data.length > 0) {
+        setPassword(data[0].password);
+        setGroup({ name: data[0].name });
+      }
     }
-  }, [user]);
+    setLoading(isLoading);
+  }, [user, data, isLoading]);
+
+  const InviteToJoin = async () => {
+    console.log('sharing invitation link to other users!');
+  };
 
   const LeaveGroup = async () => {
-    console.log('user leaving group!');
+    if (user && user.email && user.group_id) {
+      const result = await RemoveUserFromGroup(user.email, user.group_id);
+      if (result == true) {
+        navigation.navigate('Group');
+      } else {
+        alert('Cannot leave group.');
+      }
+    }
   };
 
   const handleLeaveGroup = () => {
@@ -54,6 +80,25 @@ export default function GroupSettings({ navigation }) {
 
   const changeGroupNameHandler = () => {
     console.log('Change Group Name Pressed');
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `Join our caretaking group through CareCoord! Group Name:"${group.name}" and password: ${password} `,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -83,7 +128,7 @@ export default function GroupSettings({ navigation }) {
         <View style={styles.buttonList}>
           <TextInput
             secureTextEntry={passwordVisible}
-            value={group.password}
+            value={password}
             right={
               <TextInput.Icon
                 name={passwordVisible ? 'eye' : 'eye-off'}
@@ -93,14 +138,29 @@ export default function GroupSettings({ navigation }) {
             left={
               <TextInput.Icon
                 name={'lock-reset'}
-                onPress={() => {
-                  console.log('reset pass pressed');
+                onPress={async () => {
+                  if (user && user.group_id) {
+                    setLoading(true);
+                    const result = await resetGroupPassword(user.group_id);
+                    setPassword(result);
+                    setLoading(false);
+                  }
                 }}
               />
             }
             disabled
             style={styles.passwordBox}
           />
+          <View style={styles.buttonContainer}>
+            <IconButton
+              icon='account-plus'
+              size={28}
+              color={colors.primary}
+              style={styles.iconButton}
+              onPress={onShare}
+            />
+            <Text style={styles.buttonTitle}>Invite</Text>
+          </View>
           <View style={styles.buttonContainer}>
             <IconButton
               icon='exit-to-app'
@@ -112,6 +172,13 @@ export default function GroupSettings({ navigation }) {
             <Text style={styles.buttonTitle}>Leave</Text>
           </View>
         </View>
+        {loading && (
+          <ActivityIndicator
+            size='large'
+            color='#2196f3'
+            style={styles.loader}
+          />
+        )}
         <View style={styles.memberListBox}>
           <Text style={styles.membersTitle}>Members</Text>
           <GroupMemberList members={members} />
@@ -143,7 +210,7 @@ const GroupMemberList = ({ members }) => {
   return (
     <ScrollView style={styles.listContainer}>
       {members.map((member) => (
-        <MemberItem user={member} key={member.name} />
+        <MemberItem user={member} key={member.first_name} />
       ))}
     </ScrollView>
   );
@@ -156,8 +223,10 @@ const MemberItem = ({ user }) => {
   return (
     <View>
       <TouchableOpacity style={styles.memberItem} onPress={userPressedHandler}>
-        <Avatar.Image size={24} />
-        <Text style={styles.username}>{user.name}</Text>
+        <Avatar.Image size={24} source={{ uri: user.profile_pic }} />
+        <Text style={styles.username}>
+          {user.first_name + ' ' + user.last_name}
+        </Text>
       </TouchableOpacity>
       <Divider
         style={{
@@ -250,7 +319,7 @@ const styles = StyleSheet.create({
   },
   passwordBox: {
     margin: 10,
-    width: '70%',
+    width: '60%',
     alignSelf: 'center',
   },
 });

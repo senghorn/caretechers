@@ -1,21 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button, Appbar } from 'react-native-paper';
 import colors from '../../constants/colors';
 import { createNewGroup } from '../../services/api/groups';
 import { addUserToGroup } from '../../services/api/user';
+import UserContext from '../../services/context/UserContext';
 
 export default function CreateGroup({ navigation, route }) {
-  const { user } = route.params;
+  const { user } = useContext(UserContext);
   const [groupName, setGroupName] = useState('');
 
   useEffect(() => {
     if (user != null) {
-      if (user.given_name == null) {
-        setGroupName(user.first + ' ' + user.last + ' Family');
-      } else {
-        setGroupName(user.given_name + ' ' + user.family_name + ' Family');
-      }
+      setGroupName(user.given_name + ' ' + user.family_name + ' Family');
     }
   }, [user]);
 

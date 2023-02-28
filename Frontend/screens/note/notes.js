@@ -13,8 +13,12 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Notes({ navigation, route }) {
   const { user } = useContext(UserContext);
-  const { refresh, sort, searchMode, searchResult } = useContext(NotesRefreshContext);
-  const { data, isLoading, error, mutate } = useSWR(config.backend_server + '/notes/group/' + user.group_id, fetcher);
+  const { refresh, sort, searchMode, searchResult } =
+    useContext(NotesRefreshContext);
+  const { data, isLoading, error, mutate } = useSWR(
+    config.backend_server + '/notes/group/' + user.group_id,
+    fetcher
+  );
   const [refreshing, setRefreshing] = useState(false);
   const [notesList, setNotesList] = useState(null);
   const onRefresh = useCallback(async () => {
@@ -35,7 +39,9 @@ export default function Notes({ navigation, route }) {
       setNotesList(
         <ScrollView
           style={styles.tasksContainer}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         >
           {sortedNotes.map((note) => (
             <Note key={note.id} note={note} navigation={navigation} />
@@ -53,10 +59,16 @@ export default function Notes({ navigation, route }) {
     <Provider>
       <View style={styles.container}>
         <Header title={'Notes'} sort={true} navigation={navigation} />
-        {isLoading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
+        {isLoading && (
+          <ActivityIndicator
+            size='large'
+            color='#2196f3'
+            style={styles.loader}
+          />
+        )}
         {notesList}
         <FAB
-          icon="note-plus-outline"
+          icon='note-plus-outline'
           style={styles.fab}
           color={'white'}
           onPress={() => {
