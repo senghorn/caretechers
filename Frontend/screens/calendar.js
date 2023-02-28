@@ -25,6 +25,7 @@ import UserContext from '../services/context/UserContext';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import { getDateString } from '../utils/date';
 import RecordVisitPrompt from '../components/calendar/recordVisitPrompt';
+import { useRoute } from '@react-navigation/native';
 
 const DateToVisitsContext = createContext();
 
