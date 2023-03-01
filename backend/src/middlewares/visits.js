@@ -56,8 +56,8 @@ module.exports.getVisitsByDateRange = asyncHandler(async (req, _res, next) => {
   // TO-DO: validate variables
 
   const query = sql`SELECT DATE_FORMAT(Days.the_date, '%Y-%m-%d') AS date, COUNT(tasks.id) as taskCount, COUNT(completed_tasks.id) AS completedTaskCount,
-      visits.id AS visitId, visits.visitor, visits.visit_notes, IFNULL(visits.completed, 0) AS visitCompleted, users.first_name, users.last_name, users.phone_num AS phone,
-      users.profile_pic as profile_pic,
+      visits.id AS visitId, visits.visitor, visits.visit_notes, IFNULL(visits.completed, 0) AS visitCompleted, visits.notification_identifier,
+      users.first_name, users.last_name, users.phone_num AS phone, users.profile_pic as profile_pic,
       tasks.group_id as groupId, gr.name AS groupName, gr.timezone as timeZone
 
       FROM (SELECT DATE_SUB(${start}, INTERVAL 1 DAY) + INTERVAL (day) DAY AS the_date FROM Day_Indexes) Days
