@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/", [
     graphMiddleware.verifyCreateHealthGraph,
     graphMiddleware.createNewHealthGraph,
-    sharedMiddleware.sendNoResult,
+    sharedMiddleware.sendResult,
   ]);
 
   router.get("/:groupId", [

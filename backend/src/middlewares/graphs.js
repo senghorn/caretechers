@@ -12,7 +12,7 @@ module.exports.verifyCreateHealthGraph = asyncHandler(async (req, _res, next) =>
 		properties: {
             groupId: { type: 'number' },
 			title: { type: 'string' },
-			units: { type: 'string' }			
+			units: { type: 'string' }
 		},
 		required: ['groupId','title', 'units']
 	};
@@ -25,14 +25,15 @@ module.exports.verifyCreateHealthGraph = asyncHandler(async (req, _res, next) =>
 
 module.exports.createNewHealthGraph = asyncHandler(async (req, _res, next) => {
 	var query = sql`INSERT INTO HealthGraphs(group_id, title, units) VALUES(${req.body.groupId}, ${req.body.title}, ${req.body.units});`;
-	await db.query(query);
+	const result = await db.query(query);
+	req.result = {graphId: result.insertId};
 	next();
 });
 
 module.exports.getGraphsByGroupId = asyncHandler(async(req, _res, next) => {
 	const query = sql`SELECT HG.id, HG.title, HG.units, HM.measurement, HM.date FROM \`Groups\`
 						JOIN HealthGraphs HG on \`Groups\`.id = HG.group_id
-						JOIN HealthMeasurements HM on HG.id = HM.graph_id
+						LEFT JOIN HealthMeasurements HM on HG.id = HM.graph_id
 						WHERE Groups.id = ${req.params.groupId}
 						ORDER BY HG.id, HM.date DESC;`;
 
@@ -48,10 +49,12 @@ module.exports.getGraphsByGroupId = asyncHandler(async(req, _res, next) => {
 			}
 		}
 		if (!req.query.limit || graphs[row.id].data.length < parseInt(req.query.limit)) {
-			graphs[row.id].data.push({
-				timestamp: row.date,
-				measurement: parseFloat(row.measurement)
-			});
+			if(row.date && row.measurement) {
+				graphs[row.id].data.push({
+					timestamp: row.date,
+					measurement: parseFloat(row.measurement)
+				});
+			}
 		}
 	}
 
