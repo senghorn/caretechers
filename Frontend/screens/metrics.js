@@ -6,6 +6,7 @@ import colors from '../constants/colors';
 import { Button } from 'react-native-paper';
 import UserContext from '../services/context/UserContext';
 import Dialog from "react-native-dialog";
+import Header from '../components/healthVitals/header';
 const axios = require('axios').default;
 const config = require('../constants/config').default;
 
@@ -80,7 +81,10 @@ export default function Metrics({navigation}) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.titleBar}>
+    <Header navigation={navigation} />
+    
+
+      { /*<View style={styles.titleBar}>
         <Text onPress={getGraphs} style={styles.title}>Health Vitals</Text>
         <Button
           mode="contained"
@@ -92,9 +96,9 @@ export default function Metrics({navigation}) {
         >
         New Graph
       </Button>
-      </View>
+  </View> */}
 
-      <View>
+      { /*<View>
         <Dialog.Container visible={showCreateNewGraphDialogBox}>
         { newGraphLoading ? (
           <ActivityIndicator size="large" color="#2196f3" style={{marginBottom: '10%'}} />
@@ -111,8 +115,8 @@ export default function Metrics({navigation}) {
         )
         }
         </Dialog.Container>
-      </View>
-      {isLoading ? (
+      </View> */}
+      { /*isLoading ? (
           <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
         ) : 
         (
@@ -131,10 +135,9 @@ export default function Metrics({navigation}) {
           }
           </ScrollView>
         )
-      }
+        */}
+      </View>
       
-
-    </View>
   );
 }
 
@@ -142,7 +145,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    flexDirection: 'column'
   },
   title: {
     fontWeight: 'bold',
