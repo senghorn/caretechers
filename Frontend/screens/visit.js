@@ -99,7 +99,7 @@ export default function Visit({ route, navigation }) {
             </View>
           </TouchableHighlight>
         )}
-        {!isDropping && isVisitorToday && visit.date === getDateString(new Date()) && (
+        {!isDropping && isVisitorToday && visit && visit.date === getDateString(new Date()) && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {

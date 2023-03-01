@@ -1,6 +1,10 @@
 import config from '../../constants/config';
 
-const axios = require('axios').default;
+import axios from 'axios';
+
+const headers = {
+  'Content-Type': 'application/json',
+};
 
 /**
  * Sends create new user request to the backend server using the given
@@ -8,14 +12,7 @@ const axios = require('axios').default;
  * @return True : on success
  *         False: on error
  */
-export async function createUserWithGroup(
-  first,
-  last,
-  email,
-  phone,
-  group,
-  photo
-) {
+export async function createUserWithGroup(first, last, email, phone, group, photo) {
   try {
     const data = {
       email: email,
@@ -111,14 +108,7 @@ export async function addUserToGroup(email, groupId, password) {
   return false;
 }
 
-export async function UpdateUserData(
-  email,
-  first_name,
-  last_name,
-  phone,
-  group_id,
-  profile_pic
-) {
+export async function UpdateUserData(email, first_name, last_name, phone, group_id, profile_pic) {
   const data = {
     email: email,
     firstName: first_name,
@@ -160,4 +150,12 @@ export async function RemoveUserFromGroup(user_id, group_id) {
     console.log('remove user causes error', error.message);
   }
   return false;
+}
+
+export async function setUserNotificationIdentifier(userId, identifier) {
+  try {
+    await axios.put(`${config.backend_server}/user/${userId}/identifier`, { identifier }, { headers });
+  } catch (error) {
+    console.log(error);
+  }
 }

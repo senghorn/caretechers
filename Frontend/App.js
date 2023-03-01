@@ -7,7 +7,7 @@ import colors from './constants/colors';
 import { Asset } from 'expo-asset';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import { createRef, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -80,13 +80,9 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(expoPushToken);
-  }, [expoPushToken]);
-
   return (
     <NavigationContainer ref={navigationRef}>
-      <Navigation />
+      <Navigation expoPushToken={expoPushToken} />
       <StatusBar style="auto" />
     </NavigationContainer>
   );
