@@ -67,8 +67,7 @@ export default function Navigation({ expoPushToken }) {
   }, [groupId]);
 
   useEffect(() => {
-    if (expoPushToken && user && user.email) {
-      console.log('setting identifier');
+    if (user && user.email) {
       setUserNotificationIdentifier(user.email, expoPushToken);
     }
   }, [user, expoPushToken]);
