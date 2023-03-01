@@ -9,14 +9,6 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useRef, useState } from 'react';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
-
 async function registerForPushNotificationsAsync() {
   let token;
   if (Device.isDevice) {
@@ -60,6 +52,13 @@ export default function App() {
     require('./assets/caretaker.png'),
     require('./assets/blue-background.jpg'),
   ]);
+
+  Notifications.setNotificationHandler({
+    handleNotification: async (notification) => {
+      const samePage = notification.request.content.data.url === navigationRef.current?.getCurrentRoute().name;
+      return { shouldShowAlert: !samePage, shouldPlaySound: true, shouldSetBadge: true };
+    },
+  });
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
