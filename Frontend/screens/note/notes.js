@@ -8,17 +8,19 @@ import config from '../../constants/config';
 import UserContext from '../../services/context/UserContext';
 import useSWR from 'swr';
 import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
+import { SearchNotes } from '../../services/api/notes';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Notes({ navigation, route }) {
   const { user } = useContext(UserContext);
-  const { refresh, sort, searchMode, searchResult } =
-    useContext(NotesRefreshContext);
+  const { refresh, sort, searchMode } = useContext(NotesRefreshContext);
+  const [searchResult, setSearchResult] = useState([]);
   const { data, isLoading, error, mutate } = useSWR(
     config.backend_server + '/notes/group/' + user.group_id,
     fetcher
   );
+  const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [notesList, setNotesList] = useState(null);
   const onRefresh = useCallback(async () => {
@@ -55,10 +57,26 @@ export default function Notes({ navigation, route }) {
     mutate();
   }, [refresh]);
 
+  useEffect(() => {
+    if (searchQuery && searchQuery !== '') {
+      const search = async () => {
+        const result = await SearchNotes(searchQuery, user.group_id);
+        setSearchResult(result);
+      };
+
+      search();
+    }
+  }, [searchQuery]);
+
   return (
     <Provider>
       <View style={styles.container}>
-        <Header title={'Notes'} sort={true} navigation={navigation} />
+        <Header
+          title={'Notes'}
+          sort={true}
+          navigation={navigation}
+          setSearchQuery={setSearchQuery}
+        />
         {isLoading && (
           <ActivityIndicator
             size='large'

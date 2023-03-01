@@ -3,17 +3,44 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
 import Header from '../components/notes/header';
-import { FetchMessages, FetchUsers } from '../services/api/messages';
+import {
+  FetchMessages,
+  FetchUsers,
+  searchMessage,
+  uuidv4,
+} from '../services/api/messages';
 import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
+import useSWR from 'swr';
+import config from '../constants/config';
+
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Messages({ navigation }) {
   const [this_user, setThisUser] = useState(null);
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [displayMessages, setDisplayMessages] = useState([]);
   const [users, setUsers] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchMode, setSearchMode] = useState(false);
   const { user } = useContext(UserContext);
 
+  const { data, isLoading, error, mutate } = useSWR(
+    config.backend_server + '/messages/' + user.group_id,
+    fetcher
+  );
+
+  useEffect(() => {
+    if (!isLoading && data && users) {
+      const formatted = FormatMessagesForChat(users, data);
+      setMessages(formatted);
+      setDisplayMessages(formatted);
+    }
+  }, [data, isLoading, users]);
+
+  // Sets up user so GiftedChat recognize who this user is in order
+  // to display correctly
   useEffect(() => {
     if (user && !(Object.keys(user).length === 0)) {
       setThisUser({
@@ -27,6 +54,7 @@ export default function Messages({ navigation }) {
     }
   }, [user]);
 
+  // Fetch all the users in the group for their profile photos
   useEffect(() => {
     if (this_user) {
       FetchUsers(this_user.groupId, setUsers);
@@ -35,10 +63,24 @@ export default function Messages({ navigation }) {
   }, [this_user]);
 
   useEffect(() => {
-    if (users != null && this_user != null) {
-      FetchMessages(this_user.groupId, null, setMessages, users);
+    if (
+      searchQuery &&
+      searchQuery != '' &&
+      user &&
+      user.group_id &&
+      searchMode
+    ) {
+      const search = async () => {
+        const result = await searchMessage(user.group_id, searchQuery);
+        const formatted = FormatMessagesForChat(users, result);
+        setDisplayMessages(formatted);
+      };
+      search();
+    } else if (!searchMode) {
+      // Display normal messages if searching mode is off
+      setDisplayMessages(messages);
     }
-  }, [users]);
+  }, [searchQuery, searchMode]);
 
   useEffect(() => {
     if (socket) {
@@ -51,7 +93,9 @@ export default function Messages({ navigation }) {
       });
 
       socket.on('message', (msg) => {
-        setMessages((previousMessages) => GiftedChat.append(previousMessages, msg));
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, msg)
+        );
       });
 
       socket.on('disconnect', (reason) => {
@@ -100,12 +144,18 @@ export default function Messages({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header title={'Messages'} navigation={navigation} pin />
+      <Header
+        title={'Messages'}
+        navigation={navigation}
+        pin
+        setSearchQuery={setSearchQuery}
+        setSearchingMode={setSearchMode}
+      />
       <GiftedChat
         renderBubble={renderBubble}
         wrapInSafeArea={false}
         showUserAvatar={true}
-        messages={messages}
+        messages={displayMessages}
         renderUsernameOnMessage={true}
         onSend={(messages) => onMessageSend(messages)}
         user={this_user}
@@ -113,6 +163,7 @@ export default function Messages({ navigation }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -128,3 +179,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+
+const FormatMessagesForChat = (all_users, messages) => {
+  var formatted_messages = [];
+  if (all_users) {
+    messages.forEach(function (message) {
+      formatted_messages.push({
+        text: message.content,
+        createdAt: message.date_time,
+        _id: uuidv4(),
+        user: all_users[message.sender],
+      });
+    });
+  }
+  return formatted_messages;
+};
