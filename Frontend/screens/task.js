@@ -14,6 +14,7 @@ import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshConte
 import { getCurrentDateString, getDateFromDateString, getDateString } from '../utils/date';
 import VisitRefreshContext from '../services/context/VisitRefreshContext';
 import { getLabel, REPEAT_CODES } from '../utils/tasks';
+import RecordVisitContext from '../services/context/RecordVisitContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -46,6 +47,8 @@ export default function Task({ route, navigation }) {
   const [editStartDate, setEditStartDate] = useState(new Date());
   const [editRepeat, setEditRepeat] = useState(null);
   const [editRepeatTitle, setEditRepeatTitle] = useState(getLabel(REPEAT_CODES.NEVER, undefined));
+
+  const { visitTasks, setVisitTasks } = useContext(RecordVisitContext);
 
   useEffect(() => {
     if (!editMode) {
@@ -152,7 +155,6 @@ export default function Task({ route, navigation }) {
             color="#2196f3"
             icon={id === 'new' ? 'heart-plus' : 'content-save-all'}
             onPress={async () => {
-              console.log(editRepeat);
               const body = {
                 title: editTitle,
                 description: editDescription,
@@ -160,8 +162,6 @@ export default function Task({ route, navigation }) {
                 repeat_pattern: editRepeat,
                 groupId: user.group_id,
               };
-
-              console.log(body);
 
               await saveTask(
                 id,
@@ -174,7 +174,9 @@ export default function Task({ route, navigation }) {
                 refreshVisitTasks,
                 refreshCalendar,
                 refreshVisit,
-                navigation
+                navigation,
+                visitTasks,
+                setVisitTasks
               );
             }}
           >
@@ -201,7 +203,9 @@ const saveTask = async (
   refreshVisitTasks,
   refreshCalendar,
   refreshVisit,
-  navigation
+  navigation,
+  visitTasks,
+  setVisitTasks
 ) => {
   setLoading(true);
   const url =
@@ -223,6 +227,9 @@ const saveTask = async (
   } finally {
     tasksMutate();
     refreshCalendar();
+    const newVisitTasks = { ...visitTasks };
+    newVisitTasks[newId] = visitTasks[id] ? true : false;
+    setVisitTasks(newVisitTasks);
     if (id === 'new') {
       navigation.navigate('Home');
     } else {

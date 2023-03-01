@@ -7,15 +7,7 @@ import colors from './constants/colors';
 import { Asset } from 'expo-asset';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import { createRef, useEffect, useRef, useState } from 'react';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+import { useEffect, useRef, useState } from 'react';
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -61,6 +53,13 @@ export default function App() {
     require('./assets/blue-background.jpg'),
   ]);
 
+  Notifications.setNotificationHandler({
+    handleNotification: async (notification) => {
+      const samePage = notification.request.content.data.url === navigationRef.current?.getCurrentRoute().name;
+      return { shouldShowAlert: !samePage, shouldPlaySound: true, shouldSetBadge: true };
+    },
+  });
+
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
 
@@ -80,13 +79,9 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(expoPushToken);
-  }, [expoPushToken]);
-
   return (
     <NavigationContainer ref={navigationRef}>
-      <Navigation />
+      <Navigation expoPushToken={expoPushToken} />
       <StatusBar style="auto" />
     </NavigationContainer>
   );

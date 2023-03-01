@@ -1,49 +1,28 @@
-const express = require("express");
+const express = require('express');
 
-const userMiddleware = require("../middlewares/user");
-const sharedMiddleware = require("../middlewares/shared");
+const userMiddleware = require('../middlewares/user');
+const sharedMiddleware = require('../middlewares/shared');
 
 const router = express.Router();
 
-router.get("/:userId", [
-  userMiddleware.getUserByID,
-  sharedMiddleware.sendResult,
-]);
+router.get('/:userId', [userMiddleware.getUserByID, sharedMiddleware.sendResult]);
 
-router.post("/:userId/group", [
-  userMiddleware.verifyUserExists,
-  userMiddleware.addUserToGroup,
-  sharedMiddleware.sendNoResult,
-]);
+router.post('/:userId/group', [userMiddleware.verifyUserExists, userMiddleware.addUserToGroup, sharedMiddleware.sendNoResult]);
 
-router.post("/", [
-  userMiddleware.verifyCreateUserBody,
-  userMiddleware.createNewUser,
-  sharedMiddleware.sendNoResult,
-]);
+router.post('/', [userMiddleware.verifyCreateUserBody, userMiddleware.createNewUser, sharedMiddleware.sendNoResult]);
 
-router.get("/groupId/:userId", [
-  userMiddleware.getUserGroupByID,
-  sharedMiddleware.sendResult,
-]);
+router.get('/groupId/:userId', [userMiddleware.getUserGroupByID, sharedMiddleware.sendResult]);
 
-router.patch('/:userId', [
-	userMiddleware.verifyCreateUserBody,
-	userMiddleware.editUser,
-	sharedMiddleware.sendNoResult
-]);
+router.patch('/:userId', [userMiddleware.verifyCreateUserBody, userMiddleware.editUser, sharedMiddleware.sendNoResult]);
 
-router.delete('/:userId/:groupId', [
-	userMiddleware.removeUserFromGroup,
-	sharedMiddleware.sendNoResult
-]);
+router.delete('/:userId/:groupId', [userMiddleware.removeUserFromGroup, sharedMiddleware.sendNoResult]);
 
-
+router.put('/:userId/identifier', [userMiddleware.setUserNotificationIdentifier, sharedMiddleware.sendNoResult]);
 
 module.exports = router;
 
 // SCHEMA DEFINITION
-  /**
+/**
  * @swagger
  * components:
  *   schemas:
@@ -77,7 +56,7 @@ module.exports = router;
 
 // Route Definitions
 
-  /**
+/**
  * @swagger
  * tags:
  *   name: Users
@@ -85,7 +64,7 @@ module.exports = router;
  *   get:
  *     summary: Gets a user by their email
  *     tags: [Users]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: userId
  *         schema:
@@ -101,7 +80,7 @@ module.exports = router;
  *   patch:
  *     summary: Updates a users info
  *     tags: [Users]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: userId
  *         schema:
@@ -132,7 +111,7 @@ module.exports = router;
  *   post:
  *     summary: Add a user to a group
  *     tags: [Users]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: userId
  *         schema:
@@ -178,7 +157,7 @@ module.exports = router;
  *   get:
  *     summary: Gets a user to find their groupId
  *     tags: [Users]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: userId
  *         schema:
@@ -195,7 +174,7 @@ module.exports = router;
  *   delete:
  *     summary: Removes this user from their group
  *     tags: [Users]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: userId
  *         schema:

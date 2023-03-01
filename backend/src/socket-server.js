@@ -1,5 +1,6 @@
 const sql = require('sql-template-strings');
 const db = require('./database');
+const { sendNotificationsToGroup } = require('./notifications/sendNotifications');
 
 function CreateWebSocketServer(app) {
   // -------- Messaging Code ------------
@@ -22,6 +23,15 @@ function CreateWebSocketServer(app) {
 
       const query = sql`INSERT INTO Messages VALUES(${messageData.user._id}, ${messageData.createdAt}, ${messageData.text}, ${messageData.user.groupId})`;
       await db.query(query);
+      sendNotificationsToGroup(
+        messageData.user.groupId,
+        {
+          title: `${messageData.user.first_name} ${messageData.user.last_name}`,
+          body: messageData.text,
+          data: { url: 'Messages' },
+        },
+        [messageData.user._id]
+      );
     });
 
     socket.on('disconnect', (reason) => {

@@ -13,13 +13,14 @@ export default function Messages({ navigation }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState(null);
   const { user } = useContext(UserContext);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user && !(Object.keys(user).length === 0)) {
       setThisUser({
         _id: user.email,
-        name: user.first_name + user.last_name,
+        name: `${user.first_name} ${user.last_name}`,
+        first_name: user.first_name,
+        last_name: user.last_name,
         avatar: user.profile_pic,
         groupId: user.group_id,
       });
@@ -50,9 +51,7 @@ export default function Messages({ navigation }) {
       });
 
       socket.on('message', (msg) => {
-        setMessages((previousMessages) =>
-          GiftedChat.append(previousMessages, msg)
-        );
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, msg));
       });
 
       socket.on('disconnect', (reason) => {
