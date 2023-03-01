@@ -9,6 +9,8 @@ import Task from '../../screens/task';
 import Settings from '../../screens/settings';
 import UserAccount from '../../screens/user/user-account';
 import GroupSettings from '../../screens/group/group-setting';
+import Metrics from '../../screens/metrics';
+import EditGraph from '../../screens/editGraph';
 import { useEffect, useState } from 'react';
 import UserProvider from '../../services/providers/UserProvider';
 import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
@@ -114,14 +116,56 @@ export default function Navigation({ expoPushToken }) {
                         component={CreateGroup}
                         options={{ headerShown: false, gestureEnabled: false }}
                       />
-                      <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
-                      <Stack.Screen name="Record Visit" component={RecordVisit} options={{ headerShown: false }} />
-                      <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
-                      <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
-                      <Stack.Screen name="New Note" component={NewNote} options={{ headerShown: false }} />
-                      <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
-                      <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
-                      <Stack.Screen name="GroupSettings" component={GroupSettings} options={{ headerShown: false }} />
+                      <Stack.Screen
+                        name='Visit'
+                        component={Visit}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Record Visit'
+                        component={RecordVisit}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Task'
+                        component={Task}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Note'
+                        component={Note}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='New Note'
+                        component={NewNote}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Settings'
+                        component={Settings}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='UserAccount'
+                        component={UserAccount}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='GroupSettings'
+                        component={GroupSettings}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Metrics'
+                        component={Metrics}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='EditGraph'
+                        component={EditGraph}
+                        options={{ headerShown: false }}
+                      />
                     </Stack.Navigator>
                   </RecordVisitContext.Provider>
                 </NotesRefreshProvider>
