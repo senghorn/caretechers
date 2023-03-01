@@ -12,7 +12,9 @@ export default function Header({ navigation }) {
             navigation.navigate('Settings');
           }}
         />
-    	<Appbar.Content title="Tasks" titleStyle={styles.titleText} />
+        <Appbar.Content title="Metrics" titleStyle={styles.titleText} />
+        <Appbar.Action />
+        <Appbar.Action />
       </Appbar.Header>
     </View>
   );
@@ -33,7 +35,7 @@ const styles = StyleSheet.create({
     shadowColor: '#888',
     shadowOpacity: 0.1,
     zIndex: 999,
-	flex: 1,
+    flex: 0,
   },
   titleInput: {
     flexGrow: 1,
