@@ -24,6 +24,8 @@ import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import { getDateString } from '../utils/date';
+import RecordVisitPrompt from '../components/calendar/recordVisitPrompt';
+import { useRoute } from '@react-navigation/native';
 
 const DateToVisitsContext = createContext();
 
@@ -42,7 +44,7 @@ export default function Calendar({ navigation }) {
 
   const [resetScreen, setResetScreen] = useState(false);
 
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [, setRefreshCalendar] = useContext(CalendarRefreshContext);
 
@@ -83,24 +85,23 @@ export default function Calendar({ navigation }) {
   }, [currentDateDisplayed]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <Header date={currentDateDisplayed} setInitDate={setInitDate} navigation={navigation} />
-        <DateToVisitsContext.Provider value={dateToVisitsMap}>
-          {!resetScreen && (
-            <ScrollableScreen
-              renderingDataForFlatList={renderingDataForFlatList}
-              setRenderingDataForFlatList={setRenderingDataForFlatList}
-              createRenderingDataForFlatList={createRenderingDataForFlatList}
-              setCurrentDateDisplayed={setCurrentDateDisplayed}
-              resetScreen={resetScreen}
-              setResetScreen={setResetScreen}
-              navigation={navigation}
-            />
-          )}
-        </DateToVisitsContext.Provider>
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Header date={currentDateDisplayed} setInitDate={setInitDate} navigation={navigation} />
+      <DateToVisitsContext.Provider value={dateToVisitsMap}>
+        {!resetScreen && (
+          <ScrollableScreen
+            renderingDataForFlatList={renderingDataForFlatList}
+            setRenderingDataForFlatList={setRenderingDataForFlatList}
+            createRenderingDataForFlatList={createRenderingDataForFlatList}
+            setCurrentDateDisplayed={setCurrentDateDisplayed}
+            resetScreen={resetScreen}
+            setResetScreen={setResetScreen}
+            navigation={navigation}
+          />
+        )}
+      </DateToVisitsContext.Provider>
+      <RecordVisitPrompt navigation={navigation} />
+    </View>
   );
 }
 

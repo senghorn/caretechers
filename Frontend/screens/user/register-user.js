@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
-import { createUser } from '../../services/api/user';
+import { createUser, fetchUserByEmail } from '../../services/api/user';
+import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
 
 export default function Inputs({ route, navigation }) {
@@ -14,7 +15,7 @@ export default function Inputs({ route, navigation }) {
   const [userName, setUserName] = useState('');
   const [lastName, setLastName] = useState('');
   const [missLastName, setMissLastName] = useState(true);
-
+  const { setUser } = useContext(UserContext);
   useEffect(() => {
     if (user != undefined) {
       setUserName(user['given_name']);
@@ -79,15 +80,9 @@ export default function Inputs({ route, navigation }) {
         user['picture']
       );
       if (userCreated == true) {
-        navigation.navigate('Group', {
-          user: {
-            email: email,
-            last: userName,
-            first: lastName,
-            picture: user['picture'],
-            phone: phoneNumber,
-          },
-        });
+        const result = await fetchUserByEmail(email);
+        setUser(result);
+        navigation.navigate('Group');
       } else {
         console.log('user created unsuccessful');
       }
@@ -113,8 +108,8 @@ export default function Inputs({ route, navigation }) {
         onChangeText={handleNameChange}
         autoCorrect={false}
         error={nameMissing}
-        underlineColor='lightblue'
-        activeUnderlineColor='lightblue'
+        underlineColor='grey'
+        activeUnderlineColor='blue'
       />
       <TextInput
         right={<TextInput.Icon icon='account' />}
@@ -124,8 +119,8 @@ export default function Inputs({ route, navigation }) {
         onChangeText={handleLastNameChange}
         autoCorrect={false}
         error={missLastName}
-        underlineColor='lightblue'
-        activeUnderlineColor='lightblue'
+        underlineColor='grey'
+        activeUnderlineColor='blue'
       />
       <TextInput
         right={<TextInput.Icon icon='phone' />}
@@ -135,8 +130,8 @@ export default function Inputs({ route, navigation }) {
         value={phoneNumber}
         onChangeText={(text) => formatPhoneNumber(text)}
         error={phoneMissing}
-        underlineColor='lightblue'
-        activeUnderlineColor='lightblue'
+        underlineColor='grey'
+        activeUnderlineColor='blue'
       />
       <TouchableOpacity style={styles.submitButton} onPress={submit}>
         <Text style={styles.submitButtonText}> Join Caring Group </Text>
@@ -154,7 +149,7 @@ const styles = StyleSheet.create({
     margin: 12,
   },
   submitButton: {
-    backgroundColor: colors.lightBlue,
+    backgroundColor: colors.primary,
     padding: 10,
     margin: 15,
     marginTop: 30,

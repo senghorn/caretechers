@@ -1,64 +1,26 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
-import { View, StyleSheet, RefreshControl, ScrollView } from 'react-native';
-import { FAB, ActivityIndicator, IconButton } from 'react-native-paper';
+import { StyleSheet, RefreshControl, ScrollView, View } from 'react-native';
+import { FAB, ActivityIndicator, Provider } from 'react-native-paper';
 import Note from '../../components/notes/note';
 import COLORS from '../../constants/colors';
 import Header from '../../components/notes/header';
 import config from '../../constants/config';
 import UserContext from '../../services/context/UserContext';
-import { fetchNotes } from '../../services/api/notes';
 import useSWR from 'swr';
-import { RefreshContext } from '../../services/context/RefreshContext';
+import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-export default function Notes({ navigation }) {
-  // Grab user data from UserContext
+export default function Notes({ navigation, route }) {
   const { user } = useContext(UserContext);
-  const { refresh, sort } = useContext(RefreshContext);
-
+  const { refresh, sort, searchMode, searchResult } =
+    useContext(NotesRefreshContext);
   const { data, isLoading, error, mutate } = useSWR(
     config.backend_server + '/notes/group/' + user.group_id,
     fetcher
   );
-
-  useEffect(() => {
-    if (
-      user != null &&
-      !(Object.keys(user).length === 0) &&
-      !isLoading &&
-      data
-    ) {
-      if (sort != 'none') {
-        setNotes(sortNotesByTitle(data, sort));
-      } else {
-        setNotes(data);
-      }
-    }
-  }, [user, data, isLoading]);
-
-  useEffect(() => {
-    mutate();
-  }, [refresh]);
-
-  useEffect(() => {
-    if (notes && sort) {
-      setNotes(sortNotesByTitle(notes, sort == 'ascending'));
-    }
-  }, [sort, notes]);
-
-  const [notes, setNotes] = useState(null);
-  const [noteModified, setNoteModified] = useState(null);
-
-  useEffect(() => {
-    if (noteModified) {
-      fetchNotes(user, setNotes);
-      setNoteModified(null);
-    }
-  }, [noteModified]);
-
   const [refreshing, setRefreshing] = useState(false);
-
+  const [notesList, setNotesList] = useState(null);
   const onRefresh = useCallback(async () => {
     if (user != null && user !== {}) {
       setRefreshing(true);
@@ -67,61 +29,76 @@ export default function Notes({ navigation }) {
     }
   }, [user, mutate]);
 
+  useEffect(() => {
+    if (user != null && !isLoading && data) {
+      let notes = data;
+      if (searchMode && searchResult) {
+        notes = searchResult;
+      }
+      const sortedNotes = sortNotes(notes, sort);
+      setNotesList(
+        <ScrollView
+          style={styles.tasksContainer}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {sortedNotes.map((note) => (
+            <Note key={note.id} note={note} navigation={navigation} />
+          ))}
+        </ScrollView>
+      );
+    }
+  }, [user, data, isLoading, sort, searchMode, searchResult]);
+
+  useEffect(() => {
+    mutate();
+  }, [refresh]);
+
   return (
-    <View style={styles.container}>
-      <Header title={'Notes'} sort={true} navigation={navigation} />
-      <ScrollView
-        style={styles.tasksContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {isLoading || notes === null ? (
+    <Provider>
+      <View style={styles.container}>
+        <Header title={'Notes'} sort={true} navigation={navigation} />
+        {isLoading && (
           <ActivityIndicator
             size='large'
             color='#2196f3'
             style={styles.loader}
           />
-        ) : (
-          notes.map((note) => (
-            <Note key={note.id} note={note} navigation={navigation} />
-          ))
         )}
-      </ScrollView>
-      <FAB
-        icon='note-plus-outline'
-        style={styles.fab}
-        color={'white'}
-        onPress={() => {
-          navigation.navigate('Note', {
-            note: { id: 'new', title: '', content: '' },
-          });
-        }}
-      />
-    </View>
+        {notesList}
+        <FAB
+          icon='note-plus-outline'
+          style={styles.fab}
+          color={'white'}
+          onPress={() => {
+            navigation.navigate('New Note', {
+              note: { id: 'new', title: '', content: '' },
+            });
+          }}
+        />
+      </View>
+    </Provider>
   );
 }
-/**
- * Sorts the given notes and returns the sorted notes
- * @param {JSON} notes
- * @param {Boolean} ascending
- * @returns
- */
-function sortNotesByTitle(notes, ascending = true) {
-  // Sort the notes by title in ascending or descending order
-  notes.sort(function (a, b) {
-    var titleA = a.title.toUpperCase();
-    var titleB = b.title.toUpperCase();
-    if (titleA < titleB) {
-      return ascending ? -1 : 1;
-    }
-    if (titleA > titleB) {
-      return ascending ? 1 : -1;
-    }
-    return 0;
-  });
 
-  return notes;
+function sortNotes(notes, sortingType) {
+  switch (sortingType) {
+    case 'Ascending':
+      notes.sort((a, b) => a.title.localeCompare(b.title));
+      return notes;
+    case 'Descending':
+      notes.sort((a, b) => b.title.localeCompare(a.title));
+      return notes;
+    case 'Latest Date':
+      notes.sort((a, b) => new Date(b.last_edited) - new Date(a.last_edited));
+      return notes;
+    case 'Earliest Date':
+      notes.sort((a, b) => new Date(a.last_edited) - new Date(b.last_edited));
+      return notes;
+    default:
+      return notes;
+  }
 }
 
 const styles = StyleSheet.create({
@@ -129,28 +106,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  headerContainer: {
-    flexDirection: 'row',
-    flexBasis: 'auto',
-  },
-  box: {
-    elevation: 0,
-    borderWidth: 1,
-    borderColor: COLORS.grayLight,
-  },
   tasksContainer: {
     flex: 1,
     width: '100%',
     paddingHorizontal: 24,
     marginTop: 16,
-  },
-  createButton: {
-    marginVertical: 32,
-    width: '40%',
-    alignSelf: 'center',
-  },
-  createButtonText: {
-    fontSize: 14,
   },
   fab: {
     position: 'absolute',
@@ -158,5 +118,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: COLORS.primary,
+  },
+  loader: {
+    marginTop: 40,
   },
 });

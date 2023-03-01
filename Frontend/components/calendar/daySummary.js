@@ -1,11 +1,11 @@
-import { format, isBefore, isEqual, startOfDay } from 'date-fns';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { Text, View, StyleSheet, Animated, TouchableHighlight, Touchable, Image } from 'react-native';
+import { isBefore, isEqual, startOfDay } from 'date-fns';
+import { useContext, useEffect, useState } from 'react';
+import { Text, View, StyleSheet, TouchableHighlight, Image } from 'react-native';
+import colors from '../../constants/colors';
 import { DateToVisitsContext } from '../../screens/calendar';
-import { AntDesign } from '@expo/vector-icons';
-import UserContext from '../../services/context/UserContext';
-import config from '../../constants/config';
 import { getDateString } from '../../utils/date';
+import { FadeInView } from '../generic/FadeInView';
+import VolunteerButton from '../visit/volunteerButton';
 
 export default function DaySummary({
   date,
@@ -14,9 +14,9 @@ export default function DaySummary({
   visitInfoOverride = undefined,
   isLoadingOverride = true,
   errorOverride = false,
+  visitFirst = false,
 }) {
   const dateToVisitsMap = useContext(DateToVisitsContext);
-  const user = useContext(UserContext).user;
   const key = getDateString(date);
 
   const [isLoading, setIsLoading] = useState(isLoadingOverride);
@@ -74,27 +74,14 @@ export default function DaySummary({
   const inThePast = isBefore(date, new Date());
 
   if (!visitInfo.visitor && (!inThePast || isCurrentDay)) {
-    return (
-      <TouchableHighlight
-        onPress={() => {
-          volunteerForVisit(key, user);
-          setVisitInfo({ ...visitInfo, visitor: user.email, first_name: user.first_name, profile_pic: user.profile_pic });
-        }}
-        style={styles.buttonContainer}
-        underlayColor="#ededed"
-        disabled={false}
-      >
-        <View style={styles.volunteerButton}>
-          <AntDesign name="pluscircleo" size={16} color="#2196f3" />
-          <Text style={styles.volunteerButtonText}>{`Volunteer to Visit`}</Text>
-        </View>
-      </TouchableHighlight>
-    );
+    return <VolunteerButton visitFirst={visitFirst} date={key} />;
   }
 
   let colorStyle = styles.futureDayColor;
   if (visitInfo.visitor && visitInfo.completedTaskCount === visitInfo.taskCount && inThePast && visitInfo.visitCompleted)
     colorStyle = styles.completedDayColor;
+  else if (visitInfo.visitor && visitInfo.completedTaskCount !== visitInfo.taskCount && inThePast && visitInfo.visitCompleted)
+    colorStyle = styles.almostCompletedDayColor;
   else if (isCurrentDay) colorStyle = styles.currentDayColor;
   else if (!visitInfo.visitor || inThePast) colorStyle = styles.missedDayColor;
 
@@ -125,29 +112,6 @@ export default function DaySummary({
     </TouchableHighlight>
   );
 }
-
-const headers = {
-  'Content-Type': 'application/json',
-};
-
-const volunteerForVisit = async (date, user) => {
-  const newVisit = {
-    date,
-    userEmail: user.email,
-  };
-
-  try {
-    await fetch(`${config.backend_server}/visits/group/${user.group_id}`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(newVisit),
-    });
-  } catch (error) {
-    console.log(error);
-  } finally {
-    console.log('finished volunteering');
-  }
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -182,6 +146,9 @@ const styles = StyleSheet.create({
   completedDayColor: {
     backgroundColor: '#199b1e42',
   },
+  almostCompletedDayColor: {
+    backgroundColor: colors.lightYellow,
+  },
   nameText: {
     fontWeight: '600',
   },
@@ -192,60 +159,4 @@ const styles = StyleSheet.create({
     borderRadius: '100%',
     marginRight: 16,
   },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 0,
-    borderRadius: 8,
-  },
-  volunteerButton: {
-    width: '100%',
-    height: '100%',
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    borderColor: '#ededed',
-    borderWidth: 1,
-  },
-  volunteerButtonText: {
-    color: '#2196f3',
-    fontWeight: '500',
-    fontSize: 16,
-    marginLeft: 8,
-  },
 });
-
-const FadeInView = (props) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [fadeAnim]);
-
-  return (
-    <Animated.View // Special animatable View
-      style={{
-        ...props.style,
-        opacity: fadeAnim, // Bind opacity to animated value
-      }}
-    >
-      {props.children}
-    </Animated.View>
-  );
-};

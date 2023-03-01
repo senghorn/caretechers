@@ -1,18 +1,26 @@
-import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Linking, Alert } from 'react-native';
 import Header from '../components/visit/header';
 import useSWR from 'swr';
 import { format } from 'date-fns';
 import DaySummary from '../components/calendar/daySummary';
 import { AntDesign } from '@expo/vector-icons';
 import SectionSelector from '../components/visit/sectionSelector';
-import { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import Tasks from '../components/visit/tasks';
 
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshContext';
 import VisitRefreshContext from '../services/context/VisitRefreshContext';
-import { getDateFromDateString } from '../utils/date';
+import { getDateFromDateString, getDateString } from '../utils/date';
+import colors from '../constants/colors';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { deleteVisit } from '../services/api/visits';
+import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
+import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
+import { ActivityIndicator } from 'react-native-paper';
+import VisitNotes from '../components/visit/notes';
+import { cancelPushNotification } from '../services/notifications/schedule';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -22,10 +30,12 @@ export default function Visit({ route, navigation }) {
 
   const [selected, setSelected] = useState('Tasks');
 
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
   const [, setRefreshVisit] = useContext(VisitRefreshContext);
+
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
 
   const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
 
@@ -42,11 +52,17 @@ export default function Visit({ route, navigation }) {
 
   const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR(tasksURL, fetcher);
 
+  const { refreshTodaysVisitor } = useContext(TodaysVisitorContext);
+
+  const [isDropping, setIsDropping] = useState(false);
+
   useEffect(() => {
     setRefreshVisitTasks(() => taskMutate);
   }, [taskMutate]);
 
   const visit = visits && visits[0];
+
+  const { isVisitorToday } = useContext(TodaysVisitorContext);
 
   return (
     <View style={styles.container}>
@@ -59,10 +75,11 @@ export default function Visit({ route, navigation }) {
           visitInfoOverride={visit}
           errorOverride={visitError}
           isLoadingOverride={visitLoading}
+          visitFirst
         />
       </View>
       <View style={styles.messageContainer}>
-        {visit && (
+        {visit && visit.visitor && visit.visitor !== user.email && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
@@ -79,6 +96,68 @@ export default function Visit({ route, navigation }) {
             <View style={styles.messageButton}>
               <AntDesign name="message1" size={20} color="#199b1e" />
               <Text style={styles.messageButtonText}>Message {visit.first_name}</Text>
+            </View>
+          </TouchableHighlight>
+        )}
+        {!isDropping && isVisitorToday && visit.date === getDateString(new Date()) && (
+          <TouchableHighlight
+            underlayColor="#ededed"
+            onPress={async () => {
+              navigation.navigate('Record Visit');
+            }}
+            style={[styles.touchProperties, styles.marginRight]}
+          >
+            <View style={styles.recordButton}>
+              <MaterialCommunityIcons name="calendar-edit" size={16} color="green" />
+              <Text style={styles.recordButtonText}>Record Visit</Text>
+            </View>
+          </TouchableHighlight>
+        )}
+        {visit && visit.visitor === user.email && visit.date >= getDateString(new Date()) && (
+          <TouchableHighlight
+            underlayColor="#ededed"
+            onPress={async () => {
+              Alert.alert(
+                'Retract visit sign-up?',
+                'If so, you may want to ask another caretaker to pick up your slack', // <- this part is optional, you can pass an empty string
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Confirm',
+                    onPress: async () => {
+                      setIsDropping(true);
+                      cancelPushNotification(visit.notification_identifier);
+                      await deleteVisit(visit.visitId);
+                      taskMutate();
+                      refreshCalendar();
+                      refreshTodaysVisitor();
+                      await visitMutate();
+                      setIsDropping(false);
+                    },
+                    style: 'destructive',
+                  },
+                ],
+                {
+                  cancelable: true,
+                }
+              );
+            }}
+            style={styles.touchProperties}
+          >
+            <View style={styles.cancelButton}>
+              {isDropping ? (
+                <Fragment>
+                  <ActivityIndicator color={colors.danger} size="small" />
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <MaterialCommunityIcons name="trash-can" size={16} color={colors.danger} />
+                  <Text style={styles.cancelButtonText}>Drop Visit</Text>
+                </Fragment>
+              )}
             </View>
           </TouchableHighlight>
         )}
@@ -99,9 +178,9 @@ export default function Visit({ route, navigation }) {
         />
       )}
       {selected === 'Notes' && (
-        <ScrollView style={styles.visitNotesContainer}>
-          <Text style={styles.visitNotes}>{visit.visit_notes}</Text>
-        </ScrollView>
+        <View style={styles.visitNotesContainer}>
+          <VisitNotes editMode={false} editContent={visit.visit_notes} />
+        </View>
       )}
     </View>
   );
@@ -113,12 +192,10 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   visitNotesContainer: {
-    backgroundColor: '#ededed',
+    flex: 1,
     marginHorizontal: 16,
-    marginTop: 10,
-    padding: 12,
-    borderRadius: 8,
     marginBottom: 40,
+    backgroundColor: 'red',
   },
   visitNotes: {
     fontSize: 14,
@@ -166,5 +243,40 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#199b1e',
+  },
+  cancelButton: {
+    flex: 0,
+    height: 32,
+    width: 120,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+  },
+  cancelButtonText: {
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.danger,
+  },
+  recordButton: {
+    flex: 0,
+    height: 32,
+    width: 120,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#199b1e42',
+  },
+  recordButtonText: {
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'green',
+  },
+  marginRight: {
+    marginRight: 16,
   },
 });

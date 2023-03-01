@@ -1,23 +1,30 @@
 import { StyleSheet, View, Text } from 'react-native';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { TextInput } from 'react-native-paper';
 import { Appbar } from 'react-native-paper';
-import { RefreshContext } from '../../services/context/RefreshContext';
+import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
+import SortAction from '../generic/sortAction';
+import colors from '../../constants/colors';
+import { SearchNotes } from '../../services/api/notes';
+import UserContext from '../../services/context/UserContext';
+
 
 export default function Header({ navigation, route, title, sort, pin = false }) {
-  // Sort drop down values
-  const data = [
-    { label: 'Date', value: '1' },
-    { label: 'Alphabets', value: '2' },
-    { label: 'Relevant', value: '3' },
-  ];
+  const SORT_LABELS = {
+    ascending: 'Ascending',
+    descending: 'Descending',
+    latest_date: 'Latest Date',
+    earliest_date: 'Earliest Date'
+  };
+  const sortOptions = Object.values(SORT_LABELS).map((value) => {
+    return { label: value, value };
+  });
 
-  const { sortRefresh } = useContext(RefreshContext);
-
-  // If true, sorts the notes ascending lexicographical order, otherwise descending
-  const [sortAscending, sortSortAscending] = useState(true);
+  const { sortRefresh, setSearchResult, setSearchMode } = useContext(NotesRefreshContext);
+  const { user } = useContext(UserContext);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchMode, setSearchMode] = useState(false);
+  const [iconSearchMode, setIconSearchMode] = useState(false);
+
   return (
     <View>
       <Appbar.Header style={styles.headerContainer}>
@@ -27,7 +34,7 @@ export default function Header({ navigation, route, title, sort, pin = false }) 
             navigation.navigate('Settings');
           }}
         />
-        {searchMode ? (
+        {iconSearchMode ? (
           <TextInput
             style={styles.titleInput}
             label="Search"
@@ -36,39 +43,30 @@ export default function Header({ navigation, route, title, sort, pin = false }) 
               setSearchQuery(text);
               console.log(text);
             }}
-            onEndEditing={() => {
-              console.log('Search queried of text:', searchQuery);
+            onEndEditing={async () => {
+              if (user && user.group_id) {
+                const result = await SearchNotes(searchQuery, user.group_id);
+                setSearchResult(result);
+              }
             }}
+            autoFocus
+            activeOutlineColor={colors.primary}
             mode="outlined"
           />
         ) : (
           <Appbar.Content title={title} titleStyle={styles.title} />
         )}
-        {searchMode ? (
-          <Appbar.Action
-            icon="close"
-            onPress={() => {
-              setSearchMode(false);
-            }}
-          />
-        ) : (
-          <Appbar.Action
-            icon="magnify"
-            onPress={() => {
-              setSearchMode(true);
-            }}
-          />
+        {!iconSearchMode && sort && (
+          <SortAction sortOptions={sortOptions} setSort={sortRefresh} />
         )}
-        {!searchMode && sort && (
-          <Appbar.Action
-            icon={'sort-alphabetical-variant'}
-            onPress={() => {
-              sortSortAscending(!sortAscending);
-              sortRefresh(sortAscending ? 'ascending' : 'descending');
-            }}
-          />
-        )}
-        {!searchMode && pin && (
+        <Appbar.Action
+          icon={iconSearchMode ? "close" : "magnify"}
+          onPress={() => {
+            setIconSearchMode(!iconSearchMode);
+            setSearchMode(!iconSearchMode);
+          }}
+        />
+        {!iconSearchMode && pin && (
           <Appbar.Action
             icon="pin"
             onPress={() => {
@@ -85,6 +83,12 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 0,
     backgroundColor: '#fff',
+  },
+  outerContainer: {
+    shadowOffset: { width: 0, height: -10 },
+    shadowColor: '#888',
+    shadowOpacity: 0.1,
+    zIndex: 999,
   },
   title: {
     fontWeight: '500',

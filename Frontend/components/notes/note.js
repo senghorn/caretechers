@@ -1,30 +1,28 @@
-import { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import COLORS from '../../constants/colors';
+import RenderHTML from 'react-native-render-html';
+
+const width = Dimensions.get('window').width;
 
 const Note = ({ navigation, route, note }) => {
   return (
     <TouchableOpacity
       style={styles.note}
       onPress={() => {
-        navigation.navigate('Note', {
+        navigation.navigate('New Note', {
           note: note,
         });
       }}
     >
       <View style={styles.titleContainer}>
         <Text style={styles.title}>
-          {note.title && note.title.length > 15
-            ? note.title.substring(0, 15) + '...'
-            : note.title}
+          {note.title && note.title.length > 15 ? note.title.substring(0, 15) + '...' : note.title}
         </Text>
         <Text style={styles.timeText}>{formatDate(note.last_edited)}</Text>
       </View>
-      <Text style={styles.content}>
-        {note.content && note.content.length > 45
-          ? note.content.substring(0, 45) + ' ...'
-          : note.content}
-      </Text>
+      <View style={styles.htmlRenderer}>
+        <RenderHTML source={{ html: note.content }} contentWidth={width} />
+      </View>
     </TouchableOpacity>
   );
 };
@@ -35,7 +33,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     borderWidth: 1.2,
     borderColor: COLORS.gray,
-    backgroundColor: COLORS.grayLight,
+    backgroundColor: COLORS.lighterYellow,
     borderRadius: 8,
     borderStyle: 'dashed',
   },
@@ -55,6 +53,10 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontSize: 12,
   },
+  htmlRenderer: {
+    maxHeight: 40,
+    overflow: 'hidden',
+  },
 });
 
 export default Note;
@@ -62,20 +64,7 @@ export default Note;
 function formatDate(dateString) {
   const date = new Date(dateString);
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const monthsOfYear = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  const monthsOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const dayOfWeek = daysOfWeek[date.getDay()];
   const month = monthsOfYear[date.getMonth()];

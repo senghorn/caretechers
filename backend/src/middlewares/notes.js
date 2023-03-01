@@ -82,16 +82,15 @@ module.exports.deleteNote = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.getNotesBySearchString = asyncHandler(async (req, _res, next) => {
-	const search = '%' + req.body.searchString + '%';
+	const search = '%' + req.params.searchString + '%';
 	const query = sql`SELECT * FROM Notes WHERE (title LIKE ${search} OR content LIKE ${search})
 	AND group_id = ${req.params.groupId}`;
 	req.result = await db.query(query);
 	next();
-	next();
 });
 
 module.exports.checkIfSearchIsValid = asyncHandler(async (req, _res, next) => {
-	if (!req.body.searchString) {
+	if (!req.params.searchString) {
 		return next(newError('Search string needs to be provided', 400));
 	}
 	next();

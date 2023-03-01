@@ -48,7 +48,7 @@ export default function Settings({ navigation, route }) {
               <AntDesign
                 name='phone'
                 size={20}
-                color={colors.orange}
+                color={colors.primary}
                 style={styles.infoIcon}
               />
               <Text style={styles.phone}>{phone}</Text>
@@ -57,7 +57,7 @@ export default function Settings({ navigation, route }) {
               <AntDesign
                 name='mail'
                 size={20}
-                color={colors.orange}
+                color={colors.primary}
                 style={styles.infoIcon}
               />
               <Text style={styles.phone}>{email}</Text>
@@ -108,7 +108,7 @@ export default function Settings({ navigation, route }) {
                 {notificationOn ? 'On' : 'Off'}
               </Text>
               <Switch
-                color={colors.orange}
+                color={colors.primary}
                 value={notificationOn}
                 onValueChange={() => {
                   setNotificationOn(!notificationOn);
@@ -125,7 +125,7 @@ export default function Settings({ navigation, route }) {
             <View style={styles.switchLabel}>
               <Text style={styles.switchValue}>{darkOn ? 'On' : 'Off'}</Text>
               <Switch
-                color={colors.orange}
+                color={colors.primary}
                 value={darkOn}
                 onValueChange={() => {
                   setDarkOn(!darkOn);
@@ -134,20 +134,20 @@ export default function Settings({ navigation, route }) {
             </View>
           </View>
         </View>
-        <Button
-          mode='contained'
-          uppercase={true}
-          color={colors.pinkishRed}
-          icon='logout'
-          style={styles.logout}
-          labelStyle={styles.logoutButtonText}
-          onPress={() => {
-            console.log('Log out pressed');
-          }}
-        >
-          Logout
-        </Button>
       </ScrollView>
+      <Button
+        mode='contained'
+        uppercase={true}
+        color={colors.pinkishRed}
+        icon='logout'
+        style={styles.logout}
+        labelStyle={styles.logoutButtonText}
+        onPress={() => {
+          console.log('Log out pressed');
+        }}
+      >
+        Logout
+      </Button>
     </View>
   );
 }
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   logout: {
-    marginTop: '50%',
+    bottom: 0,
     height: 50,
     alignContent: 'center',
     justifyContent: 'center',

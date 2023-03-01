@@ -12,6 +12,43 @@ module.exports.createVisit = asyncHandler(async (req, _res, next) => {
   next();
 });
 
+module.exports.deleteVisit = asyncHandler(async (req, _res, next) => {
+  const { visitId } = req.params;
+
+  const query = sql`DELETE FROM Visits WHERE id=${visitId}`;
+
+  await db.query(query);
+  next();
+});
+
+module.exports.setVisitIdentifier = asyncHandler(async (req, _res, next) => {
+  const { visitId } = req.params;
+
+  const query = sql`UPDATE Visits SET notification_identifier = ${req.body.identifier} WHERE id = ${visitId};`;
+
+  await db.query(query);
+  next();
+});
+
+module.exports.recordVisit = asyncHandler(async (req, _res, next) => {
+  const { visitId } = req.params;
+
+  const tasksQuery = sql``;
+
+  req.body.tasks.forEach((task) => {
+    tasksQuery.append(`INSERT IGNORE INTO Tasks (meta_id, occurence_date, completed, visit_id)
+                        VALUES (${task}, '${req.body.date}', 1, ${visitId});`);
+  });
+
+  await db.query(tasksQuery);
+
+  const completeVisitQuery = sql`UPDATE Visits SET completed = 1, visit_notes = ${req.body.notes} WHERE id=${visitId};`;
+
+  await db.query(completeVisitQuery);
+
+  next();
+});
+
 module.exports.getVisitsByDateRange = asyncHandler(async (req, _res, next) => {
   const { groupId } = req.params;
   const { start, end } = req.query;
@@ -19,8 +56,8 @@ module.exports.getVisitsByDateRange = asyncHandler(async (req, _res, next) => {
   // TO-DO: validate variables
 
   const query = sql`SELECT DATE_FORMAT(Days.the_date, '%Y-%m-%d') AS date, COUNT(tasks.id) as taskCount, COUNT(completed_tasks.id) AS completedTaskCount,
-      visits.id AS visitId, visits.visitor, visits.visit_notes, IFNULL(visits.completed, 0) AS visitCompleted, users.first_name, users.last_name, users.phone_num AS phone,
-      users.profile_pic as profile_pic,
+      visits.id AS visitId, visits.visitor, visits.visit_notes, IFNULL(visits.completed, 0) AS visitCompleted, visits.notification_identifier,
+      users.first_name, users.last_name, users.phone_num AS phone, users.profile_pic as profile_pic,
       tasks.group_id as groupId, gr.name AS groupName, gr.timezone as timeZone
 
       FROM (SELECT DATE_SUB(${start}, INTERVAL 1 DAY) + INTERVAL (day) DAY AS the_date FROM Day_Indexes) Days
