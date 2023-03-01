@@ -41,7 +41,7 @@ export async function RemoveNote(noteId) {
     let connection_string = config.backend_server + '/notes/';
     axios
       .delete(connection_string + noteId)
-      .then((response) => { })
+      .then((response) => {})
       .catch((error) => {
         console.log(error);
       });
@@ -69,16 +69,15 @@ export async function CreateNote(newNote, group_id) {
   }
 }
 
-
 export async function SearchNotes(search_string, group_id) {
-
   try {
-    let url = config.backend_server + `/notes/search/${group_id}/${search_string}`;
+    let url =
+      config.backend_server + `/notes/search/${group_id}/${search_string}`;
     const result = await fetch(url);
     const data = await result.json();
     return data;
   } catch (error) {
-    console.log("Search note threw an error: ", error.message);
+    console.log('Search note threw an error: ', error.message);
     return null;
   }
 }
