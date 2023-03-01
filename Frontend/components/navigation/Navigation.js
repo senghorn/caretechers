@@ -9,6 +9,8 @@ import Task from '../../screens/task';
 import Settings from '../../screens/settings';
 import UserAccount from '../../screens/user/user-account';
 import GroupSettings from '../../screens/group/group-setting';
+import Metrics from '../../screens/metrics';
+import EditGraph from '../../screens/editGraph';
 import { useEffect, useState } from 'react';
 import UserProvider from '../../services/providers/UserProvider';
 import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
@@ -177,6 +179,16 @@ export default function Navigation() {
                       <Stack.Screen
                         name='GroupSettings'
                         component={GroupSettings}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='Metrics'
+                        component={Metrics}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='EditGraph'
+                        component={EditGraph}
                         options={{ headerShown: false }}
                       />
                     </Stack.Navigator>
