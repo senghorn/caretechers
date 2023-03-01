@@ -1,25 +1,24 @@
 import { View, Text, StyleSheet, ScrollView, Dimensions, Alert } from 'react-native';
-import { useState, useEffect, useContext} from 'react';
-import Graph from '../components/healthVitals/graph'
-import { ActivityIndicator } from 'react-native-paper';
+import { useState, useEffect, useContext } from 'react';
+import Graph from '../components/healthVitals/graph';
+import { ActivityIndicator, FAB } from 'react-native-paper';
 import colors from '../constants/colors';
 import { Button } from 'react-native-paper';
 import UserContext from '../services/context/UserContext';
-import Dialog from "react-native-dialog";
+import Dialog from 'react-native-dialog';
 import Header from '../components/healthVitals/header';
 const axios = require('axios').default;
 const config = require('../constants/config').default;
 
-export default function Metrics({navigation}) {
-
+export default function Metrics({ navigation }) {
   const [showCreateNewGraphDialogBox, setShowCreateNewGraphDialogBox] = useState(false);
   const [graphs, setGraphs] = useState({});
   const [newTitle, setNewTitle] = useState(null);
   const [newUnits, setNewUnits] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [newGraphLoading, setNewGraphLoading] = useState(false);
-  
-  const {user} = useContext(UserContext);
+
+  const { user } = useContext(UserContext);
 
   const formatDate = (timestamp) => {
     return timestamp.slice(5).replace('-', '/');
@@ -27,7 +26,7 @@ export default function Metrics({navigation}) {
 
   const createNewGraph = async () => {
     if (newTitle === null || newUnits === null) {
-      Alert.alert('Error', 'Title and units required!', [{text: 'OK', onPress: () => console.log('OK Pressed')}]);
+      Alert.alert('Error', 'Title and units required!', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
       return;
     }
     let graphId;
@@ -37,7 +36,7 @@ export default function Metrics({navigation}) {
       const response = await axios.post(connection_string, {
         groupId: user.group_id,
         title: newTitle,
-        units: newUnits
+        units: newUnits,
       });
       graphId = parseInt(response.data.graphId);
     } catch (e) {
@@ -46,17 +45,17 @@ export default function Metrics({navigation}) {
     }
 
     let graphsCopy = JSON.parse(JSON.stringify(graphs));
-    graphsCopy[graphId]= {
+    graphsCopy[graphId] = {
       title: newTitle,
       units: newUnits,
-      data:[]
+      data: [],
     };
     setGraphs(graphsCopy);
     setShowCreateNewGraphDialogBox(false);
     setNewTitle(null);
     setNewUnits(null);
     setNewGraphLoading(false);
-  }
+  };
 
   const getGraphs = async () => {
     let connection_string = config.backend_server + '/graphs/' + user.group_id + '?limit=7';
@@ -76,68 +75,59 @@ export default function Metrics({navigation}) {
   };
 
   useEffect(() => {
-    getGraphs()
+    getGraphs();
   }, []);
 
   return (
     <View style={styles.container}>
-    <Header navigation={navigation} />
-    
-
-      { /*<View style={styles.titleBar}>
-        <Text onPress={getGraphs} style={styles.title}>Health Vitals</Text>
-        <Button
-          mode="contained"
-          uppercase={false}
-          color="#2196f3"
-          icon="plus-circle-outline"
-          title="New Graph"
-          onPress={() => setShowCreateNewGraphDialogBox(true)}
-        >
-        New Graph
-      </Button>
-  </View> */}
-
-      { /*<View>
+      <Header navigation={navigation} />
+      <View>
         <Dialog.Container visible={showCreateNewGraphDialogBox}>
-        { newGraphLoading ? (
-          <ActivityIndicator size="large" color="#2196f3" style={{marginBottom: '10%'}} />
-        ) : (
-          <>
-            <Dialog.Title style={{marginBottom: '10%'}}>Create a new graph</Dialog.Title>
-            <Dialog.Input placeholder='Title' onChangeText={(newTitle) => setNewTitle(newTitle)}/>
-            <Dialog.Input placeholder='Units' onChangeText={(newUnits) => setNewUnits(newUnits)}/>
-            <View style={{display: 'flex', flexDirection: 'row'}}>
-              <Dialog.Button label="Cancel" onPress={() => setShowCreateNewGraphDialogBox(false)}/>
-              <Dialog.Button label="Save" onPress={() => createNewGraph()}/>
-            </View>
-          </>
-        )
-        }
+          {newGraphLoading ? (
+            <ActivityIndicator size="large" color="#2196f3" style={{ marginBottom: '10%' }} />
+          ) : (
+            <>
+              <Dialog.Title style={{ marginBottom: '10%' }}>Create a new graph</Dialog.Title>
+              <Dialog.Input placeholder="Title" onChangeText={(newTitle) => setNewTitle(newTitle)} />
+              <Dialog.Input placeholder="Units" onChangeText={(newUnits) => setNewUnits(newUnits)} />
+              <View style={{ display: 'flex', flexDirection: 'row' }}>
+                <Dialog.Button label="Cancel" onPress={() => setShowCreateNewGraphDialogBox(false)} />
+                <Dialog.Button label="Save" onPress={() => createNewGraph()} />
+              </View>
+            </>
+          )}
         </Dialog.Container>
-      </View> */}
-      { /*isLoading ? (
-          <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
-        ) : 
-        (
-          <ScrollView>
-          {
-            Object.keys(graphs).map(key => <Graph
-                                        key={key}
-                                        id={key}
-                                        title={graphs[key].title}
-                                        units={graphs[key].units}
-                                        labels={graphs[key].data.map(data => formatDate(data.timestamp))}
-                                        data={graphs[key].data.map(data => data.measurement)}
-                                        navigation={navigation}
-                                        getGraphs={getGraphs}
-                                      />)
-          }
-          </ScrollView>
-        )
-        */}
       </View>
-      
+
+      <View style={styles.scrollContainer}>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
+        ) : (
+          <ScrollView>
+            {Object.keys(graphs).map((key) => (
+              <Graph
+                key={key}
+                id={key}
+                title={graphs[key].title}
+                units={graphs[key].units}
+                labels={graphs[key].data.map((data) => formatDate(data.timestamp))}
+                data={graphs[key].data.map((data) => data.measurement)}
+                navigation={navigation}
+                getGraphs={getGraphs}
+              />
+            ))}
+          </ScrollView>
+        )}
+      </View>
+      <FAB
+        icon="chart-box-plus-outline"
+        style={styles.fab}
+        color="#fff"
+        onPress={() => {
+          setShowCreateNewGraphDialogBox(true);
+        }}
+      />
+    </View>
   );
 }
 
@@ -145,7 +135,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    flexDirection: 'column'
+    flexDirection: 'column',
+  },
+  scrollContainer: {
+    backgroundColor: '#fff',
+    flex: 1,
+    marginTop: 16,
   },
   title: {
     fontWeight: 'bold',
@@ -163,5 +158,16 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: colors.card,
-  }
+  },
+  loader: {
+    height: '100%',
+    transform: [{ translateY: -16 }],
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.primary,
+  },
 });
