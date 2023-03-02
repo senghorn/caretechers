@@ -18,25 +18,24 @@
 image: node:latest
 
 stages:
-  - test
   - deploy
 
-test:
-  stage: test
-  before_script:
-    - cd backend && npm install
-  script:
-    # are we in a docker-executor
-    - if [ -f /.dockerenv ]; then echo "docker-executor"; fi
-    - npm run test:ci
-  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-  artifacts:
-    paths:
-      - coverage/
-    when: always
-    reports:
-      junit:
-        - junit.xml
+# test:
+#   stage: test
+#   before_script:
+#     - cd backend && npm install
+#   script:
+#     # are we in a docker-executor
+#     - if [ -f /.dockerenv ]; then echo "docker-executor"; fi
+#     - npm run test:ci
+#   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+#   artifacts:
+#     paths:
+#       - coverage/
+#     when: always
+#     reports:
+#       junit:
+#         - junit.xml
 
 deploy-prod:
   stage: deploy

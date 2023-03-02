@@ -30,7 +30,7 @@ export default function ViewSetter({ setFilter }) {
         <MenuItemWrapper label="All Tasks" setLabel={setLabel} closeMenu={closeMenu} value={null} setValue={setFilter} />
         <Divider />
         <MenuItemWrapper
-          label="Solo Tasks"
+          label="Non-Repeating Tasks"
           setLabel={setLabel}
           closeMenu={closeMenu}
           value={REPEAT_CODES.NEVER}
