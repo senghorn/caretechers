@@ -35,12 +35,14 @@ module.exports.recordVisit = asyncHandler(async (req, _res, next) => {
 
   const tasksQuery = sql``;
 
-  req.body.tasks.forEach((task) => {
-    tasksQuery.append(`INSERT IGNORE INTO Tasks (meta_id, occurence_date, completed, visit_id)
-                        VALUES (${task}, '${req.body.date}', 1, ${visitId});`);
-  });
+  if (req.body.tasks && req.body.tasks.length > 0) {
+    req.body.tasks.forEach((task) => {
+      tasksQuery.append(`INSERT IGNORE INTO Tasks (meta_id, occurence_date, completed, visit_id)
+                          VALUES (${task}, '${req.body.date}', 1, ${visitId});`);
+    });
 
-  await db.query(tasksQuery);
+    await db.query(tasksQuery);
+  }
 
   const completeVisitQuery = sql`UPDATE Visits SET completed = 1, visit_notes = ${req.body.notes} WHERE id=${visitId};`;
 

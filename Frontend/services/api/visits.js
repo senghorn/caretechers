@@ -9,6 +9,7 @@ const headers = {
 export const recordVisit = async (visitId, date, completedTasks, notes) => {
   try {
     const tasks = Object.keys(completedTasks).filter((taskId) => completedTasks[taskId]);
+    console.log(tasks, notes, date);
     await axios.post(`${config.backend_server}/visits/${visitId}/record`, { tasks, notes, date }, { headers });
   } catch (error) {
     console.log(error);
