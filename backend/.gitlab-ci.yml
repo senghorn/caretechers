@@ -16,6 +16,22 @@
 #     - echo "which simulates a test that runs 20 seconds longer than test-job1"
 #     - sleep 20
 
+test:
+  image: node:latest
+  stage: test
+  before_script:
+    - npm install
+  script:
+    - npm run test:ci
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  artifacts:
+    paths:
+      - coverage/
+    when: always
+    reports:
+      junit:
+        - junit.xml
+
 deploy-prod:
   stage: deploy
   script:
@@ -30,4 +46,3 @@ deploy-prod:
     - if: '$CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH'
       when: never
     - if: '$CI_COMMIT_TAG || $CI_COMMIT_BRANCH'
-
