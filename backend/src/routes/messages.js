@@ -136,9 +136,11 @@ module.exports = router;
 *         required: true
 *     responses:
 *       200:
-*         description: The updated measurement
+*         description: The list of messages
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/components/schemas/Messages'
+*               type: array
+*               items:
+*                 $ref: '#/components/schemas/Messages'
 */

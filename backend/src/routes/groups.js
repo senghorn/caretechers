@@ -103,7 +103,7 @@ module.exports = router;
  *               properties:
  *                 password:
  *                   type: string
-* /groups/passreset/{groupId}:
+ * /groups/passreset/{groupId}:
  *   patch:
  *     summary: Updates the group password
  *     tags: [Groups]
@@ -122,4 +122,33 @@ module.exports = router;
  *               properties:
  *                 password:
  *                   type: string
+ * /groups/info/{groupId}:
+ *   get: 
+ *     summary: Gets a list of user/group info for this group
+ *     tags: [Groups]
+ *     parameters: 
+ *       - in: path
+ *         name: groupId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: The list of user/group info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                  properties:
+ *                   groupName:
+ *                     type: string
+ *                   first_name:
+ *                     type: string
+ *                   last_name:
+ *                     type: string
+ *                   phone_num:
+ *                     type: string
+ *                   group_password:
+ *                     type: string  
  */
