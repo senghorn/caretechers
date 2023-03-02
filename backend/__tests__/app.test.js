@@ -1,6 +1,5 @@
 const supertest = require('supertest');
 const assert = require('assert');
-const express = require('express');
 const rest_app = require('../src/rest-server');
 
 const app = rest_app.CreateRESTServer();

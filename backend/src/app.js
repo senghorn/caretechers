@@ -9,6 +9,4 @@ app.listen(port, () => {
 });
 
 const httpServer = web_socket_server.CreateWebSocketServer(app);
-httpServer.listen(3001, () =>
-  console.log('Chat server listening on port 3001')
-);
+httpServer.listen(3001, () => console.log('Chat server listening on port 3001'));
