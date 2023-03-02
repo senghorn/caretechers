@@ -16,6 +16,9 @@
 #     - echo "which simulates a test that runs 20 seconds longer than test-job1"
 #     - sleep 20
 
+stages:
+  - test
+
 test:
   image: node:latest
   stage: test
