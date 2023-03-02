@@ -21,7 +21,7 @@ function CreateWebSocketServer(app) {
       io.to(groupName).emit('message', messages);
       const messageData = messages[0];
 
-      const query = sql`INSERT INTO Messages VALUES(${messageData.user._id}, ${messageData.createdAt}, ${messageData.text}, ${messageData.user.groupId})`;
+      const query = sql`INSERT INTO Messages VALUES(NULL, ${messageData.user._id}, ${messageData.createdAt}, ${messageData.text}, ${messageData.user.groupId}, 0)`;
       await db.query(query);
       sendNotificationsToGroup(
         messageData.user.groupId,

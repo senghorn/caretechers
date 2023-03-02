@@ -21,7 +21,7 @@ import { NotesRefreshProvider } from '../../services/context/NotesRefreshContext
 import Note from '../../screens/note/note';
 import NewNote from '../../screens/note/newNote';
 import RecordVisit from '../../screens/recordVisit';
-
+import PinnedMessages from '../../screens/pinnedMessages';
 import useSWR from 'swr';
 import { fetcher } from '../../utils/dataFetching';
 import { getDateString } from '../../utils/date';
@@ -164,6 +164,11 @@ export default function Navigation({ expoPushToken }) {
                       <Stack.Screen
                         name='EditGraph'
                         component={EditGraph}
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name='PinnedMessages'
+                        component={PinnedMessages}
                         options={{ headerShown: false }}
                       />
                     </Stack.Navigator>
