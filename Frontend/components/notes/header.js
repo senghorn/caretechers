@@ -13,7 +13,7 @@ export default function Header({
   sort,
   pin = false,
   setSearchQuery,
-  setSearchingMode = () => {},
+  setSearchingMode = () => { },
 }) {
   const SORT_LABELS = {
     ascending: 'Ascending',
@@ -66,7 +66,7 @@ export default function Header({
           <Appbar.Action
             icon='pin'
             onPress={() => {
-              console.log('open pinned messages');
+              navigation.navigate('PinnedMessages');
             }}
           />
         )}

@@ -73,6 +73,29 @@ export async function searchMessage(group_id, query) {
   }
 }
 
+export async function PinMessage(message_id) {
+  try {
+    let url =
+      config.backend_server + '/messages/pin/' + message_id;
+    await axios.post(url);
+  } catch (error) {
+    console.log('pin message error', error);
+  }
+  return true;
+}
+
+export async function GetPinnedMessages(group_id) {
+  try {
+    let url = config.backend_server + '/messages/pin/' + group_id;
+    const result = await axios.get(url);
+    console.log(result.data);
+    return result.data;
+  } catch (error) {
+    console.log('fetch pinned messages error', error);
+  }
+  return null;
+}
+
 export async function FetchUsers(group_id, setUsers) {
   try {
     let connection_string =

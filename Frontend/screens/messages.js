@@ -1,13 +1,12 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ActionSheetIOS, Text } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
 import Header from '../components/notes/header';
 import {
-  FetchMessages,
   FetchUsers,
   searchMessage,
-  uuidv4,
+  PinMessage,
 } from '../services/api/messages';
 import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
@@ -83,6 +82,12 @@ export default function Messages({ navigation }) {
   }, [searchQuery, searchMode]);
 
   useEffect(() => {
+    if (!searchMode && messages) {
+      setDisplayMessages(messages);
+    }
+  }, [messages]);
+
+  useEffect(() => {
     if (socket) {
       socket.connect();
       socket.on('connect_error', (err) => {
@@ -122,6 +127,36 @@ export default function Messages({ navigation }) {
     [socket]
   );
 
+  const [pinMessage, setPinMessage] = useState(null);
+
+  useEffect(() => {
+    if (pinMessage && pinMessage._id && user && user.group_id) {
+      PinMessage(pinMessage._id);
+      setPinMessage(null);
+    }
+
+  }, [pinMessage]);
+
+  const onLongPress = (context, message) => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Pin', 'Remove'],
+        destructiveButtonIndex: 2,
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'dark',
+      },
+      buttonIndex => {
+        if (buttonIndex === 0) {
+          // cancel action
+        } else if (buttonIndex === 1) {
+          setPinMessage(message);
+        } else if (buttonIndex === 2) {
+        }
+      },
+    );
+
+  };
+
   // Message render bubble
   const renderBubble = (props) => {
     const message_sender_id = props.currentMessage.user._id;
@@ -143,6 +178,7 @@ export default function Messages({ navigation }) {
   };
 
   return (
+
     <View style={styles.container}>
       <Header
         title={'Messages'}
@@ -159,6 +195,7 @@ export default function Messages({ navigation }) {
         renderUsernameOnMessage={true}
         onSend={(messages) => onMessageSend(messages)}
         user={this_user}
+        onLongPress={onLongPress}
       />
     </View>
   );
@@ -187,7 +224,7 @@ const FormatMessagesForChat = (all_users, messages) => {
       formatted_messages.push({
         text: message.content,
         createdAt: message.date_time,
-        _id: uuidv4(),
+        _id: message.id,
         user: all_users[message.sender],
       });
     });
