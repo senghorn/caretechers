@@ -20,7 +20,7 @@ test:
   image: node:latest
   stage: test
   before_script:
-    - npm install
+    - cd backend && npm install
   script:
     - npm run test:ci
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
