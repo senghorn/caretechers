@@ -26,7 +26,7 @@ module.exports.getUsersInGroup = asyncHandler(async (req, res, next) => {
 	next();
 });
 
-async function createNewMessage(message_data){
+async function createNewMessage(message_data) {
 	const query = sql`INSERT INTO Messages(sender, date_time, content, group_id) VALUES(${message.sender}, ${getUTCDateTime()}, ${message.content}, ${message.group_id})`;
 	let result = await db.query(query);
 	return result;
@@ -43,6 +43,23 @@ module.exports.getMessagesBySearchString = asyncHandler(async (req, _res, next) 
 	const search = '%' + req.params.searchString + '%';
 	const query = sql`SELECT * FROM Messages WHERE content LIKE ${search}
 	AND group_id = ${req.params.groupId}`;
+	req.result = await db.query(query);
+	next();
+});
+
+module.exports.setMessagePin = asyncHandler(async (req, _res, next) => {
+	if (req.params.messageId) {
+		const query = sql`UPDATE Messages SET pin = 1 WHERE id = ${req.params.messageId}`;
+		req.result = await db.query(query);
+	}
+	else {
+		return next(newError('Message ID is not provided', 400));
+	}
+	next();
+});
+
+module.exports.getPinnedMessages = asyncHandler(async (req, _res, next) => {
+	const query = sql`SELECT * FROM Messages WHERE group_id = ${req.params.groupId} AND pin = 1`;
 	req.result = await db.query(query);
 	next();
 });
