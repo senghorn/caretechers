@@ -58,6 +58,18 @@ module.exports.setMessagePin = asyncHandler(async (req, _res, next) => {
 	next();
 });
 
+module.exports.unpinMessage = asyncHandler(async (req, _res, next) => {
+	if (req.params.messageId) {
+		const query = sql`UPDATE Messages SET pin = 0 WHERE id = ${req.params.messageId}`;
+		req.result = await db.query(query);
+	}
+	else {
+		return next(newError('Message ID is not provided', 400));
+	}
+	next();
+});
+
+
 module.exports.getPinnedMessages = asyncHandler(async (req, _res, next) => {
 	const query = sql`SELECT * FROM Messages WHERE group_id = ${req.params.groupId} AND pin = 1`;
 	req.result = await db.query(query);

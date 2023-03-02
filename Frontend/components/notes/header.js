@@ -65,6 +65,7 @@ export default function Header({
         {!iconSearchMode && pin && (
           <Appbar.Action
             icon='pin'
+            color='#CF3232'
             onPress={() => {
               navigation.navigate('PinnedMessages');
             }}

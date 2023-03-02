@@ -84,6 +84,17 @@ export async function PinMessage(message_id) {
   return true;
 }
 
+export async function UnpinMessage(message_id) {
+  try {
+    let url =
+      config.backend_server + '/messages/unpin/' + message_id;
+    await axios.post(url);
+  } catch (error) {
+    console.log('pin message error', error);
+  }
+  return true;
+}
+
 export async function GetPinnedMessages(group_id) {
   try {
     let url = config.backend_server + '/messages/pin/' + group_id;

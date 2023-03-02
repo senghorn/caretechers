@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useContext, useState, useEffect } from 'react';
-import { Appbar, Avatar, Divider } from 'react-native-paper';
-import { FetchUsers } from '../services/api/messages';
+import { Appbar, Avatar, Divider, IconButton } from 'react-native-paper';
+import { FetchUsers, UnpinMessage } from '../services/api/messages';
+import { Badge } from '@rneui/themed';
 import useSWR from 'swr';
 import colors from '../constants/colors';
+import { getMonthDate } from '../utils/date';
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import { ActivityIndicator } from 'react-native-paper';
@@ -35,6 +37,19 @@ export default function PinnedMessages({ navigation }) {
         }
     }, [user])
 
+    const [messageToUnpin, setMessageToUnpin] = useState(null);
+    useEffect(() => {
+        if (messageToUnpin != null) {
+            const unpin = async () => {
+                await UnpinMessage(messageToUnpin.id);
+            }
+            unpin();
+            mutate(); // We can instead of fetching data again, remove the unpinned message
+            setMessageToUnpin(null);
+        }
+    }, [messageToUnpin]);
+
+
     return (
         <View style={styles.container}>
             <Appbar.Header style={styles.headerContainer}>
@@ -46,12 +61,14 @@ export default function PinnedMessages({ navigation }) {
                 />
                 <Appbar.Content title={'Pinned Messages'} titleStyle={styles.titleStyle} />
             </Appbar.Header>
-            {isLoading && users && messages ? (
+            {isLoading ? (
                 <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
             ) : (
                 <ScrollView style={styles.messageList}>
-                    {messages.map((message) => {
-                        return <MessageBox message={message} key={message.id} sender={users[message.sender]} />
+                        {messages != null && messages.map((message) => {
+                            return (
+                                <MessageBox message={message} key={message.id} sender={users[message.sender]} setMessageToUnpin={setMessageToUnpin} />
+                            )
                     })}
                 </ScrollView>
             )}
@@ -76,64 +93,97 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         margin: 10,
     },
-    messageOuterBox: {
-        marginTop: 10,
-        marginBottom: 5,
-        padding: 10,
+    avatar: {
         alignContent: 'center',
         alignSelf: 'center',
-        borderRadius: '20',
-        flexDirection: 'column',
-        width: '100%',
-    }
-    ,
-    avatar: {
-        alignContent: 'center'
-    },
-    messageContent: {
-        justifyContent: 'center'
-    },
-    contentText: {
-        fontSize: '16',
-        fontWeight: '400'
+        marginRight: 10
     },
     messageBox: {
-        flexDirection: 'row',
+        marginTop: 15,
+        padding: 10,
+        backgroundColor: '#FFAA',
+        borderRadius: 20
+    },
+    topRow: {
         justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignContent: 'center',
+        alignItems: 'center',
     },
-    messageInfo: {
-        marginBottom: 15
+    bottomRow: {
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignContent: 'center',
+        alignItems: 'center'
     },
-    name: {
-        fontSize: 15,
-        fontWeight: '500'
+    messageContent: {
+        fontSize: 14,
+        alignSelf: 'center',
+        padding: 5
+
+    },
+    senderName: {
+        fontWeight: '400',
+        fontSize: 12
+    },
+    dateTime: {
+        fontSize: 12
     }
 });
 
-const MessageBox = ({ message, sender }) => {
+const MessageBox = ({ message, sender, setMessageToUnpin }) => {
+    const handleUnpinPressed = () => {
+        Alert.alert(
+            'Do you want to unpin this message?',
+            'Old messages are sometimes hard to find!', // <- this part is optional, you can pass an empty string
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Confirm',
+                    onPress: async () => {
+                        setMessageToUnpin(message);
+                    },
+                    style: 'destructive',
+                },
+            ],
+            {
+                cancelable: true,
+            }
+        );
+    }
+
     if (sender == null) {
         return;
     }
     return (
         <View>
-            <View style={styles.messageOuterBox}>
-                <View style={styles.messageInfo}>
-                    <Text style={styles.name}>
-                        {sender.name}
-                    </Text>
+            <View style={styles.messageBox}>
+                <View style={styles.topRow}>
+                    {sender.avatar != '' ?
+                        <Avatar.Image size={32} style={styles.avatar} source={{ uri: sender.avatar }} /> :
+                        <Avatar.Image size={32} style={styles.avatar} />}
+                    <Text style={styles.senderName}>{sender.name}</Text>
+                    <Text style={styles.dateTime}>{getMonthDate(message.date_time)}</Text>
                 </View>
-                <View style={styles.messageBox}>
-                    <Avatar.Image size={32} style={styles.avatar} source={{ uri: sender.avatar }} />
-                    <View style={styles.messageContent}>
-                        <Text style={styles.contentText}>
-                            {message.content}
-                        </Text>
-                    </View>
+                <Divider style={{ marginTop: 5 }} />
+                <View style={styles.bottomRow}>
+                    <Text style={styles.messageContent}>{message.content}</Text>
                 </View>
             </View>
-            <Divider style={{
-                marginLeft: 40,
-            }} />
+            <Badge
+                color={colors.black}
+                status={'error'}
+                value={<IconButton
+                    icon="pin"
+                    size={15}
+                    color={colors.white}
+                    onPress={handleUnpinPressed}
+                />}
+                containerStyle={{ position: 'absolute', top: 10, right: 0 }}
+            />
         </View>
     );
 }

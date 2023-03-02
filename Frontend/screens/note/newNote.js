@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import { formatDate } from '../../utils/date';
 import {
   Alert,
   Dimensions,
@@ -126,6 +127,7 @@ export default function NewNote({ navigation, route }) {
             )}
           </Appbar.Header>
         </View>
+        {note && <Text style={styles.dateTimeText}>{formatDate(note.last_edited)}</Text>}
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
           <ScrollView style={styles.scrollView}>
             <RichEditor
@@ -213,4 +215,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     fontSize: 18,
   },
+  dateTimeText: {
+    alignSelf: 'center',
+    padding: 10,
+    fontSize: 12
+  }
 });

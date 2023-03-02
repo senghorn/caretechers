@@ -30,6 +30,11 @@ router.post('/pin/:messageId', [
 	sharedMiddleware.sendNoResult
 ]);
 
+router.post('/unpin/:messageId', [
+	messagesMiddleware.unpinMessage,
+	sharedMiddleware.sendNoResult
+]);
+
 router.get('/pin/:groupId', [
 	groupMiddleware.checkIfGroupExists,
 	messagesMiddleware.getPinnedMessages,
