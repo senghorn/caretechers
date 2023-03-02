@@ -7,7 +7,7 @@
     "start": "node src/app.js",
     "test": "jest",
     "swagger-autogen": "node ./src/swagger.js",
-    "test:ci": "npm run test -- --testResultsProcessor=\"jest-junit\" --watchAll=false --ci --coverage"
+    "test:ci": "jest --config ./jest.config.js --collectCoverage --coverageDirectory=\"./coverage\" --ci --reporters=default --reporters=jest-junit --watchAll=false"
   },
   "author": "",
   "license": "ISC",
