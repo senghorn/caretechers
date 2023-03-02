@@ -6,16 +6,30 @@ const app = rest_app.CreateRESTServer();
 
 
 //NOTES Tests
-describe('groups', () => {
-  describe('get groups route', () => {
-    describe('given group id', () => {
-      it('given number of groups', async () => {
-        const groupId = '9';
-        await supertest(app)
-          .get(`/notes/group/` + groupId)
-          .expect(200);
-      });
+describe('notes', () => {
+  const groupId = '1';
+  const noteId = '114'
+  const searchString = 'Test';
+  describe('get notes route', () => {
+    it('given group id', async () => {
+
+      await supertest(app)
+        .get(`/notes/group/` + groupId)
+        .expect(200);
     });
+
+    it('given existing note id', async () => {
+      await supertest(app)
+        .get(`/notes/` + noteId)
+        .expect(200);
+    });
+
+    it('given group id and string', async () => {
+      await supertest(app)
+        .get(`/notes/search/${groupId}/` + searchString)
+        .expect(200);
+    })
+
   });
 });
 
