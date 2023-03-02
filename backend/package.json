@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/app.js",
     "test": "jest",
-    "swagger-autogen": "node ./src/swagger.js"
+    "swagger-autogen": "node ./src/swagger.js",
+    "test:ci": "jest --config ./jest.config.js --collectCoverage --coverageDirectory=\"./coverage\" --ci --reporters=default --reporters=jest-junit --watchAll=false"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +29,7 @@
     "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
-    "jest": "^29.4.3"
+    "jest": "^29.4.3",
+    "jest-junit": "^15.0.0"
   }
 }
