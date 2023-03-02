@@ -22,7 +22,7 @@ test:
   before_script:
     - cd backend && npm install
   script:
-    - cd backend && npm run test:ci
+    - npm run test:ci
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     paths:
