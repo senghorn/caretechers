@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useContext, useState, useEffect } from 'react';
 import { Appbar, Avatar, Divider } from 'react-native-paper';
-import { FetchUsers } from '../services/api/messages';
+import { FetchUsers, UnpinMessage } from '../services/api/messages';
 import useSWR from 'swr';
 import colors from '../constants/colors';
+import { getMonthDate } from '../utils/date';
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import { ActivityIndicator } from 'react-native-paper';
@@ -78,7 +79,6 @@ const styles = StyleSheet.create({
     },
     messageOuterBox: {
         marginTop: 10,
-        marginBottom: 5,
         padding: 10,
         alignContent: 'center',
         alignSelf: 'center',
@@ -88,7 +88,9 @@ const styles = StyleSheet.create({
     }
     ,
     avatar: {
-        alignContent: 'center'
+        alignContent: 'center',
+        alignSelf: 'center',
+        marginRight: 10
     },
     messageContent: {
         justifyContent: 'center'
@@ -102,11 +104,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     messageInfo: {
-        marginBottom: 15
+        flexDirection: 'column',
+        marginBottom: 15,
+        justifyContent: 'space-between',
+        flexWrap: 'wrap'
     },
     name: {
         fontSize: 15,
         fontWeight: '500'
+    },
+    box: {
+        flexDirection: 'row',
     }
 });
 
@@ -115,25 +123,27 @@ const MessageBox = ({ message, sender }) => {
         return;
     }
     return (
-        <View>
+        <View style={styles.box}>
+            <Avatar.Image size={32} style={styles.avatar} source={{ uri: sender.avatar }} />
             <View style={styles.messageOuterBox}>
                 <View style={styles.messageInfo}>
                     <Text style={styles.name}>
                         {sender.name}
                     </Text>
+                    <Text style={{ fontSize: 10 }}>
+                        {getMonthDate(message.date_time)}
+                    </Text>
+                    <Text style={styles.contentText}>
+                        {message.content}
+                    </Text>
                 </View>
                 <View style={styles.messageBox}>
-                    <Avatar.Image size={32} style={styles.avatar} source={{ uri: sender.avatar }} />
                     <View style={styles.messageContent}>
-                        <Text style={styles.contentText}>
-                            {message.content}
-                        </Text>
+
                     </View>
                 </View>
+                <Divider />
             </View>
-            <Divider style={{
-                marginLeft: 40,
-            }} />
         </View>
     );
 }
