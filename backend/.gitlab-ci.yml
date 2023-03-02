@@ -18,6 +18,7 @@
 
 stages:
   - test
+  - deploy
 
 test:
   image: node:latest
