@@ -22,10 +22,14 @@ stages:
 
 test:
   image: node:latest
+  tags:
+    - docker
   stage: test
   before_script:
     - cd backend && npm install
   script:
+    # are we in a docker-executor
+    - if [ -f /.dockerenv ]; then echo "docker-executor"; fi
     - npm run test:ci
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
