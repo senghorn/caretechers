@@ -15,13 +15,13 @@
 #     - echo "After the echo commands complete, it runs the sleep command for 20 seconds"
 #     - echo "which simulates a test that runs 20 seconds longer than test-job1"
 #     - sleep 20
+image: node:latest
 
 stages:
   - test
   - deploy
 
 test:
-  image: node:latest
   stage: test
   before_script:
     - cd backend && npm install
