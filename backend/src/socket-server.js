@@ -18,11 +18,12 @@ function CreateWebSocketServer(app) {
 
     console.log(socket.username, ' just connected!');
     socket.on('chat', async (messages) => {
-      io.to(groupName).emit('message', messages);
-      const messageData = messages[0];
 
+      var messageData = messages[0];
       const query = sql`INSERT INTO Messages VALUES(NULL, ${messageData.user._id}, ${messageData.createdAt}, ${messageData.text}, ${messageData.user.groupId}, 0)`;
-      await db.query(query);
+      const result = await db.query(query);
+      messageData._id = result.insertId;
+      io.to(groupName).emit('message', messageData);
       sendNotificationsToGroup(
         messageData.user.groupId,
         {
