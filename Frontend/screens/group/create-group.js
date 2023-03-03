@@ -3,11 +3,11 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button, Appbar } from 'react-native-paper';
 import colors from '../../constants/colors';
 import { createNewGroup } from '../../services/api/groups';
-import { addUserToGroup } from '../../services/api/user';
+import { addUserToGroup, fetchUserByEmail } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 
 export default function CreateGroup({ navigation, route }) {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [groupName, setGroupName] = useState('');
   useEffect(() => {
     if (user != null && user.first_name) {
@@ -49,7 +49,14 @@ export default function CreateGroup({ navigation, route }) {
       <Button
         icon='check-all'
         mode='contained'
-        onPress={() => createGroup(groupName, user, navigation)}
+        onPress={async () => {
+          const create = await createGroup(groupName, user, navigation);
+          if (create) {
+            const fetchedUser = await fetchUserByEmail(user.email);
+            setUser(fetchedUser);
+            navigation.navigate('Home');
+          }
+        }}
         style={styles.createButton}
         color={colors.primary}
       >
@@ -78,7 +85,7 @@ const createGroup = async (groupName, user, navigation) => {
     ) => {
       const joined = await addUserToGroup(userEmail, groupId, 1);
       if (joined) {
-        navigation.navigate('Home', { user: user });
+        return true;
       } else {
         console.log(`Join group failed on attempt ${attempt}`);
         if (attempt < maxAttempts) {
@@ -94,12 +101,15 @@ const createGroup = async (groupName, user, navigation) => {
           console.log(
             `Maximum attempts (${maxAttempts}) reached. Join group failed.`
           );
+          return false;
         }
       }
     };
 
-    joinGroupWithRetry(user.email, result.groupId, 3);
+    return joinGroupWithRetry(user.email, result.groupId, 3);
   }
+
+  return false;
 };
 
 const styles = StyleSheet.create({
