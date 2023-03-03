@@ -56,8 +56,8 @@ export default function NewNote({ navigation, route }) {
                   setEditMode(false);
                   setEditContent(note.content);
                   setEditTitle(note.title);
-                }
-                else navigation.goBack();
+                  richText.current?.setContentHTML(note.content);
+                } else navigation.goBack();
               }}
             />
             {editMode ? (
@@ -131,9 +131,9 @@ export default function NewNote({ navigation, route }) {
             )}
           </Appbar.Header>
         </View>
-        {note && <Text style={styles.dateTimeText}>{
-          note.last_edited ? formatDate(note.last_edited) : formatDate(new Date())
-        }</Text>}
+        {note && (
+          <Text style={styles.dateTimeText}>{note.last_edited ? formatDate(note.last_edited) : formatDate(new Date())}</Text>
+        )}
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
           <ScrollView style={styles.scrollView}>
             <RichEditor
@@ -224,6 +224,6 @@ const styles = StyleSheet.create({
   dateTimeText: {
     alignSelf: 'center',
     padding: 10,
-    fontSize: 12
-  }
+    fontSize: 12,
+  },
 });
