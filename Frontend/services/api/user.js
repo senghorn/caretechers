@@ -86,12 +86,14 @@ export async function fetchUserByEmail(email) {
  * @param {int} groupId
  * @returns
  */
-export async function addUserToGroup(email, groupId, password) {
+export async function addUserToGroup(email, groupName, password) {
   const data = {
-    groupId: Number(groupId),
+    groupName: groupName,
+    groupPassword: password
   };
   try {
-    let connection_string = config.backend_server + '/user/' + email + '/group';
+    // /:userId/group/join'
+    let connection_string = config.backend_server + '/user/' + email + '/group/join';
     return await axios
       .post(connection_string, data)
       .then(function (response) {

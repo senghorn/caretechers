@@ -19,6 +19,8 @@ router.delete('/:userId/:groupId', [userMiddleware.removeUserFromGroup, sharedMi
 
 router.put('/:userId/identifier', [userMiddleware.setUserNotificationIdentifier, sharedMiddleware.sendNoResult]);
 
+router.post('/:userId/group/join', [userMiddleware.verifyUserExists, userMiddleware.addUserToGroupWithNameAndPassword, sharedMiddleware.sendNoResult]);
+
 module.exports = router;
 
 // SCHEMA DEFINITION

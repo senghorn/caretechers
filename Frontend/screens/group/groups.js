@@ -29,7 +29,7 @@ export default function Groups({ navigation }) {
           <TextInput
             right={<TextInput.Icon icon='home-heart' />}
             value={groupName}
-            label={'Group ID'}
+            label={'Group Name'}
             activeUnderlineColor={colors.primary}
             underlineColor='grey'
             onChangeText={(text) => {
@@ -60,6 +60,8 @@ export default function Groups({ navigation }) {
               const fetchedUser = await fetchUserByEmail(user.email);
               setUser(fetchedUser);
               navigation.navigate('Home');
+            } else {
+              alert('Group name and password are incorrect!');
             }
           }}
           style={styles.createButton}
@@ -73,7 +75,6 @@ export default function Groups({ navigation }) {
 }
 
 const joinGroupHandler = async (user, group, password) => {
-  console.log(user);
   const joined = await addUserToGroup(user.email, group, password);
 
   if (joined == true) {
