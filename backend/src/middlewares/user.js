@@ -64,6 +64,26 @@ module.exports.verifyUserExists = asyncHandler(async (req, _res, next) => {
   next();
 });
 
+module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res, next) => {
+  if (!req.body.groupName || !req.body.groupPassword) {
+    return next(newError('Join Group request body is incorrect!', 400));
+  }
+
+  let query = sql`UPDATE Users SET group_id = (
+    SELECT id 
+    FROM \`Groups\` 
+    WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword}
+  ) 
+  WHERE email = ${req.params.userId} AND EXISTS(SELECT * FROM \`Groups\` 
+  WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword});
+  `
+  const result = await db.query(query);
+  if (result.affectedRows == 0) {
+    return next(newError('Cannot join the group!', 400));
+  }
+  next();
+});
+
 module.exports.addUserToGroup = asyncHandler(async (req, _res, next) => {
   if (!req.body.groupId || typeof req.body.groupId !== 'number') {
     return next(newError('This groupId is invalid!', 400));
