@@ -80,7 +80,7 @@ export default function Metrics({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header navigation={navigation} />
+      <Header onPress={getGraphs} navigation={navigation} />
       <View>
         <Dialog.Container visible={showCreateNewGraphDialogBox}>
           {newGraphLoading ? (
@@ -114,6 +114,7 @@ export default function Metrics({ navigation }) {
                 data={graphs[key].data.map((data) => data.measurement)}
                 navigation={navigation}
                 getGraphs={getGraphs}
+                graphData={graphs}
               />
             ))}
           </ScrollView>

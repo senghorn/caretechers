@@ -2,9 +2,9 @@ import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import colors from '../../constants/colors';
 
-export default function AddDataButton() {
+export default function AddDataButton({setShowEditDialogBox}) {
   return (
-    <TouchableHighlight onPress={() => {}} underlayColor="#ededed" style={styles.outerContainer}>
+    <TouchableHighlight onPress={() => setShowEditDialogBox(true)} underlayColor="#ededed" style={styles.outerContainer}>
       <View style={styles.container}>
         <SimpleLineIcons name="graph" size={24} color="#fff" style={styles.icon} />
         <Text style={styles.text}>Add New Measurement</Text>
