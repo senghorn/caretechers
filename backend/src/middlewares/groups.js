@@ -45,8 +45,13 @@ module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
 			${req.body.visitFrequency}, SUBSTR(MD5(RAND()), 1, 15));`;
   }
 
-  const result = await db.query(query);
-  req.result = { groupId: result.insertId };
+  let result = await db.query(query);
+  query = sql`SELECT * FROM \`Groups\` WHERE id = ${result.insertId}`
+  result = await db.query(query);
+  req.result = {
+    groupName: result[0].name,
+    groupPassword: result[0].password
+  }
   next();
 });
 
