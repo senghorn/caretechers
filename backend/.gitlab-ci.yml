@@ -1,4 +1,4 @@
-image: node:latest
+image: node:19.7.0
 
 stages:
   - test
