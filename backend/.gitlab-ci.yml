@@ -1,4 +1,4 @@
-image: node:19.7.0
+image: node:16.16
 
 stages:
   - test
@@ -7,7 +7,7 @@ stages:
 test:
   stage: test
   before_script:
-    - cd backend && npm install -g n && n stable && npm install
+    - cd backend && npm install
   script:
     # are we in a docker-executor
     - if [ -f /.dockerenv ]; then echo "docker-executor"; fi
