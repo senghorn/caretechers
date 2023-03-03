@@ -14,7 +14,7 @@ export default function Settings({ navigation, route }) {
   const [email, setEmail] = useState('johndoe@fakemail.com');
   const [photo, setPhoto] = useState(require('../assets/favicon.png'));
 
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   useEffect(() => {
     if (user) {
       setUsername(user.first_name + ' ' + user.last_name);
@@ -45,31 +45,21 @@ export default function Settings({ navigation, route }) {
               <Text style={styles.name}>{username}</Text>
             </View>
             <View style={styles.infoRow}>
-              <AntDesign
-                name='phone'
-                size={20}
-                color={colors.primary}
-                style={styles.infoIcon}
-              />
+              <AntDesign name="phone" size={20} color={colors.primary} style={styles.infoIcon} />
               <Text style={styles.phone}>{phone}</Text>
             </View>
             <View style={styles.infoRow}>
-              <AntDesign
-                name='mail'
-                size={20}
-                color={colors.primary}
-                style={styles.infoIcon}
-              />
+              <AntDesign name="mail" size={20} color={colors.primary} style={styles.infoIcon} />
               <Text style={styles.phone}>{email}</Text>
             </View>
           </View>
         </View>
         <View style={styles.settingsContainer}>
           <Button
-            mode='contained'
+            mode="contained"
             uppercase={false}
             color={'lightgray'}
-            icon='account-edit'
+            icon="account-edit"
             style={styles.editButton}
             labelStyle={styles.editButtonText}
             onPress={() => {
@@ -79,10 +69,10 @@ export default function Settings({ navigation, route }) {
             Edit Profile
           </Button>
           <Button
-            mode='contained'
+            mode="contained"
             uppercase={false}
             color={'lightgray'}
-            icon='account-group'
+            icon="account-group"
             style={styles.editButton}
             labelStyle={styles.editButtonText}
             onPress={() => {
@@ -97,16 +87,12 @@ export default function Settings({ navigation, route }) {
         <View style={styles.switchList}>
           <View style={styles.switchItem}>
             <View style={styles.switchLabel}>
-              {notificationOn && <Ionicons name='notifications' size={26} />}
-              {!notificationOn && (
-                <Ionicons name='notifications-off' size={26} />
-              )}
+              {notificationOn && <Ionicons name="notifications" size={26} />}
+              {!notificationOn && <Ionicons name="notifications-off" size={26} />}
               <Text style={styles.textLabel}>Notification</Text>
             </View>
             <View style={styles.switchLabel}>
-              <Text style={styles.switchValue}>
-                {notificationOn ? 'On' : 'Off'}
-              </Text>
+              <Text style={styles.switchValue}>{notificationOn ? 'On' : 'Off'}</Text>
               <Switch
                 color={colors.primary}
                 value={notificationOn}
@@ -118,8 +104,8 @@ export default function Settings({ navigation, route }) {
           </View>
           <View style={styles.switchItem}>
             <View style={styles.switchLabel}>
-              {darkOn && <Ionicons name='moon' size={26} />}
-              {!darkOn && <Ionicons name='ios-sunny' size={26} />}
+              {darkOn && <Ionicons name="moon" size={26} />}
+              {!darkOn && <Ionicons name="ios-sunny" size={26} />}
               <Text style={styles.textLabel}>Dark Mode</Text>
             </View>
             <View style={styles.switchLabel}>
@@ -136,14 +122,15 @@ export default function Settings({ navigation, route }) {
         </View>
       </ScrollView>
       <Button
-        mode='contained'
+        mode="contained"
         uppercase={true}
         color={colors.pinkishRed}
-        icon='logout'
+        icon="logout"
         style={styles.logout}
         labelStyle={styles.logoutButtonText}
         onPress={() => {
-          console.log('Log out pressed');
+          navigation.navigate('Login');
+          setUser({});
         }}
       >
         Logout

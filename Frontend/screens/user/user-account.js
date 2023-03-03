@@ -1,17 +1,5 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ImageBackground,
-} from 'react-native';
-import {
-  Appbar,
-  Avatar,
-  TextInput,
-  Button,
-  Text,
-  ActivityIndicator,
-} from 'react-native-paper';
+import { StyleSheet, TouchableOpacity, View, ImageBackground } from 'react-native';
+import { Appbar, Avatar, TextInput, Button, Text, ActivityIndicator } from 'react-native-paper';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
 import { useState, useContext, useEffect } from 'react';
@@ -42,21 +30,9 @@ export default function UserAccount({ navigation, route, newUser }) {
 
   const handleSave = async () => {
     setSaving(true);
-    if (
-      user &&
-      phone.length == 12 &&
-      firstName.length > 0 &&
-      lastName.length > 0
-    ) {
+    if (user && phone.length == 12 && firstName.length > 0 && lastName.length > 0) {
       await (async () => {
-        const update = await UpdateUserData(
-          email,
-          firstName,
-          lastName,
-          phone,
-          user.group_id,
-          user.profile_pic
-        );
+        const update = await UpdateUserData(email, firstName, lastName, phone, user.group_id, user.profile_pic);
         if (update) {
           setUser({
             email: user.email,
@@ -84,12 +60,7 @@ export default function UserAccount({ navigation, route, newUser }) {
       }
     }
     if (cleaned.length >= 7) {
-      cleaned =
-        cleaned.slice(0, 3) +
-        '-' +
-        cleaned.slice(3, 6) +
-        '-' +
-        cleaned.slice(6);
+      cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3, 6) + '-' + cleaned.slice(6);
     } else if (cleaned.length > 3) {
       cleaned = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
     }
@@ -121,15 +92,8 @@ export default function UserAccount({ navigation, route, newUser }) {
       </ImageBackground>
       <View style={styles.infoContainer}>
         <TextInput
-          mode='outlined'
-          left={
-            <TextInput.Icon
-              icon='account'
-              style={styles.iconStyle}
-              size={20}
-              color={colors.primary}
-            />
-          }
+          mode="outlined"
+          left={<TextInput.Icon icon="account" style={styles.iconStyle} size={20} color={colors.primary} />}
           value={firstName}
           style={styles.phone}
           activeOutlineColor={colors.primary}
@@ -139,15 +103,8 @@ export default function UserAccount({ navigation, route, newUser }) {
           }}
         />
         <TextInput
-          mode='outlined'
-          left={
-            <TextInput.Icon
-              icon='account'
-              style={styles.iconStyle}
-              size={20}
-              color={colors.primary}
-            />
-          }
+          mode="outlined"
+          left={<TextInput.Icon icon="account" style={styles.iconStyle} size={20} color={colors.primary} />}
           value={lastName}
           style={styles.phone}
           activeOutlineColor={colors.primary}
@@ -157,15 +114,8 @@ export default function UserAccount({ navigation, route, newUser }) {
           }}
         />
         <TextInput
-          mode='outlined'
-          left={
-            <TextInput.Icon
-              icon='phone'
-              style={styles.iconStyle}
-              size={20}
-              color={colors.primary}
-            />
-          }
+          mode="outlined"
+          left={<TextInput.Icon icon="phone" style={styles.iconStyle} size={20} color={colors.primary} />}
           value={phone}
           style={styles.phone}
           activeOutlineColor={colors.primary}
@@ -173,13 +123,11 @@ export default function UserAccount({ navigation, route, newUser }) {
           onChangeText={(text) => {
             formatPhoneNumber(text);
           }}
-          keyboardType='number-pad'
+          keyboardType="number-pad"
         />
         <TextInput
-          mode='outlined'
-          left={
-            <TextInput.Icon icon='email' style={styles.iconStyle} size={20} />
-          }
+          mode="outlined"
+          left={<TextInput.Icon icon="email" style={styles.iconStyle} size={20} />}
           value={email}
           style={styles.email}
           outlineColor={colors.darkblue}
@@ -191,17 +139,13 @@ export default function UserAccount({ navigation, route, newUser }) {
       {!newUser && (
         <View>
           {saving ? (
-            <ActivityIndicator
-              size='large'
-              color='#2196f3'
-              style={styles.loader}
-            />
+            <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
           ) : (
             <View style={styles.buttonRow}>
               <Button
-                mode='contained'
+                mode="contained"
                 color={colors.primary}
-                icon='progress-check'
+                icon="progress-check"
                 style={styles.createButton}
                 labelStyle={styles.createButtonText}
                 onPress={handleSave}
@@ -209,13 +153,14 @@ export default function UserAccount({ navigation, route, newUser }) {
                 Save
               </Button>
               <Button
-                mode='contained'
+                mode="contained"
                 color={colors.gray}
-                icon='cancel'
+                icon="cancel"
                 style={styles.createButton}
                 labelStyle={styles.createButtonText}
                 onPress={() => {
                   initData();
+                  navigation.goBack();
                 }}
               >
                 Cancel
@@ -244,7 +189,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     margin: 20,
-    height: 100
+    height: 100,
   },
   name: {
     fontSize: 20,
