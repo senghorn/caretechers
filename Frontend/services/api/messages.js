@@ -3,18 +3,6 @@ import config from '../../constants/config';
 const axios = require('axios').default;
 
 /**
- * Generates a long random string(universal unique id)
- * @returns Random String
- */
-export function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.floor(Math.random() * 16);
-    const v = c === 'x' ? r : (r % 4) + 8;
-    return v.toString(16);
-  });
-}
-
-/**
  * Asynchronously fetch messages given group id and last message id.
  * If last_message is null, fetch all message. Otherwise, fetch messages
  * that comes before the last_message.
@@ -40,7 +28,7 @@ export async function FetchMessages(
             messages.push({
               text: message.content,
               createdAt: message.date_time,
-              _id: uuidv4(),
+              _id: message.id,
               user: users[message.sender],
             });
           });
@@ -74,10 +62,11 @@ export async function searchMessage(group_id, query) {
 }
 
 export async function PinMessage(message_id) {
+  console.log(message_id);
   try {
     let url =
       config.backend_server + '/messages/pin/' + message_id;
-    await axios.post(url);
+    const result = await axios.post(url);
   } catch (error) {
     console.log('pin message error', error);
   }
