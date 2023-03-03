@@ -6,10 +6,9 @@ import Metrics from '../../screens/metrics';
 import Calendar from '../../screens/calendar';
 import Tasks from '../../screens/tasks';
 import { useContext, useEffect } from 'react';
-import config from '../../constants/config';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
-import UserContext from '../../services/context/UserContext';
+
 import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
 
 const axios = require('axios').default;
