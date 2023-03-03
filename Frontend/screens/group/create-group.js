@@ -76,14 +76,20 @@ const createGroup = async (groupName, user, navigation) => {
   // TODO: get visit frequency and group password below
   const timezone = 'America/Denver';
   const result = await createNewGroup(groupName, timezone, 4);
-  if (result.groupId != null) {
+  console.log(result);
+  if (result.groupName != null && result.groupPassword) {
+
+
     const joinGroupWithRetry = async (
       userEmail,
-      groupId,
+      groupName,
+      groupPassword,
       maxAttempts = 3,
       attempt = 1
     ) => {
-      const joined = await addUserToGroup(userEmail, groupId, 1);
+
+      const joined = await addUserToGroup(userEmail, groupName, groupPassword);
+      console.log(groupName, groupPassword);
       if (joined) {
         return true;
       } else {
@@ -92,7 +98,8 @@ const createGroup = async (groupName, user, navigation) => {
           setTimeout(async () => {
             await joinGroupWithRetry(
               userEmail,
-              groupId,
+              groupName,
+              groupPassword,
               maxAttempts,
               attempt + 1
             );
@@ -106,7 +113,7 @@ const createGroup = async (groupName, user, navigation) => {
       }
     };
 
-    return joinGroupWithRetry(user.email, result.groupId, 3);
+    return joinGroupWithRetry(user.email, result.groupName, result.groupPassword, 3, 1);
   }
 
   return false;
