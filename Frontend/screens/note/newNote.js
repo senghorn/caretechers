@@ -52,7 +52,11 @@ export default function NewNote({ navigation, route }) {
               icon={editMode && noteId ? 'marker-cancel' : 'chevron-left'}
               color={editMode && noteId ? '#f00' : '#000'}
               onPress={() => {
-                if (editMode && noteId) setEditMode(false);
+                if (editMode && noteId) {
+                  setEditMode(false);
+                  setEditContent(note.content);
+                  setEditTitle(note.title);
+                }
                 else navigation.goBack();
               }}
             />
@@ -127,7 +131,9 @@ export default function NewNote({ navigation, route }) {
             )}
           </Appbar.Header>
         </View>
-        {note && <Text style={styles.dateTimeText}>{formatDate(note.last_edited)}</Text>}
+        {note && <Text style={styles.dateTimeText}>{
+          note.last_edited ? formatDate(note.last_edited) : formatDate(new Date())
+        }</Text>}
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
           <ScrollView style={styles.scrollView}>
             <RichEditor

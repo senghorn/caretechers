@@ -9,10 +9,9 @@ import UserContext from '../../services/context/UserContext';
 export default function CreateGroup({ navigation, route }) {
   const { user } = useContext(UserContext);
   const [groupName, setGroupName] = useState('');
-
   useEffect(() => {
-    if (user != null) {
-      setGroupName(user.given_name + ' ' + user.family_name + ' Family');
+    if (user != null && user.first_name) {
+      setGroupName(user.first_name + ' ' + user.last_name + ' Family');
     }
   }, [user]);
 
