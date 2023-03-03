@@ -1,21 +1,5 @@
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  ImageBackground,
-  Alert,
-  Share,
-} from 'react-native';
-import {
-  Appbar,
-  IconButton,
-  Avatar,
-  Divider,
-  Text,
-  TextInput,
-  ActivityIndicator,
-} from 'react-native-paper';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Alert, Share } from 'react-native';
+import { Appbar, IconButton, Avatar, Divider, Text, TextInput, ActivityIndicator } from 'react-native-paper';
 import { useState, useEffect, useContext } from 'react';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
@@ -28,10 +12,7 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function GroupSettings({ navigation }) {
   const { user } = useContext(UserContext);
-  const { data, isLoading, error, mutate } = useSWR(
-    config.backend_server + '/groups/info/' + user.group_id,
-    fetcher
-  );
+  const { data, isLoading, error, mutate } = useSWR(config.backend_server + '/groups/info/' + user.group_id, fetcher);
   const [showAlert, setShowAlert] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [password, setPassword] = useState('');
@@ -60,7 +41,7 @@ export default function GroupSettings({ navigation }) {
     if (user && user.email && user.group_id) {
       const result = await RemoveUserFromGroup(user.email, user.group_id);
       if (result == true) {
-        navigation.navigate('Group');
+        navigation.navigate('Login');
       } else {
         alert('Cannot leave group.');
       }
@@ -130,10 +111,7 @@ export default function GroupSettings({ navigation }) {
             secureTextEntry={passwordVisible}
             value={password}
             right={
-              <TextInput.Icon
-                name={passwordVisible ? 'eye' : 'eye-off'}
-                onPress={() => setPasswordVisible(!passwordVisible)}
-              />
+              <TextInput.Icon name={passwordVisible ? 'eye' : 'eye-off'} onPress={() => setPasswordVisible(!passwordVisible)} />
             }
             left={
               <TextInput.Icon
@@ -152,33 +130,15 @@ export default function GroupSettings({ navigation }) {
             style={styles.passwordBox}
           />
           <View style={styles.buttonContainer}>
-            <IconButton
-              icon='account-plus'
-              size={28}
-              color={colors.primary}
-              style={styles.iconButton}
-              onPress={onShare}
-            />
+            <IconButton icon="account-plus" size={28} color={colors.primary} style={styles.iconButton} onPress={onShare} />
             <Text style={styles.buttonTitle}>Invite</Text>
           </View>
           <View style={styles.buttonContainer}>
-            <IconButton
-              icon='exit-to-app'
-              size={28}
-              color={colors.danger}
-              style={styles.iconButton}
-              onPress={handleLeaveGroup}
-            />
+            <IconButton icon="exit-to-app" size={28} color={colors.danger} style={styles.iconButton} onPress={handleLeaveGroup} />
             <Text style={styles.buttonTitle}>Leave</Text>
           </View>
         </View>
-        {loading && (
-          <ActivityIndicator
-            size='large'
-            color='#2196f3'
-            style={styles.loader}
-          />
-        )}
+        {loading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
         <View style={styles.memberListBox}>
           <Text style={styles.membersTitle}>Members</Text>
           <GroupMemberList members={members} />
@@ -224,9 +184,7 @@ const MemberItem = ({ user }) => {
     <View>
       <TouchableOpacity style={styles.memberItem} onPress={userPressedHandler}>
         <Avatar.Image size={24} source={{ uri: user.profile_pic }} />
-        <Text style={styles.username}>
-          {user.first_name + ' ' + user.last_name}
-        </Text>
+        <Text style={styles.username}>{user.first_name + ' ' + user.last_name}</Text>
       </TouchableOpacity>
       <Divider
         style={{
