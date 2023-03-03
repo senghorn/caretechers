@@ -159,11 +159,6 @@ export default function EditGraph({navigation, route}) {
             size={30}
             onPress={() => setShowDeleteConfirmation(true)}
           />
-          <IconButton
-            icon="plus-box"
-            size={30}
-            onPress={() => setShowEditDialogBox(true)}
-          />
         </View>
       </View>
       <View style={styles.tableWrapper}>
@@ -184,39 +179,6 @@ export default function EditGraph({navigation, route}) {
           )
         }
 
-      </View>
-
-      <View>
-        <Dialog.Container visible={showEditDialogBox}>
-        {
-          saveLoading ? (
-            <ActivityIndicator size="large" color="#2196f3" style={{marginBottom: '10%'}} />
-            ):(
-              <>
-                <Dialog.Title style={{marginBottom: '10%'}}>Enter a new measurement</Dialog.Title>
-                <View style={{display: 'flex', flexDirection:'column', alignItems: 'center'}}>
-                <Dialog.Input
-                  placeholder='Measurement'
-                  style={{ width: 100}}
-                  onChangeText={newMeasurement => setNewMeasurement(newMeasurement)}
-                />
-                <DateTimePicker
-                  testID="dateTimePicker"
-                  value={newDate}
-                  mode='date'
-                  onChange={onDateChange}
-                  display='spinner'
-                />
-                </View>
-                <View style={{display: 'flex', flexDirection: 'row'}}>
-                  <Dialog.Button label="Cancel" onPress={() => setShowEditDialogBox(false)}/>
-                  <Dialog.Button label="Save" onPress={addNewMeasurement}/>
-                </View>
-              </>
-            )
-          }
-
-        </Dialog.Container>
       </View>
 
       <View>
