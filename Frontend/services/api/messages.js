@@ -46,6 +46,32 @@ export async function FetchMessages(
   return null;
 }
 
+/*
+ * Fetches more messages given last message id and group id
+ */
+export async function fetchMoreMessages(group_id, last_id) {
+  try {
+    let url = config.backend_server = `messages/${group_id}/${last_id}`;
+    const result = await axios.get(url);
+    if (result.status == 200) {
+      var messages = [];
+      result.data.forEach(function (message) {
+        messages.push({
+          text: message.content,
+          createdAt: message.date_time,
+          _id: message.id,
+          user: users[message.sender],
+        });
+      });
+    }
+    else {
+      return null;
+    }
+  } catch (error) {
+    console.log('')
+  }
+}
+
 export async function searchMessage(group_id, query) {
   try {
     let url =

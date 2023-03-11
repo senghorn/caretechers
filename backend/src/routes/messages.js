@@ -12,6 +12,12 @@ router.get('/:groupId', [
 	sharedMiddleware.sendResult
 ]);
 
+router.get('/:groupId/:lastId', [
+	groupMiddleware.checkIfGroupExists,
+	messagesMiddleware.fetchMoreMessagesByLastMessageId,
+	sharedMiddleware.sendResult
+]);
+
 router.get('/users/:groupId', [
 	groupMiddleware.checkIfGroupExists,
 	messagesMiddleware.getUsersInGroup,
