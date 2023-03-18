@@ -7,6 +7,7 @@ import {
   FetchUsers,
   searchMessage,
   PinMessage,
+  fetchMoreMessages
 } from '../services/api/messages';
 import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
@@ -25,8 +26,20 @@ export default function Messages({ navigation }) {
   const [searchMode, setSearchMode] = useState(false);
   const { user } = useContext(UserContext);
 
+  const getBiggestIdOfMessages = () => {
+    let result = 0;
+    if (messages) {
+      messages.forEach((message) => {
+        if (message._id > result) {
+          result = message._id;
+        }
+      })
+    }
+    return result;
+  }
+
   const { data, isLoading, error, mutate } = useSWR(
-    config.backend_server + '/messages/' + user.group_id,
+    config.backend_server + '/messages/fetch/' + user.group_id,
     fetcher
   );
 
@@ -52,6 +65,21 @@ export default function Messages({ navigation }) {
       });
     }
   }, [user]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const loadEarlier = async () => {
+    if (user && users && user.group_id && messages) {
+      if (!isLoadingData) {
+        setIsLoadingData(true);
+        var last_id = getBiggestIdOfMessages();
+        console.log("****** LAST MESSAGE ID " + last_id)
+        const more_messages = await fetchMoreMessages(user.group_id, last_id, users);
+        console.log(more_messages);
+        if (more_messages) {
+          setMessages(messages.concat(more_messages));
+        }
+      }
+    }
+  }
 
   // Fetch all the users in the group for their profile photos
   useEffect(() => {
@@ -86,6 +114,10 @@ export default function Messages({ navigation }) {
       setDisplayMessages(messages);
     }
   }, [messages]);
+
+  useEffect(() => {
+    setIsLoadingData(false);
+  }, [displayMessages]);
 
   useEffect(() => {
     if (socket) {
@@ -196,6 +228,9 @@ export default function Messages({ navigation }) {
         onSend={(messages) => onMessageSend(messages)}
         user={this_user}
         onLongPress={onLongPress}
+        onLoadEarlier={loadEarlier}
+        loadEarlier
+        infiniteScroll
       />
     </View>
   );
@@ -225,7 +260,7 @@ const FormatMessagesForChat = (all_users, messages) => {
         text: message.content,
         createdAt: message.date_time,
         _id: message.id,
-        user: all_users[message.sender],
+        user: all_users[message.sender] ? all_users[message.sender] : { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
       });
     });
   }

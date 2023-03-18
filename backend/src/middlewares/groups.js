@@ -10,7 +10,6 @@ module.exports.checkIfGroupExists = asyncHandler(async (req, res, next) => {
   const query = sql`SELECT * FROM \`Groups\` G
 						WHERE id = ${req.params.groupId}`;
   const [result] = await db.query(query);
-
   if (!result) {
     return next(newError('This group does not exist!', 404));
   }
