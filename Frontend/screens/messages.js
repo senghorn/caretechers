@@ -28,9 +28,10 @@ export default function Messages({ navigation }) {
 
   const getBiggestIdOfMessages = () => {
     let result = 0;
-    if (messages) {
+    if (messages && messages.length > 0) {
+      result = messages[0]._id;
       messages.forEach((message) => {
-        if (message._id > result) {
+        if (message._id < result) {
           result = message._id;
         }
       })
@@ -73,7 +74,6 @@ export default function Messages({ navigation }) {
         var last_id = getBiggestIdOfMessages();
         console.log("****** LAST MESSAGE ID " + last_id)
         const more_messages = await fetchMoreMessages(user.group_id, last_id, users);
-        console.log(more_messages);
         if (more_messages) {
           setMessages(messages.concat(more_messages));
         }
