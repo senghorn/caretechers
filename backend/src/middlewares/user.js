@@ -119,10 +119,20 @@ module.exports.setUserNotificationIdentifier = asyncHandler(async (req, _res, ne
 });
 
 module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
-  const query = sql`SELECT * FROM Users WHERE email = ${req.params.userId};`;
+  const query = sql`SELECT curr_group FROM Users WHERE email = ${req.params.userId};`;
   const [result] = await db.query(query);
   if (!result) {
     return next(newError('This user does not have a group', 404));
+  }
+  req.result = result;
+  next();
+});
+
+module.exports.getAllUserGroups = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT group_id FROM GroupMembers WHERE member_id = ${req.params.userId} and active = TRUE;`;
+  const [result] = await db.query(query);
+  if (!result) {
+    return next(newError('This user does not have any groups', 404));
   }
   req.result = result;
   next();

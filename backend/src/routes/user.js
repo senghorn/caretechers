@@ -11,6 +11,8 @@ router.post('/:userId/group', [userMiddleware.verifyUserExists, userMiddleware.a
 
 router.post('/', [userMiddleware.verifyCreateUserBody, userMiddleware.createNewUser, sharedMiddleware.sendNoResult]);
 
+router.get('/groups/:userId', [userMiddleware.getAllUserGroups, sharedMiddleware.sendResult]);
+
 router.get('/currentGroup/:userId', [userMiddleware.getUserCurrGroupByID, sharedMiddleware.sendResult]);
 
 router.patch('/currentGroup/:userId', [userMiddleware.setUserCurrGroup, sharedMiddleware.sendNoResult]);
