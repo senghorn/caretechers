@@ -118,7 +118,6 @@ module.exports.setUserNotificationIdentifier = asyncHandler(async (req, _res, ne
   next();
 });
 
-//TO-DO
 module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
   const query = sql`SELECT * FROM Users WHERE email = ${req.params.userId};`;
   const [result] = await db.query(query);
@@ -126,6 +125,15 @@ module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
     return next(newError('This user does not have a group', 404));
   }
   req.result = result;
+  next();
+});
+
+module.exports.setUserCurrGroup = asyncHandler(async (req, _res, next) => {
+  if (!req.body.currGroup || typeof req.body.currGroup !== 'number') {
+    return next(newError('The currGroup is invalid!', 400));
+  }
+  const query = sql`UPDATE Users SET curr_group = ${req.body.currGroup} WHERE email = ${req.params.userId};`;
+  await db.query(query);
   next();
 });
 
