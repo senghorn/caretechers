@@ -76,6 +76,7 @@ module.exports.resetPassword = asyncHandler(async (req, _res, next) => {
   next();
 });
 
+//TO-DO
 module.exports.getGroupInfo = asyncHandler(async (req, _res, next) => {
   let query = sql`SELECT name, first_name, last_name, profile_pic, password from \`Groups\` g join Users u where u.group_id = g.id and g.id = ${req.params.groupId}; `;
   req.result = await db.query(query);
