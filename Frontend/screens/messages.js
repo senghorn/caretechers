@@ -1,4 +1,4 @@
-import { StyleSheet, View, ActionSheetIOS, Text } from 'react-native';
+import { StyleSheet, View, ActionSheetIOS } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
@@ -24,7 +24,10 @@ export default function Messages({ navigation }) {
   const [users, setUsers] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMode, setSearchMode] = useState(false);
+  const [noEalierMessages, setNoEarlierMessages] = useState(false);
   const { user } = useContext(UserContext);
+
+  const onToggleSnackBar = () => setNoEarlierMessages(!noEalierMessages);
 
   const getBiggestIdOfMessages = () => {
     let result = 0;
@@ -72,9 +75,11 @@ export default function Messages({ navigation }) {
       if (!isLoadingData) {
         setIsLoadingData(true);
         var last_id = getBiggestIdOfMessages();
-        console.log("****** LAST MESSAGE ID " + last_id)
         const more_messages = await fetchMoreMessages(user.group_id, last_id, users);
         if (more_messages) {
+          if (more_messages.length === 0) {
+            setNoEarlierMessages(true);
+          }
           setMessages(messages.concat(more_messages));
         }
       }
@@ -229,7 +234,7 @@ export default function Messages({ navigation }) {
         user={this_user}
         onLongPress={onLongPress}
         onLoadEarlier={loadEarlier}
-        loadEarlier
+        loadEarlier={!noEalierMessages}
         infiniteScroll
       />
     </View>
