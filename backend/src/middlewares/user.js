@@ -129,7 +129,7 @@ module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.setUserCurrGroup = asyncHandler(async (req, _res, next) => {
-  if (!req.body.currGroup || typeof req.body.currGroup !== 'number') {
+  if (!req.body.currGroup) {
     return next(newError('The currGroup is invalid!', 400));
   }
   const query = sql`UPDATE Users SET curr_group = ${req.body.currGroup} WHERE email = ${req.params.userId};`;
@@ -139,7 +139,7 @@ module.exports.setUserCurrGroup = asyncHandler(async (req, _res, next) => {
 
 
 module.exports.removeUserFromGroup = asyncHandler(async (req, _res, next) => {
-  query = sql`UPDATE GroupMembers SET active = FALSE WHERE email = ${req.params.userId};`;
+  query = sql`UPDATE GroupMembers SET active = FALSE WHERE member_id = ${req.params.userId} and group_id = ${req.params.groupId};`;
   await db.query(query);
   next();
 });
