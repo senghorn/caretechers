@@ -119,7 +119,7 @@ module.exports.setUserNotificationIdentifier = asyncHandler(async (req, _res, ne
 });
 
 //TO-DO
-module.exports.getUserGroupByID = asyncHandler(async (req, _res, next) => {
+module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
   const query = sql`SELECT * FROM Users WHERE email = ${req.params.userId};`;
   const [result] = await db.query(query);
   if (!result) {
