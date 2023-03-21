@@ -64,7 +64,6 @@ module.exports.verifyUserExists = asyncHandler(async (req, _res, next) => {
   next();
 });
 
-//TO-DO
 module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res, next) => {
   if (!req.body.groupName || !req.body.groupPassword) {
     return next(newError('Join Group request body is incorrect!', 400));
@@ -93,7 +92,6 @@ module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res
   next();
 });
 
-//TO-DO
 module.exports.addUserToGroup = asyncHandler(async (req, _res, next) => {
   if (!req.body.groupId || typeof req.body.groupId !== 'number') {
     return next(newError('This groupId is invalid!', 400));
@@ -107,7 +105,6 @@ module.exports.addUserToGroup = asyncHandler(async (req, _res, next) => {
     return next(newError('This group does not exist!', 404));
   }
 
-  //query = sql`UPDATE Users SET group_id = ${req.body.groupId} WHERE email = ${req.params.userId};`;
   query = sql`INSERT INTO GroupMembers(member_id, group_id, active) VALUES(${req.params.userId}, ${req.body.groupId}, TRUE);`
   await db.query(query);
   next();
@@ -132,9 +129,9 @@ module.exports.getUserGroupByID = asyncHandler(async (req, _res, next) => {
   next();
 });
 
-// TO-DO
+
 module.exports.removeUserFromGroup = asyncHandler(async (req, _res, next) => {
-  query = sql`UPDATE Users SET group_id = NULL WHERE email = ${req.params.userId};`;
+  query = sql`UPDATE GroupMembers SET active = FALSE WHERE email = ${req.params.userId};`;
   await db.query(query);
   next();
 });
