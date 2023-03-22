@@ -4,7 +4,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
 import COLORS from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import config from '../constants/config';
+import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
 import { fetchUserByEmail } from '../services/api/user';
 const axios = require('axios').default;
@@ -34,6 +34,8 @@ export default function GoogleLogin({ navigation }) {
   useEffect(() => {
     if (accessToken != null) {
       getUserData();
+      const serverAccessToken = getAccessToken(accessToken);
+
     }
   }, [accessToken]);
 
@@ -44,6 +46,10 @@ export default function GoogleLogin({ navigation }) {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
+
+    // Request access token from backend and store it in AsyncStorage for later requests
+
+
     const data = await userInfoResponse.json();
     const result = await fetchUserByEmail(data['email']);
     if (result) {
