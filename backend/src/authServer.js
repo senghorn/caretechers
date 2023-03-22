@@ -32,6 +32,7 @@ function authServer() {
 
         // Authenticate User
         const token = req.body.token;
+        console.log(token);
         let email = "";
         if (token) {
             try {

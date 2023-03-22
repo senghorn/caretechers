@@ -13,6 +13,7 @@ WebBrowser.maybeCompleteAuthSession();
 export default function GoogleLogin({ navigation }) {
   const { setUser } = useContext(UserContext);
   const [accessToken, setAccessToken] = useState(null);
+  const [cookies, setCookies] = useState(null);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
       '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
@@ -34,10 +35,19 @@ export default function GoogleLogin({ navigation }) {
   useEffect(() => {
     if (accessToken != null) {
       getUserData();
-      const serverAccessToken = getAccessToken(accessToken);
-
+      const tokenRequest = async () => {
+        let serverAccessTokens = await getAccessToken(accessToken);
+        setCookies(serverAccessTokens);
+      }
+      tokenRequest();
     }
   }, [accessToken]);
+
+  useEffect(() => {
+    if (cookies) {
+      console.log(`cookies: `, cookies)
+    }
+  }, [cookies]);
 
   async function getUserData() {
     let userInfoResponse = await fetch(
@@ -48,8 +58,6 @@ export default function GoogleLogin({ navigation }) {
     );
 
     // Request access token from backend and store it in AsyncStorage for later requests
-
-
     const data = await userInfoResponse.json();
     const result = await fetchUserByEmail(data['email']);
     if (result) {
