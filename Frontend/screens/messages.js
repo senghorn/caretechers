@@ -1,4 +1,4 @@
-import { StyleSheet, View, ActionSheetIOS, Text } from 'react-native';
+import { StyleSheet, View, ActionSheetIOS } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
@@ -7,6 +7,7 @@ import {
   FetchUsers,
   searchMessage,
   PinMessage,
+  fetchMoreMessages
 } from '../services/api/messages';
 import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
@@ -23,10 +24,26 @@ export default function Messages({ navigation }) {
   const [users, setUsers] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMode, setSearchMode] = useState(false);
+  const [noEalierMessages, setNoEarlierMessages] = useState(false);
   const { user } = useContext(UserContext);
 
+  const onToggleSnackBar = () => setNoEarlierMessages(!noEalierMessages);
+
+  const getBiggestIdOfMessages = () => {
+    let result = 0;
+    if (messages && messages.length > 0) {
+      result = messages[0]._id;
+      messages.forEach((message) => {
+        if (message._id < result) {
+          result = message._id;
+        }
+      })
+    }
+    return result;
+  }
+
   const { data, isLoading, error, mutate } = useSWR(
-    config.backend_server + '/messages/' + user.group_id,
+    config.backend_server + '/messages/fetch/' + user.group_id,
     fetcher
   );
 
@@ -52,6 +69,22 @@ export default function Messages({ navigation }) {
       });
     }
   }, [user]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const loadEarlier = async () => {
+    if (user && users && user.group_id && messages) {
+      if (!isLoadingData) {
+        setIsLoadingData(true);
+        var last_id = getBiggestIdOfMessages();
+        const more_messages = await fetchMoreMessages(user.group_id, last_id, users);
+        if (more_messages) {
+          if (more_messages.length === 0) {
+            setNoEarlierMessages(true);
+          }
+          setMessages(messages.concat(more_messages));
+        }
+      }
+    }
+  }
 
   // Fetch all the users in the group for their profile photos
   useEffect(() => {
@@ -86,6 +119,10 @@ export default function Messages({ navigation }) {
       setDisplayMessages(messages);
     }
   }, [messages]);
+
+  useEffect(() => {
+    setIsLoadingData(false);
+  }, [displayMessages]);
 
   useEffect(() => {
     if (socket) {
@@ -196,6 +233,9 @@ export default function Messages({ navigation }) {
         onSend={(messages) => onMessageSend(messages)}
         user={this_user}
         onLongPress={onLongPress}
+        onLoadEarlier={loadEarlier}
+        loadEarlier={!noEalierMessages}
+        infiniteScroll
       />
     </View>
   );
@@ -225,7 +265,7 @@ const FormatMessagesForChat = (all_users, messages) => {
         text: message.content,
         createdAt: message.date_time,
         _id: message.id,
-        user: all_users[message.sender],
+        user: all_users[message.sender] ? all_users[message.sender] : { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
       });
     });
   }
