@@ -6,8 +6,8 @@ import COLORS from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
-import { fetchUserByEmail } from '../services/api/user';
-import { getGoogleAccessToken, setGoogleAccessToken } from '../services/storage/asyncStorage';
+import { fetchUserByCookie, fetchUserByEmail } from '../services/api/user';
+import { getGoogleAccessToken, setGoogleAccessToken, setAPIAccessToken, setAPIResetToken } from '../services/storage/asyncStorage';
 import { validateTokens } from '../utils/accessController';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -30,7 +30,7 @@ export default function GoogleLogin({ navigation }) {
   const loginHandler = async () => {
     const userAccess = await validateTokens();
     if (userAccess === "Authenticated") {
-      navigation.navigate('Home');
+      getUserData();
     } else if (userAccess === "GoogleAuthenticated") {
       const googleToken = await getGoogleAccessToken();
       setAccessToken(googleToken);
@@ -42,8 +42,6 @@ export default function GoogleLogin({ navigation }) {
   useEffect(() => {
     if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
-    } else {
-
     }
   }, [response]);
 
@@ -53,6 +51,12 @@ export default function GoogleLogin({ navigation }) {
       const tokenRequest = async () => {
         let serverAccessTokens = await getAccessToken(accessToken);
         setCookies(serverAccessTokens);
+        if (serverAccessTokens.accessToken) {
+          setAPIAccessToken(serverAccessTokens.accessToken);
+        }
+        if (serverAccessTokens.refreshToken) {
+          setAPIResetToken(serverAccessTokens.refreshToken);
+        }
       }
       tokenRequest();
     }
@@ -74,10 +78,10 @@ export default function GoogleLogin({ navigation }) {
       );
       // Request access token from backend and store it in AsyncStorage for later requests
       let data = await userInfoResponse.json();
-      const result = await fetchUserByEmail(data['email'], cookies.accessToken);
+      const result = await fetchUserByCookie(cookies.accessToken);
       if (result) {
-        // set user context
-        setUser(result);
+        // set user context 
+        setUser({ "curr_group": result.curr_group, "id": result.id, "access_token": cookies.accessToken });
         if (result.curr_group) {
           navigation.navigate('Home');
         } else {

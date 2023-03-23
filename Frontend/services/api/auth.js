@@ -1,6 +1,12 @@
 import config from '../../constants/config';
 import axios from 'axios';
 
+/**
+ * Given a google access token, it sends a login request and returns back cookies.
+ * If login fails, it returns null.
+ * @param {String} token | Google access token
+ * @returns 
+ */
 export async function getAccessToken(token) {
     try {
         let connection_string =

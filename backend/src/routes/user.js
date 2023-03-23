@@ -13,6 +13,8 @@ router.post('/', [userMiddleware.verifyCreateUserBody, userMiddleware.createNewU
 
 router.get('/groupId/:userId', [userMiddleware.getUserGroupByID, sharedMiddleware.sendResult]);
 
+router.get('/fetch/userInfo', [userMiddleware.getUserByToken, sharedMiddleware.sendResult]);
+
 router.patch('/:userId', [userMiddleware.verifyCreateUserBody, userMiddleware.editUser, sharedMiddleware.sendNoResult]);
 
 router.delete('/:userId/:groupId', [userMiddleware.removeUserFromGroup, sharedMiddleware.sendNoResult]);

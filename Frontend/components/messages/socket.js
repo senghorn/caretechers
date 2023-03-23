@@ -3,18 +3,18 @@ import config from "../../constants/config";
 
 const URL = config.backend_messaging;
 
-const createSocket = (user) => {
-    return io(URL, {
-      reconnectionDelayMax: 10000,
-      auth: {
-        token: user.token,
-        username: user._id,
-      },
-      query: {
-        groupId: user.groupId,
-      },
-      autoConnect: false,
-    });
-  };
-  
-  export default createSocket;
+const createSocket = (user, token) => {
+  return io(URL, {
+    reconnectionDelayMax: 10000,
+    auth: {
+      token: token,
+      username: user.id,
+    },
+    query: {
+      groupId: user.curr_group,
+    },
+    autoConnect: true,
+  });
+};
+
+export default createSocket;

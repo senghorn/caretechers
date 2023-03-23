@@ -1,5 +1,9 @@
+require('dotenv').config()
+
 const sql = require('sql-template-strings');
 const db = require('./database');
+const jwt = require('jsonwebtoken')
+
 const { sendNotificationsToGroup } = require('./notifications/sendNotifications');
 
 function CreateWebSocketServer(app) {
@@ -13,10 +17,9 @@ function CreateWebSocketServer(app) {
   });
 
   io.on('connect', (socket) => {
+    console.log(`User ${socket.username} connected!`);
     const groupName = socket.groupId;
     socket.join(groupName);
-
-    console.log(socket.username, ' just connected!');
     socket.on('chat', async (messages) => {
 
       var messageData = messages[0];
@@ -48,16 +51,34 @@ function CreateWebSocketServer(app) {
 
   // Register middleware function that gets called every incoming socket
   io.use((socket, next) => {
-    const username = socket.handshake.auth.username;
-    if (!username) {
-      return next(new Error('invalid username'));
+    const accessToken = socket.handshake.auth.token;
+    if (accessToken) {
+      const decodedUser = decodeToken(accessToken);
+      if (decodedUser && decodedUser.id && decodedUser.curr_group) {
+        socket.username = decodedUser.id;
+        socket.groupId = decodedUser.curr_group;
+      } else {
+        return next(new Error('invalid token'));
+      }
     }
-    socket.username = username;
-    socket.groupId = socket.handshake.query.groupId;
     next();
   });
 
   return httpServer;
+}
+
+function decodeToken(token) {
+  let decodedUser = null;
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      console.log('token decoded error', err)
+      return res.sendStatus(403)
+    }
+    decodedUser = user;
+    return user;
+  })
+
+  return decodedUser;
 }
 
 module.exports.CreateWebSocketServer = CreateWebSocketServer;

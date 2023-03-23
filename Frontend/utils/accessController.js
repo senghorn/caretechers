@@ -36,6 +36,7 @@ async function validateGoogleToken(token) {
         }
     );
     if (userInfoResponse.status === 401) {
+        console.log('Google token expired');
         return false;
     }
 

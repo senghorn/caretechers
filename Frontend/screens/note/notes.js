@@ -7,22 +7,27 @@ import Header from '../../components/notes/header';
 import config from '../../constants/config';
 import UserContext from '../../services/context/UserContext';
 import useSWR from 'swr';
+import axios from 'axios';
 import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
+import { getAPIAccessToken } from '../../services/storage/asyncStorage';
 import { SearchNotes } from '../../services/api/notes';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function Notes({ navigation, route }) {
   const { user } = useContext(UserContext);
   const { refresh, sort, searchMode } = useContext(NotesRefreshContext);
   const [searchResult, setSearchResult] = useState([]);
   const { data, isLoading, error, mutate } = useSWR(
-    config.backend_server + '/notes/group/' + user.group_id,
-    fetcher
+    [config.backend_server + '/notes/group/' + user.curr_group,
+      {
+        headers: { 'Authorization': 'Bearer ' + user.access_token }
+      }],
+    ([url, token]) => fetcher(url, token)
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const [notesList, setNotesList] = useState(null);
+  const [notesList, setNotesList] = useState([]);
   const onRefresh = useCallback(async () => {
     if (user != null && user !== {}) {
       setRefreshing(true);
@@ -30,6 +35,7 @@ export default function Notes({ navigation, route }) {
       setRefreshing(false);
     }
   }, [user, mutate]);
+
 
   useEffect(() => {
     if (user != null && !isLoading && data) {

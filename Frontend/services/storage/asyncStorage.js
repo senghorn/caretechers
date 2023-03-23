@@ -11,7 +11,6 @@ export async function setGoogleAccessToken(token) {
 export async function getGoogleAccessToken() {
     try {
         const savedGoogleToken = await AsyncStorage.getItem("google_token");
-        console.log('google token stored', savedGoogleToken);
         const googleToken = JSON.parse(savedGoogleToken);
         return googleToken;
     } catch (error) {
@@ -32,7 +31,6 @@ export async function getAPIAccessToken() {
     try {
         const apiToken = await AsyncStorage.getItem("api_access_token");
         const apiAccessToken = JSON.parse(apiToken);
-        console.log(apiAccessToken);
         return apiAccessToken;
     } catch (error) {
         console.log(error);

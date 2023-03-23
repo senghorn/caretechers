@@ -9,23 +9,20 @@ import {
   PinMessage,
   fetchMoreMessages
 } from '../services/api/messages';
-import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
 import useSWR from 'swr';
 import config from '../constants/config';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-export default function Messages({ navigation }) {
+export default function Messages({ navigation, socket }) {
   const [this_user, setThisUser] = useState(null);
-  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [displayMessages, setDisplayMessages] = useState([]);
   const [users, setUsers] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMode, setSearchMode] = useState(false);
   const { user } = useContext(UserContext);
-
   const getBiggestIdOfMessages = () => {
     let result = 0;
     if (messages) {
@@ -85,7 +82,6 @@ export default function Messages({ navigation }) {
   useEffect(() => {
     if (this_user) {
       FetchUsers(this_user.groupId, setUsers);
-      setSocket(createSocket(this_user));
     }
   }, [this_user]);
 
@@ -121,34 +117,14 @@ export default function Messages({ navigation }) {
 
   useEffect(() => {
     if (socket) {
-      socket.connect();
-      socket.on('connect_error', (err) => {
-        console.log(err.message);
-        if (err.message === 'invalid username') {
-          console.log('failed to connect to message server');
-        }
-      });
-
+      console.log('socket available');
       socket.on('message', (msg) => {
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, msg)
         );
       });
-
-      socket.on('disconnect', (reason) => {
-        console.log(reason);
-        socket.disconnect();
-        if (reason === 'io server disconnect') {
-        }
-      });
-
-      // Network clean up: This will clean up any necessary connections with server
-      return () => {
-        socket.disconnect();
-        console.log('cleaning up');
-      };
     }
-  }, [socket]);
+  }, [socket])
 
   var onMessageSend = useCallback(
     (messages = []) => {

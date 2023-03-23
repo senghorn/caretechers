@@ -76,11 +76,26 @@ export async function fetchUserByEmail(email, cookie) {
   return await axios
     .get(connection_string, { headers })
     .then(function (response) {
-      console.log('fetched user by email response:', response);
       return response.data;
     })
     .catch(function (error) {
       console.log('fetch user by email ', error);
+      return null;
+    });
+}
+
+export async function fetchUserByCookie(cookie) {
+  let connection_string = config.backend_server + '/user/fetch/userInfo';
+  let headers = {
+    Authorization: `Bearer ${cookie}`,
+  };
+  return await axios
+    .get(connection_string, { headers })
+    .then(function (response) {
+      return response.data;
+    })
+    .catch(function (error) {
+      console.log('fetch user by cookie ', error);
       return null;
     });
 }
