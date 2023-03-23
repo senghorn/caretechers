@@ -1,13 +1,15 @@
 import { useEffect, useState, useContext } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
-import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Image, Alert } from 'react-native';
 import COLORS from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
 import { fetchUserByEmail } from '../services/api/user';
-const axios = require('axios').default;
+import { getGoogleAccessToken, setGoogleAccessToken } from '../services/storage/asyncStorage';
+import { validateTokens } from '../utils/accessController';
+
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleLogin({ navigation }) {
@@ -25,16 +27,29 @@ export default function GoogleLogin({ navigation }) {
       '899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com',
   });
 
+  const loginHandler = async () => {
+    const userAccess = await validateTokens();
+    if (userAccess === "Authenticated") {
+      navigation.navigate('Home');
+    } else if (userAccess === "GoogleAuthenticated") {
+      const googleToken = await getGoogleAccessToken();
+      setAccessToken(googleToken);
+    } else {
+      promptAsync();
+    }
+  }
+
   useEffect(() => {
     if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
     } else {
+
     }
   }, [response]);
 
   useEffect(() => {
     if (accessToken != null) {
-      getUserData();
+      setGoogleAccessToken(accessToken);
       const tokenRequest = async () => {
         let serverAccessTokens = await getAccessToken(accessToken);
         setCookies(serverAccessTokens);
@@ -45,31 +60,34 @@ export default function GoogleLogin({ navigation }) {
 
   useEffect(() => {
     if (cookies) {
-      console.log(`cookies: `, cookies)
+      getUserData();
     }
   }, [cookies]);
 
   async function getUserData() {
-    let userInfoResponse = await fetch(
-      'https://www.googleapis.com/userinfo/v2/me',
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-
-    // Request access token from backend and store it in AsyncStorage for later requests
-    const data = await userInfoResponse.json();
-    const result = await fetchUserByEmail(data['email']);
-    if (result) {
-      // set user context
-      setUser(result);
-      if (result.group_id) {
-        navigation.navigate('Home');
+    try {
+      let userInfoResponse = await fetch(
+        'https://www.googleapis.com/userinfo/v2/me',
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      // Request access token from backend and store it in AsyncStorage for later requests
+      let data = await userInfoResponse.json();
+      const result = await fetchUserByEmail(data['email'], cookies.accessToken);
+      if (result) {
+        // set user context
+        setUser(result);
+        if (result.curr_group) {
+          navigation.navigate('Home');
+        } else {
+          navigation.navigate('Group');
+        }
       } else {
-        navigation.navigate('Group');
+        navigation.navigate('RegisterUser', { user: data });
       }
-    } else {
-      navigation.navigate('RegisterUser', { user: data });
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -95,7 +113,7 @@ export default function GoogleLogin({ navigation }) {
             size={35}
             iconStyle={styles.icon}
             onPress={() => {
-              promptAsync();
+              loginHandler();
             }}
           >
             <Text style={styles.loginText}>Login with Google</Text>

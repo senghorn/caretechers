@@ -11,7 +11,6 @@ export async function getAccessToken(token) {
                 token: token
             })
             .then(function (response) {
-                // console.log("returned data", response.data);
                 return response.data;
             })
             .catch(function (error) {
