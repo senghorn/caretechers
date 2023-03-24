@@ -1,17 +1,17 @@
 import config from '../../constants/config';
-
 const axios = require('axios').default;
 
-export async function UpdateNote(updated_note) {
+export async function UpdateNote(updated_note, cookie) {
   try {
     let connection_string = config.backend_server + '/notes/' + updated_note.id;
     await axios
       .patch(connection_string, {
         title: updated_note.title,
         content: updated_note.content,
+      }, {
+        headers: { 'Authorization': 'Bearer ' + cookie }
       })
       .then((response) => {
-        // console.log(response.data);
         return true;
       })
       .catch((error) => {
@@ -24,44 +24,48 @@ export async function UpdateNote(updated_note) {
   return false;
 }
 
-export async function fetchNotes(user, setNotes) {
+/**
+ * Sends a request to remove the provided noteId's note
+ * @param {string} noteId 
+ * @returns 
+ */
+export async function RemoveNote(noteId, cookie) {
   try {
-    let connection_string =
-      config.backend_server + '/notes/group/' + user.group_id;
-    await axios.get(connection_string).then(function (response) {
-      setNotes(response.data);
-    });
-  } catch (error) {
-    console.log('Fetching note error', error.message);
-  }
-}
-
-export async function RemoveNote(noteId) {
-  try {
-    let connection_string = config.backend_server + '/notes/';
-    axios
-      .delete(connection_string + noteId)
-      .then((response) => {})
+    let connection_string = config.backend_server + '/notes/' + noteId;
+    await axios.delete(connection_string, {
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    })
+      .then((response) => { })
       .catch((error) => {
-        console.log(error);
+        console.log('delete note error', error);
       });
   } catch (error) {
     console.log(error.message);
   }
 }
 
-// Sends the new added note to backend
-export async function CreateNote(newNote, group_id) {
+
+/**
+ * Saves the new note created by send the request to the server.
+ * @param {object} newNote 
+ * @param {string} group_id 
+ * @returns 
+ */
+export async function CreateNote(newNote, group_id, cookie) {
   try {
     let connection_string = config.backend_server + '/notes/group/' + group_id;
-    const result = await fetch(connection_string, {
-      method: 'POST',
-      body: JSON.stringify(newNote),
+    const result = await axios.post(connection_string, newNote, {
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + cookie
       },
+      params: {
+        groupId: group_id
+      }
     });
-    const data = await result.json();
+    const data = result.data;
     return data.noteId;
   } catch (error) {
     console.log("Can't create new note", error.message);
@@ -69,6 +73,13 @@ export async function CreateNote(newNote, group_id) {
   }
 }
 
+
+/**
+ * Returns the result of searching. Returns null if fail.
+ * @param {string} search_string 
+ * @param {string} group_id 
+ * @returns 
+ */
 export async function SearchNotes(search_string, group_id) {
   try {
     let url =

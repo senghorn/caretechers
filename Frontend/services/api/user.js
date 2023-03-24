@@ -84,6 +84,13 @@ export async function fetchUserByEmail(email, cookie) {
     });
 }
 
+/**
+ * Given access token, it returns the user data by sending request to the backend for 
+ * fetching the information. 
+ * 
+ * @param {string} cookie 
+ * @returns user data
+ */
 export async function fetchUserByCookie(cookie) {
   let connection_string = config.backend_server + '/user/fetch/userInfo';
   let headers = {

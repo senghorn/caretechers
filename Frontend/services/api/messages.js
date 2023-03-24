@@ -78,6 +78,13 @@ export async function fetchMoreMessages(group_id, last_id, users) {
   }
 }
 
+/**
+ * Returns relevant messages upon successful search of the given query.
+ * Otherwise, returns null.
+ * @param {string} group_id 
+ * @param {string} query 
+ * @returns 
+ */
 export async function searchMessage(group_id, query) {
   try {
     let url =
@@ -91,8 +98,14 @@ export async function searchMessage(group_id, query) {
   } catch (error) {
     console.log('search message error', error);
   }
+  return null;
 }
 
+/**
+ * Sends a request to the server to pin the message of message_id
+ * @param {string} message_id 
+ * @returns 
+ */
 export async function PinMessage(message_id) {
   console.log(message_id);
   try {
@@ -105,6 +118,11 @@ export async function PinMessage(message_id) {
   return true;
 }
 
+/**
+ * Sends a request to the server to unpin the message of message_id
+ * @param {string} message_id 
+ * @returns 
+ */
 export async function UnpinMessage(message_id) {
   try {
     let url =
@@ -116,6 +134,11 @@ export async function UnpinMessage(message_id) {
   return true;
 }
 
+/**
+ * Returns all pinned messages of the given group. Null upon error.
+ * @param {string} group_id 
+ * @returns []
+ */
 export async function GetPinnedMessages(group_id) {
   try {
     let url = config.backend_server + '/messages/pin/' + group_id;
@@ -128,6 +151,16 @@ export async function GetPinnedMessages(group_id) {
   return null;
 }
 
+
+/**
+ * Fetches users that are in the user's group. Upon success, it calls setUsers on all the received data.
+ * It also calls setThisUser on the user that has id matches provided user.
+ * @param {object} user 
+ * @param {function} setUsers 
+ * @param {function} setThisUser 
+ * @param {string} cookie 
+ * @returns 
+ */
 export async function FetchUsers(user, setUsers, setThisUser, cookie) {
   try {
     let connection_string =
