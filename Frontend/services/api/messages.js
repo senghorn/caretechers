@@ -128,29 +128,41 @@ export async function GetPinnedMessages(group_id) {
   return null;
 }
 
-export async function FetchUsers(group_id, setUsers) {
+export async function FetchUsers(user, setUsers, setThisUser, cookie) {
   try {
     let connection_string =
-      config.backend_server + '/messages/users/' + group_id;
-    return await axios
-      .get(connection_string, {
-        groupId: group_id,
-      })
+      config.backend_server + '/messages/users/' + user.curr_group;
+    let headers = {
+      Authorization: `Bearer ${cookie}`,
+    };
+    return await axios.get(connection_string, {
+      headers: headers,
+      params: {
+        groupId: user.curr_group
+      }
+    })
       .then((response) => {
         var users = {};
-        response.data.forEach(function (user) {
-          users[user.email] = {
-            _id: user.email,
-            name: user.first_name + ' ' + user.last_name,
-            avatar: user.profile_pic ? user.profile_pic : '',
+        response.data.forEach(function (newUser) {
+          users[newUser.email] = {
+            _id: newUser.email,
+            name: newUser.first_name + ' ' + newUser.last_name,
+            avatar: newUser.profile_pic ? newUser.profile_pic : '',
           };
+          if (user.id === newUser.email) {
+            setThisUser({
+              _id: newUser.email,
+              name: newUser.first_name + ' ' + newUser.last_name,
+              avatar: newUser.profile_pic ? newUser.profile_pic : '',
+            })
+          }
         });
 
         setUsers(users);
         return response.data;
       })
       .catch((error) => {
-        console.log(error);
+        console.log('fetch user error', error);
       });
   } catch (error) {
     console.log(error.message);

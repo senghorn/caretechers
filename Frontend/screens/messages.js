@@ -13,7 +13,7 @@ import UserContext from '../services/context/UserContext';
 import useSWR from 'swr';
 import config from '../constants/config';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function Messages({ navigation, socket }) {
   const [this_user, setThisUser] = useState(null);
@@ -35,9 +35,13 @@ export default function Messages({ navigation, socket }) {
     return result;
   }
 
+
   const { data, isLoading, error, mutate } = useSWR(
-    config.backend_server + '/messages/fetch/' + user.group_id,
-    fetcher
+    [config.backend_server + '/messages/fetch/' + user.curr_group,
+      {
+        headers: { 'Authorization': 'Bearer ' + user.access_token }
+      }],
+    ([url, token]) => fetcher(url, token)
   );
 
   useEffect(() => {
@@ -48,20 +52,6 @@ export default function Messages({ navigation, socket }) {
     }
   }, [data, isLoading, users]);
 
-  // Sets up user so GiftedChat recognize who this user is in order
-  // to display correctly
-  useEffect(() => {
-    if (user && !(Object.keys(user).length === 0)) {
-      setThisUser({
-        _id: user.email,
-        name: `${user.first_name} ${user.last_name}`,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        avatar: user.profile_pic,
-        groupId: user.group_id,
-      });
-    }
-  }, [user]);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const loadEarlier = async () => {
     if (user && users && user.group_id && messages) {
@@ -80,10 +70,10 @@ export default function Messages({ navigation, socket }) {
 
   // Fetch all the users in the group for their profile photos
   useEffect(() => {
-    if (this_user) {
-      FetchUsers(this_user.groupId, setUsers);
+    if (user) {
+      FetchUsers(user, setUsers, setThisUser, user.access_token);
     }
-  }, [this_user]);
+  }, [user]);
 
   useEffect(() => {
     if (
@@ -171,7 +161,7 @@ export default function Messages({ navigation, socket }) {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == user.email ? 'right' : 'left'}
+        position={message_sender_id == this_user._id ? 'right' : 'left'}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.primary,

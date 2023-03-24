@@ -6,9 +6,9 @@ const db = require('../database');
 const { getUTCDateTime } = require('../utls');
 
 module.exports.getMessagesByGroup = asyncHandler(async (req, res, next) => {
+
 	const query = sql`SELECT * FROM Messages WHERE group_id = ${req.params.groupId} ORDER BY date_time DESC LIMIT 50;`
 	let result = await db.query(query);
-
 	if (req.query.offset) {
 		result = result.slice(req.query.offset);
 	};
@@ -28,7 +28,7 @@ module.exports.fetchMoreMessagesByLastMessageId = asyncHandler(async (req, res, 
 });
 
 module.exports.getUsersInGroup = asyncHandler(async (req, res, next) => {
-	const query = sql`SELECT * FROM Users WHERE group_id = ${req.params.groupId};`;
+	const query = sql`SELECT * FROM Users WHERE curr_group = ${req.params.groupId};`;
 	let result = await db.query(query);
 	req.result = result;
 	next();
