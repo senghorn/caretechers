@@ -66,7 +66,7 @@ export default function Notes({ navigation, route }) {
   useEffect(() => {
     if (searchQuery && searchQuery !== '') {
       const search = async () => {
-        const result = await SearchNotes(searchQuery, user.group_id);
+        const result = await SearchNotes(searchQuery, user.curr_group, user.access_token);
         setSearchResult(result);
       };
 

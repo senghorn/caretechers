@@ -54,7 +54,7 @@ export default function Messages({ navigation, socket }) {
 
   const [isLoadingData, setIsLoadingData] = useState(false);
   const loadEarlier = async () => {
-    if (user && users && user.group_id && messages) {
+    if (user && users && user.curr_group && messages) {
       if (!isLoadingData) {
         setIsLoadingData(true);
         var last_id = getBiggestIdOfMessages();

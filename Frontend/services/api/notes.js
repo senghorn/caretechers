@@ -80,11 +80,15 @@ export async function CreateNote(newNote, group_id, cookie) {
  * @param {string} group_id 
  * @returns 
  */
-export async function SearchNotes(search_string, group_id) {
+export async function SearchNotes(search_string, group_id, cookie) {
   try {
     let url =
       config.backend_server + `/notes/search/${group_id}/${search_string}`;
-    const result = await fetch(url);
+    const result = await fetch(url, {
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
     const data = await result.json();
     return data;
   } catch (error) {
