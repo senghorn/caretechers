@@ -1,6 +1,6 @@
 import { getAPIAccessToken, getGoogleAccessToken } from '../services/storage/asyncStorage';
-
-
+import config from '../constants/config';
+import axios from 'axios';
 /**
  * Returns "Authenticated" if the app has valid access tokens to backend.
  * Returns "GoogleAuthenticated" if the only has valid Google Access Token.
@@ -44,6 +44,18 @@ async function validateGoogleToken(token) {
 }
 
 async function validateApiToken(token) {
-    // TODO: Validate the token with the backend
-    return false;
+    let connection_string =
+        config.auth_server + '/validate';
+    // attache the token to the request body
+    return await axios
+        .post(connection_string, {
+            token: token
+        })
+        .then(function (response) {
+            return true;
+        })
+        .catch(function (error) {
+            console.log('login request error', error);
+            return false;
+        });
 }

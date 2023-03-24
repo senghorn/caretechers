@@ -7,7 +7,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
 import { fetchUserByCookie, fetchUserByEmail } from '../services/api/user';
-import { getGoogleAccessToken, setGoogleAccessToken, setAPIAccessToken, setAPIResetToken } from '../services/storage/asyncStorage';
+import { getGoogleAccessToken, setGoogleAccessToken, setAPIAccessToken, setAPIResetToken, getAPIAccessToken } from '../services/storage/asyncStorage';
 import { validateTokens } from '../utils/accessController';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -26,6 +26,11 @@ export default function GoogleLogin({ navigation }) {
     webClientId:
       '899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com',
   });
+
+  // On load, try logging in automatically
+  useEffect(() => {
+    loginHandler();
+  }, []);
 
   const loginHandler = async () => {
     const userAccess = await validateTokens();
@@ -78,10 +83,11 @@ export default function GoogleLogin({ navigation }) {
       );
       // Request access token from backend and store it in AsyncStorage for later requests
       let data = await userInfoResponse.json();
-      const result = await fetchUserByCookie(cookies.accessToken);
+      const access_token = await getAPIAccessToken();
+      const result = await fetchUserByCookie(access_token);
       if (result) {
         // set user context 
-        setUser({ "curr_group": result.curr_group, "id": result.id, "access_token": cookies.accessToken });
+        setUser({ "curr_group": result.curr_group, "id": result.id, "access_token": access_token });
         if (result.curr_group) {
           navigation.navigate('Home');
         } else {

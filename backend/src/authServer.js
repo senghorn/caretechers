@@ -26,11 +26,15 @@ function authServer() {
         })
     })
 
-    app.post('/info', (req, res) => {
+    app.post('/validate', (req, res) => {
+        console.log(req.body);
         const accessToken = req.body.token
         if (accessToken == null) return res.sendStatus(401)
         jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-            if (err) return res.sendStatus(403)
+            if (err) {
+                console.log(err.message);
+                return res.sendStatus(403)
+            }
             return res.sendStatus(200);
         })
     })
