@@ -97,9 +97,9 @@ async function getUserData(email) {
     const query = sql`SELECT * FROM Users WHERE email = ${email};`;
     const [result] = await db.query(query);
     if (!result) {
-        return { id: email, curr_group: [] }
+        return { id: email, curr_group: [], first_name: "", last_name: "" }
     }
-    return { id: result.email, curr_group: result.curr_group };
+    return { id: result.email, curr_group: result.curr_group, first_name: result.first_name, last_name: result.last_name };
 }
 
 module.exports.authServer = authServer;

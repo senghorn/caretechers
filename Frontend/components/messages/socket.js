@@ -8,12 +8,8 @@ const createSocket = (user, token) => {
     reconnectionDelayMax: 10000,
     auth: {
       token: token,
-      username: user.id,
     },
-    query: {
-      groupId: user.curr_group,
-    },
-    autoConnect: true,
+    autoConnect: false,
   });
 };
 

@@ -12,10 +12,11 @@ import {
 import UserContext from '../services/context/UserContext';
 import useSWR from 'swr';
 import config from '../constants/config';
+import SocketContext from '../services/context/SocketContext';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
-export default function Messages({ navigation, socket }) {
+export default function Messages({ navigation }) {
   const [this_user, setThisUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [displayMessages, setDisplayMessages] = useState([]);
@@ -23,7 +24,8 @@ export default function Messages({ navigation, socket }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMode, setSearchMode] = useState(false);
   const { user } = useContext(UserContext);
-  const getBiggestIdOfMessages = () => {
+  const [socket, setSocket] = useContext(SocketContext);
+  const getSmallestMessageId = () => {
     let result = 0;
     if (messages) {
       messages.forEach((message) => {
@@ -57,10 +59,8 @@ export default function Messages({ navigation, socket }) {
     if (user && users && user.curr_group && messages) {
       if (!isLoadingData) {
         setIsLoadingData(true);
-        var last_id = getBiggestIdOfMessages();
-        console.log("****** LAST MESSAGE ID " + last_id)
-        const more_messages = await fetchMoreMessages(user.group_id, last_id, users);
-        console.log(more_messages);
+        var last_id = getSmallestMessageId();
+        const more_messages = await fetchMoreMessages(user.curr_group, last_id, users);
         if (more_messages) {
           setMessages(messages.concat(more_messages));
         }
@@ -80,11 +80,11 @@ export default function Messages({ navigation, socket }) {
       searchQuery &&
       searchQuery != '' &&
       user &&
-      user.group_id &&
+      user.curr_group &&
       searchMode
     ) {
       const search = async () => {
-        const result = await searchMessage(user.group_id, searchQuery);
+        const result = await searchMessage(user.curr_group, searchQuery);
         const formatted = FormatMessagesForChat(users, result);
         setDisplayMessages(formatted);
       };
@@ -107,18 +107,18 @@ export default function Messages({ navigation, socket }) {
 
   useEffect(() => {
     if (socket) {
-      console.log('socket available');
       socket.on('message', (msg) => {
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, msg)
         );
       });
     }
-  }, [socket])
+  }, [])
 
   var onMessageSend = useCallback(
     (messages = []) => {
       if (socket) {
+        console.log(messages);
         socket.emit('chat', messages);
       }
     },
@@ -128,7 +128,7 @@ export default function Messages({ navigation, socket }) {
   const [pinMessage, setPinMessage] = useState(null);
 
   useEffect(() => {
-    if (pinMessage && pinMessage._id && user && user.group_id) {
+    if (pinMessage && pinMessage._id && user && user.curr_group) {
       PinMessage(pinMessage._id);
       setPinMessage(null);
     }
