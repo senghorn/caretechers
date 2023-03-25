@@ -49,13 +49,18 @@ export async function FetchMessages(
 /*
  * Fetches more messages given last message id and group id
  */
-export async function fetchMoreMessages(group_id, last_id, users) {
+export async function fetchMoreMessages(group_id, last_id, users, cookie) {
   try {
     if (!last_id) {
       return null;
     }
     let url = config.backend_server + `/messages/fetch/${group_id}/${last_id}`;
-    const result = await axios.get(url);
+    const result = await axios.get(url, {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
     if (result.status == 200) {
       var messages = [];
       result.data.forEach(function (message) {
@@ -85,11 +90,16 @@ export async function fetchMoreMessages(group_id, last_id, users) {
  * @param {string} query 
  * @returns 
  */
-export async function searchMessage(group_id, query) {
+export async function searchMessage(group_id, query, cookie) {
   try {
     let url =
       config.backend_server + '/messages/search/' + group_id + '/' + query;
-    const result = await axios.get(url);
+    const result = await axios.get(url, {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
     if (result.status == 200) {
       return result.data;
     } else {
@@ -106,12 +116,17 @@ export async function searchMessage(group_id, query) {
  * @param {string} message_id 
  * @returns 
  */
-export async function PinMessage(message_id) {
+export async function PinMessage(message_id, cookie) {
   console.log(message_id);
   try {
     let url =
       config.backend_server + '/messages/pin/' + message_id;
-    const result = await axios.post(url);
+    const result = await axios.post(url, [], {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
   } catch (error) {
     console.log('pin message error', error);
   }
@@ -123,13 +138,18 @@ export async function PinMessage(message_id) {
  * @param {string} message_id 
  * @returns 
  */
-export async function UnpinMessage(message_id) {
+export async function UnpinMessage(message_id, cookie) {
   try {
     let url =
       config.backend_server + '/messages/unpin/' + message_id;
-    await axios.post(url);
+    await axios.post(url, [], {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
   } catch (error) {
-    console.log('pin message error', error);
+    console.log('unpin message error', error);
   }
   return true;
 }
@@ -139,11 +159,15 @@ export async function UnpinMessage(message_id) {
  * @param {string} group_id 
  * @returns []
  */
-export async function GetPinnedMessages(group_id) {
+export async function GetPinnedMessages(group_id, cookie) {
   try {
     let url = config.backend_server + '/messages/pin/' + group_id;
-    const result = await axios.get(url);
-    console.log(result.data);
+    const result = await axios.get(url, {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
     return result.data;
   } catch (error) {
     console.log('fetch pinned messages error', error);

@@ -27,7 +27,6 @@ function authServer() {
     })
 
     app.post('/validate', (req, res) => {
-        console.log(req.body);
         const accessToken = req.body.token
         if (accessToken == null) return res.sendStatus(401)
         jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {

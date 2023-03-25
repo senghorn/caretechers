@@ -10,17 +10,24 @@ import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import { ActivityIndicator } from 'react-native-paper';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function PinnedMessages({ navigation }) {
 
     const { user } = useContext(UserContext);
     const [messages, setMessages] = useState([]);
     const { data, isLoading, error, mutate } = useSWR(
-        config.backend_server + '/messages/pin/' + user.group_id,
-        fetcher
+        [config.backend_server + '/messages/pin/' + user.curr_group, {
+            params: {
+                groupId: user.curr_group
+            },
+            headers: { 'Authorization': 'Bearer ' + user.access_token }
+        }],
+        ([url, token]) => fetcher(url, token)
     );
     const [users, setUsers] = useState([]);
+    const [this_user, setThisUser] = useState(null);
+
     useEffect(() => {
         if (data && !isLoading) {
             setMessages(data);
@@ -28,9 +35,9 @@ export default function PinnedMessages({ navigation }) {
     }, [data, isLoading]);
 
     useEffect(() => {
-        if (user && user.group_id) {
+        if (user && user.curr_group) {
             const fetchData = async () => {
-                await FetchUsers(user.group_id, setUsers);
+                await FetchUsers(user, setUsers, setThisUser, user.access_token);
                 mutate();
             }
             fetchData();
@@ -41,7 +48,7 @@ export default function PinnedMessages({ navigation }) {
     useEffect(() => {
         if (messageToUnpin != null) {
             const unpin = async () => {
-                await UnpinMessage(messageToUnpin.id);
+                await UnpinMessage(messageToUnpin.id, user.access_token);
             }
             unpin();
             mutate(); // We can instead of fetching data again, remove the unpinned message

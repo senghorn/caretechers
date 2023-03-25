@@ -60,7 +60,7 @@ export default function Messages({ navigation }) {
       if (!isLoadingData) {
         setIsLoadingData(true);
         var last_id = getSmallestMessageId();
-        const more_messages = await fetchMoreMessages(user.curr_group, last_id, users);
+        const more_messages = await fetchMoreMessages(user.curr_group, last_id, users, user.access_token);
         if (more_messages) {
           setMessages(messages.concat(more_messages));
         }
@@ -84,7 +84,7 @@ export default function Messages({ navigation }) {
       searchMode
     ) {
       const search = async () => {
-        const result = await searchMessage(user.curr_group, searchQuery);
+        const result = await searchMessage(user.curr_group, searchQuery, user.access_token);
         const formatted = FormatMessagesForChat(users, result);
         setDisplayMessages(formatted);
       };
@@ -129,7 +129,7 @@ export default function Messages({ navigation }) {
 
   useEffect(() => {
     if (pinMessage && pinMessage._id && user && user.curr_group) {
-      PinMessage(pinMessage._id);
+      PinMessage(pinMessage._id, user.access_token);
       setPinMessage(null);
     }
 
