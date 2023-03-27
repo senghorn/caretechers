@@ -14,6 +14,7 @@ export default function Settings({ navigation }) {
   const [photo, setPhoto] = useState(require('../assets/favicon.png'));
 
   const { user, setUser } = useContext(UserContext);
+
   useEffect(() => {
     if (user) {
       setUsername(user.first_name + ' ' + user.last_name);

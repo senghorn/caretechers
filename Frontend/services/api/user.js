@@ -137,7 +137,7 @@ export async function addUserToGroup(email, groupName, password) {
   return false;
 }
 
-export async function UpdateUserData(email, first_name, last_name, phone, group_id, profile_pic) {
+export async function UpdateUserData(email, first_name, last_name, phone, group_id, profile_pic, cookie) {
   const data = {
     email: email,
     firstName: first_name,
@@ -149,12 +149,14 @@ export async function UpdateUserData(email, first_name, last_name, phone, group_
   try {
     let connection_string = config.backend_server + '/user/' + email;
     return await axios
-      .patch(connection_string, data)
+      .patch(connection_string, data, {
+        headers: { 'Authorization': 'Bearer ' + cookie }
+      })
       .then(function (response) {
         return true;
       })
       .catch(function (error) {
-        console.log(error);
+        console.log('join group error ', error);
         return false;
       });
   } catch (error) {

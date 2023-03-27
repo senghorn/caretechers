@@ -8,11 +8,15 @@ import { RemoveUserFromGroup } from '../../services/api/user';
 import config from '../../constants/config';
 import useSWR from 'swr';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function GroupSettings({ navigation }) {
   const { user } = useContext(UserContext);
-  const { data, isLoading, error, mutate } = useSWR(config.backend_server + '/groups/info/' + user.group_id, fetcher);
+  const { data, isLoading, error, mutate } = useSWR([config.backend_server + '/groups/info/' + user.curr_group,
+  {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }],
+    ([url, token]) => fetcher(url, token));
   const [showAlert, setShowAlert] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [password, setPassword] = useState('');
@@ -38,8 +42,8 @@ export default function GroupSettings({ navigation }) {
   };
 
   const LeaveGroup = async () => {
-    if (user && user.email && user.group_id) {
-      const result = await RemoveUserFromGroup(user.email, user.group_id);
+    if (user && user.id && user.curr_group) {
+      const result = await RemoveUserFromGroup(user.id, user.curr_group);
       if (result == true) {
         navigation.navigate('Login');
       } else {
@@ -117,9 +121,9 @@ export default function GroupSettings({ navigation }) {
               <TextInput.Icon
                 name={'lock-reset'}
                 onPress={async () => {
-                  if (user && user.group_id) {
+                  if (user && user.curr_group) {
                     setLoading(true);
-                    const result = await resetGroupPassword(user.group_id);
+                    const result = await resetGroupPassword(user.curr_group);
                     setPassword(result);
                     setLoading(false);
                   }

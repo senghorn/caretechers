@@ -37,7 +37,7 @@ module.exports.createNewUser = asyncHandler(async (req, _res, next) => {
 
 module.exports.editUser = asyncHandler(async (req, _res, next) => {
   const query = sql`UPDATE Users SET Users.email = ${req.body.email}, Users.first_name = ${req.body.firstName}, 
-	Users.last_name = ${req.body.lastName}, Users.phone_num = ${req.body.phoneNum}, Users.group_id = ${req.body.groupId}, Users.profile_pic = ${req.body.profilePic}
+	Users.last_name = ${req.body.lastName}, Users.phone_num = ${req.body.phoneNum}, Users.curr_group = ${req.body.groupId}, Users.profile_pic = ${req.body.profilePic}
 	WHERE Users.email = ${req.params.userId};`;
   await db.query(query);
   next();
