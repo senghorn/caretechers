@@ -151,5 +151,7 @@ module.exports.setUserCurrGroup = asyncHandler(async (req, _res, next) => {
 module.exports.removeUserFromGroup = asyncHandler(async (req, _res, next) => {
   query = sql`UPDATE GroupMembers SET active = FALSE WHERE member_id = ${req.params.userId} and group_id = ${req.params.groupId};`;
   await db.query(query);
+  query = sql`UPDATE Users SET curr_group = NULL WHERE member_id = ${req.params.userId};`;
+  await db.query(query);
   next();
 });
