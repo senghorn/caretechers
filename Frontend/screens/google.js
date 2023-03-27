@@ -87,7 +87,11 @@ export default function GoogleLogin({ navigation }) {
       const result = await fetchUserByCookie(access_token);
       if (result) {
         // set user context 
-        setUser({ "curr_group": result.curr_group, "id": result.id, "access_token": access_token });
+        setUser({
+          "access_token": access_token, "curr_group": result.curr_group, "id": result.id,
+          "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+          "phone_num": result.phone_num
+        });
         if (result.curr_group) {
           navigation.navigate('Home');
         } else {

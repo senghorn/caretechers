@@ -120,7 +120,17 @@ module.exports.getUserGroupByID = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.getUserByToken = asyncHandler(async (req, _res, next) => {
-  req.result = { curr_group: req.user.curr_group, id: req.user.id }
+
+  query = sql`SELECT * FROM Users WHERE email = ${req.user.id}`;
+  const [result] = await db.query(query);
+  if (!result) {
+    return next(newError('This user does not have a group', 404));
+  }
+  req.result = {
+    curr_group: result.curr_group, id: result.email, first_name: result.first_name,
+    last_name: result.last_name, profile_pic: result.profile_pic, phone_num: result.phone_num,
+    notification_identifier: result.notification_identifier
+  }
   next();
 });
 

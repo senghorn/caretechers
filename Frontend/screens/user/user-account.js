@@ -23,7 +23,7 @@ export default function UserAccount({ navigation, route, newUser }) {
       setFirstName(user.first_name);
       setLastName(user.last_name);
       setPhone(user.phone_num);
-      setEmail(user.email);
+      setEmail(user.id);
       setProfile({ uri: user.profile_pic });
     }
   };

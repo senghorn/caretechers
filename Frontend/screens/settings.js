@@ -6,9 +6,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import UserContext from '../services/context/UserContext';
 import colors from '../constants/colors';
 
-export default function Settings({ navigation, route }) {
+export default function Settings({ navigation }) {
   const [notificationOn, setNotificationOn] = useState(false);
-  const [darkOn, setDarkOn] = useState(false);
   const [username, setUsername] = useState('John Doe');
   const [phone, setPhone] = useState('123-321-1234');
   const [email, setEmail] = useState('johndoe@fakemail.com');
@@ -19,7 +18,7 @@ export default function Settings({ navigation, route }) {
     if (user) {
       setUsername(user.first_name + ' ' + user.last_name);
       setPhone(user.phone_num);
-      setEmail(user.email);
+      setEmail(user.id);
       setPhoto({ uri: user.profile_pic });
     }
   }, [user]);
@@ -98,23 +97,6 @@ export default function Settings({ navigation, route }) {
                 value={notificationOn}
                 onValueChange={() => {
                   setNotificationOn(!notificationOn);
-                }}
-              />
-            </View>
-          </View>
-          <View style={styles.switchItem}>
-            <View style={styles.switchLabel}>
-              {darkOn && <Ionicons name="moon" size={26} />}
-              {!darkOn && <Ionicons name="ios-sunny" size={26} />}
-              <Text style={styles.textLabel}>Dark Mode</Text>
-            </View>
-            <View style={styles.switchLabel}>
-              <Text style={styles.switchValue}>{darkOn ? 'On' : 'Off'}</Text>
-              <Switch
-                color={colors.primary}
-                value={darkOn}
-                onValueChange={() => {
-                  setDarkOn(!darkOn);
                 }}
               />
             </View>
