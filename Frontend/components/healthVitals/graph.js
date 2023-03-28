@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { StyleSheet, Text, View, Alert } from 'react-native';
 import { Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
@@ -7,6 +7,7 @@ import { ActivityIndicator, FAB } from 'react-native-paper';
 import AddDataButton from './addDataButton';
 import Dialog from "react-native-dialog";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import UserContext from '../../services/context/UserContext';
 const config = require('../../constants/config').default;
 const axios = require('axios').default;
 
@@ -21,6 +22,7 @@ export default function Graph({ id, title, units, labels, data, navigation, getG
     legend: [`${units}`],
   };
 
+  const { user } = useContext(UserContext);
   const chartConfig = {
     color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
     backgroundColor: '#e26a00',
@@ -48,22 +50,22 @@ export default function Graph({ id, title, units, labels, data, navigation, getG
     const currentDate = new Date(selectedDate);
     const month = currentDate.getMonth() + 1 < 10 ? `0${currentDate.getMonth() + 1}` : currentDate.getMonth() + 1;
     const date = currentDate.getDate() < 10 ? `0${currentDate.getDate()}` : currentDate.getDate();
-    
+
     const dateString = `${currentDate.getFullYear()}-${month}-${date}`;
     console.log(dateString);
     setDateToInsert(dateString);
     setNewDate(selectedDate);
   };
-  
 
-  const addNewMeasurement = async () => {
+
+  const addNewMeasurement = async (token) => {
     if (newMeasurement === null) {
-      Alert.alert('Error', 'Measurement required!', [{text: 'OK', onPress: () => console.log('OK Pressed')}]);
+      Alert.alert('Error', 'Measurement required!', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
     }
 
     for (const timestamp of Object.keys(graphData)) {
       if (dateToInsert === timestamp) {
-        Alert.alert('Error', `Measurement already exists for ${dateToInsert}`, [{text: 'OK', onPress: () => console.log('OK Pressed')}]);
+        Alert.alert('Error', `Measurement already exists for ${dateToInsert}`, [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
         return;
       }
     }
@@ -76,8 +78,14 @@ export default function Graph({ id, title, units, labels, data, navigation, getG
       await axios.post(connection_string, {
         measurement: newMeasurement,
         date: dateToInsert
-      });
-      await getGraphs()
+      },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      await getGraphs(token);
     } catch (e) {
       console.log(e);
     }
@@ -116,19 +124,19 @@ export default function Graph({ id, title, units, labels, data, navigation, getG
       ) : (
         <Text style={styles.nodata}>No data yet! Add a measurement to get started</Text>
       )}
-      <AddDataButton setShowEditDialogBox={setShowEditDialogBox}/>
+      <AddDataButton setShowEditDialogBox={setShowEditDialogBox} />
 
       <Dialog.Container visible={showEditDialogBox}>
         {
           saveLoading ? (
-            <ActivityIndicator size="large" color="#2196f3" style={{marginBottom: '10%'}} />
-            ):(
-              <>
-                <Dialog.Title style={{marginBottom: '10%'}}>Enter a new measurement</Dialog.Title>
-                <View style={{display: 'flex', flexDirection:'column', alignItems: 'center'}}>
+            <ActivityIndicator size="large" color="#2196f3" style={{ marginBottom: '10%' }} />
+          ) : (
+            <>
+                <Dialog.Title style={{ marginBottom: '10%' }}>Enter a new measurement</Dialog.Title>
+                <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Dialog.Input
                   placeholder='Measurement'
-                  style={{ width: 100}}
+                    style={{ width: 100 }}
                   onChangeText={newMeasurement => setNewMeasurement(newMeasurement)}
                 />
                 <DateTimePicker
@@ -139,15 +147,15 @@ export default function Graph({ id, title, units, labels, data, navigation, getG
                   display='spinner'
                 />
                 </View>
-                <View style={{display: 'flex', flexDirection: 'row'}}>
-                  <Dialog.Button label="Cancel" onPress={() => setShowEditDialogBox(false)}/>
-                  <Dialog.Button label="Save" onPress={addNewMeasurement}/>
-                </View>
-              </>
-            )
-          }
+              <View style={{ display: 'flex', flexDirection: 'row' }}>
+                <Dialog.Button label="Cancel" onPress={() => setShowEditDialogBox(false)} />
+                <Dialog.Button label="Save" onPress={() => addNewMeasurement(user.access_token)} />
+              </View>
+            </>
+          )
+        }
 
-        </Dialog.Container>
+      </Dialog.Container>
     </View>
   );
 }

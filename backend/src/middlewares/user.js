@@ -14,7 +14,7 @@ module.exports.verifyCreateUserBody = asyncHandler(async (req, _res, next) => {
       firstName: { type: 'string' },
       lastName: { type: 'string' },
       phoneNum: { type: 'string' },
-      groupId: { type: 'number' },
+      currGroup: { type: 'number' },
       profilePic: { type: 'string' },
     },
     required: ['email', 'firstName', 'lastName', 'phoneNum', 'profilePic'],

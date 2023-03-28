@@ -3,7 +3,6 @@ import { useState, useEffect, useContext } from 'react';
 import Graph from '../components/healthVitals/graph';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import colors from '../constants/colors';
-import { Button } from 'react-native-paper';
 import UserContext from '../services/context/UserContext';
 import Dialog from 'react-native-dialog';
 import Header from '../components/healthVitals/header';
@@ -24,7 +23,7 @@ export default function Metrics({ navigation }) {
     return timestamp.slice(5).replace('-', '/');
   };
 
-  const createNewGraph = async () => {
+  const createNewGraph = async (token) => {
     if (newTitle === null || newUnits === null) {
       Alert.alert('Error', 'Title and units required!', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
       return;
@@ -34,9 +33,14 @@ export default function Metrics({ navigation }) {
     try {
       let connection_string = config.backend_server + '/graphs';
       const response = await axios.post(connection_string, {
-        groupId: user.group_id,
+        groupId: user.curr_group,
         title: newTitle,
         units: newUnits,
+      }, {
+        withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
       });
       graphId = parseInt(response.data.graphId);
     } catch (e) {
@@ -57,11 +61,16 @@ export default function Metrics({ navigation }) {
     setNewGraphLoading(false);
   };
 
-  const getGraphs = async () => {
-    let connection_string = config.backend_server + '/graphs/' + user.group_id + '?limit=7';
+  const getGraphs = async (token) => {
+    let connection_string = config.backend_server + '/graphs/' + user.curr_group + '?limit=7';
     try {
       setIsLoading(true);
-      const response = await axios.get(connection_string);
+      const response = await axios.get(connection_string, {
+        withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
       // for (const id of Object.keys(response.data)) {
       //   if (response.data[id].data.length === 0) {
       //     delete response.data[id]
@@ -75,7 +84,7 @@ export default function Metrics({ navigation }) {
   };
 
   useEffect(() => {
-    getGraphs();
+    getGraphs(user.access_token);
   }, []);
 
   return (
@@ -92,7 +101,7 @@ export default function Metrics({ navigation }) {
               <Dialog.Input placeholder="Units" onChangeText={(newUnits) => setNewUnits(newUnits)} />
               <View style={{ display: 'flex', flexDirection: 'row' }}>
                 <Dialog.Button label="Cancel" onPress={() => setShowCreateNewGraphDialogBox(false)} />
-                <Dialog.Button label="Save" onPress={() => createNewGraph()} />
+                  <Dialog.Button label="Save" onPress={() => createNewGraph(user.access_token)} />
               </View>
             </>
           )}

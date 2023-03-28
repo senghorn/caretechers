@@ -1,23 +1,25 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Dimensions, Alert} from 'react-native';
+import { useState, useEffect, useContext } from 'react';
+import { StyleSheet, View, Text, Dimensions, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button } from 'react-native-paper';
 import { ActivityIndicator } from 'react-native-paper';
 import { IconButton, MD3Colors } from 'react-native-paper';
 import Dialog from "react-native-dialog";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import UserContext from '../services/context/UserContext';
 const axios = require('axios').default;
 const config = require('../constants/config').default;
 import colors from '../constants/colors';
 
-const MeasurementRow = ({timestamp, measurement, removeMeasurement}) => {
+const MeasurementRow = ({ timestamp, measurement, removeMeasurement }) => {
+  const { user } = useContext(UserContext);
   return (
     <View style={styles.row}>
-      <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <Text style={{...styles.cell, ...styles.measurement}}>{measurement}</Text>
+      <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Text style={{ ...styles.cell, ...styles.measurement }}>{measurement}</Text>
         <Text style={styles.cell}>{timestamp}</Text>
       </View>
-      <View style={{display: 'flex', flexDirection: 'row'}}>
+      <View style={{ display: 'flex', flexDirection: 'row' }}>
         {/**
         <Button
           mode="contained"
@@ -35,7 +37,9 @@ const MeasurementRow = ({timestamp, measurement, removeMeasurement}) => {
           uppercase={false}
           color="#FF0D0E"
           icon="minus-box"
-          onPress={() => removeMeasurement(timestamp)}
+          onPress={() => {
+            removeMeasurement(timestamp, user.access_token)
+          }}
         >
           Delete
         </Button>
@@ -44,9 +48,9 @@ const MeasurementRow = ({timestamp, measurement, removeMeasurement}) => {
   );
 };
 
-export default function EditGraph({navigation, route}) {
-  const {id, units, title, getGraphs} = route.params;
-
+export default function EditGraph({ navigation, route }) {
+  const { id, units, title, getGraphs } = route.params;
+  const { user } = useContext(UserContext);
   const [graphData, setGraphData] = useState({});
   const [showEditDialogBox, setShowEditDialogBox] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -67,10 +71,14 @@ export default function EditGraph({navigation, route}) {
     setNewDate(selectedDate);
   };
 
-  const removeMeasurement = async (timestamp) => {
+  const removeMeasurement = async (timestamp, token) => {
     let connection_string = config.backend_server + `/measurements/${id}/${timestamp}`;
     try {
-      await axios.delete(connection_string);
+      await axios.delete(connection_string, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
     } catch (e) {
       console.log(e);
     }
@@ -81,11 +89,15 @@ export default function EditGraph({navigation, route}) {
     await getGraphs()
   }
 
-  const getMeasurements = async () => {
+  const getMeasurements = async (token) => {
     let connection_string = config.backend_server + '/measurements/' + id;
     try {
       setIsLoading(true);
-      const response = await axios.get(connection_string);
+      const response = await axios.get(connection_string, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setGraphData(response.data);
       setIsLoading(false);
     } catch (e) {
@@ -95,12 +107,12 @@ export default function EditGraph({navigation, route}) {
 
   const addNewMeasurement = async () => {
     if (newMeasurement === null) {
-      Alert.alert('Error', 'Measurement required!', [{text: 'OK', onPress: () => console.log('OK Pressed')}]);
+      Alert.alert('Error', 'Measurement required!', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
     }
 
     for (const timestamp of Object.keys(graphData)) {
       if (dateToInsert === timestamp) {
-        Alert.alert('Error', `Measurement already exists for ${dateToInsert}`, [{text: 'OK', onPress: () => console.log('OK Pressed')}]);
+        Alert.alert('Error', `Measurement already exists for ${dateToInsert}`, [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
         return;
       }
     }
@@ -128,11 +140,15 @@ export default function EditGraph({navigation, route}) {
     setSaveLoading(false);
   };
 
-  const deleteGraph = async () => {
+  const deleteGraph = async (token) => {
     setDeleteLoading(true);
     let connection_string = config.backend_server + '/graphs/' + id;
     try {
-      await axios.delete(connection_string);
+      await axios.delete(connection_string, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
     } catch (e) {
       console.log(e);
     }
@@ -143,11 +159,11 @@ export default function EditGraph({navigation, route}) {
   };
 
   useEffect(() => {
-    getMeasurements();
+    getMeasurements(user.access_token);
   }, [])
 
   return (
-    <View style={{height: Dimensions.get('window').height, alignItems: 'center'}}>
+    <View style={{ height: Dimensions.get('window').height, alignItems: 'center' }}>
       <View style={styles.header}>
         <View style={styles.titleView}>
           <Text style={styles.title}>{title}</Text>
@@ -164,16 +180,16 @@ export default function EditGraph({navigation, route}) {
       <View style={styles.tableWrapper}>
         {isLoading ? (
           <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
-          ): (
-            <ScrollView contentContainerStyle={styles.table}>
+        ) : (
+          <ScrollView contentContainerStyle={styles.table}>
             {
                 Object.keys(graphData).map((timestamp) => <MeasurementRow
-                                                            key={`${timestamp}${graphData[timestamp]}`}
-                                                            timestamp={timestamp}
-                                                            measurement={graphData[timestamp]}
-                                                            removeMeasurement={removeMeasurement}
-                                                            >
-                                                            </MeasurementRow>)
+                  key={`${timestamp}${graphData[timestamp]}`}
+                  timestamp={timestamp}
+                  measurement={graphData[timestamp]}
+                  removeMeasurement={(token) => removeMeasurement(token)}
+                >
+                </MeasurementRow>)
             }
             </ScrollView>
           )
@@ -182,20 +198,20 @@ export default function EditGraph({navigation, route}) {
       </View>
 
       <View>
-      <Dialog.Container visible={showDeleteConfirmation}>
-      {
-        deleteLoading ? (
-          <ActivityIndicator size="large" color="#2196f3" style={{marginBottom: '10%'}} />
-        ) : (
-          <>
-            <Dialog.Title>Are you sure you want to delete this graph? THIS CANNOT BE UNDONE!</Dialog.Title>
-            <View style={{display: 'flex', flexDirection: 'row'}}>
-              <Dialog.Button label="No" onPress={() => setShowDeleteConfirmation(false)}/>
-              <Dialog.Button label="Yes" onPress={deleteGraph}/>
-            </View>
-          </>
-          )
-        }
+        <Dialog.Container visible={showDeleteConfirmation}>
+          {
+            deleteLoading ? (
+              <ActivityIndicator size="large" color="#2196f3" style={{ marginBottom: '10%' }} />
+            ) : (
+              <>
+                <Dialog.Title>Are you sure you want to delete this graph? THIS CANNOT BE UNDONE!</Dialog.Title>
+                <View style={{ display: 'flex', flexDirection: 'row' }}>
+                  <Dialog.Button label="No" onPress={() => setShowDeleteConfirmation(false)} />
+                  <Dialog.Button label="Yes" onPress={() => deleteGraph(user.access_token)} />
+                </View>
+              </>
+            )
+          }
         </Dialog.Container>
       </View>
 

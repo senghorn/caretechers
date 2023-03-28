@@ -135,7 +135,11 @@ const styles = StyleSheet.create({
     },
     dateTime: {
         fontSize: 12
-    }
+    },
+    loader: {
+        height: '100%',
+        transform: [{ translateY: -16 }],
+    },
 });
 
 const MessageBox = ({ message, sender, setMessageToUnpin }) => {

@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   loader: {
-    marginTop: 40,
+    height: '100%',
+    transform: [{ translateY: -16 }],
   },
 });
