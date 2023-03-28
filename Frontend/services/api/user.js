@@ -166,10 +166,14 @@ export async function UpdateUserData(email, first_name, last_name, phone, group_
   return false;
 }
 
-export async function RemoveUserFromGroup(user_id, group_id) {
+export async function RemoveUserFromGroup(user_id, group_id, token) {
   let url = config.backend_server + '/user/' + user_id + '/' + group_id;
   try {
-    const result = await axios.delete(url);
+    const result = await axios.delete(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     if (result.status == 204) {
       console.log('User Left Group Successfully');
       return true;
@@ -190,3 +194,4 @@ export async function setUserNotificationIdentifier(userId, identifier) {
     console.log(error);
   }
 }
+

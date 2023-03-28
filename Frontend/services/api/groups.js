@@ -82,12 +82,14 @@ export async function getGroupPassword(group_id) {
  * @param {string} group_id
  * @returns
  */
-export async function resetGroupPassword(group_id) {
+export async function resetGroupPassword(group_id, cookie) {
   try {
     let connection_string =
       config.backend_server + '/groups/passreset/' + group_id;
     return await axios
-      .patch(connection_string)
+      .patch(connection_string, {}, {
+        headers: { 'Authorization': 'Bearer ' + cookie }
+      })
       .then(function (response) {
         if (response.data[0] != undefined) {
           return response.data[0].password;

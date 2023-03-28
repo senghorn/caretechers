@@ -134,9 +134,40 @@ module.exports.getUserByToken = asyncHandler(async (req, _res, next) => {
   next();
 });
 
-// Will have to update when we allow multiple groups
-module.exports.removeUserFromGroup = asyncHandler(async (req, _res, next) => {
-  query = sql`UPDATE Users SET group_id = NULL WHERE email = ${req.params.userId};`;
+module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT curr_group FROM Users WHERE email = ${req.params.userId};`;
+  const [result] = await db.query(query);
+  if (!result) {
+    return next(newError('This user does not have a group', 404));
+  }
+  req.result = result;
+  next();
+});
+
+module.exports.getAllUserGroups = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT group_id FROM GroupMembers WHERE member_id = ${req.params.userId} and active = TRUE;`;
+  const [result] = await db.query(query);
+  if (!result) {
+    return next(newError('This user does not have any groups', 404));
+  }
+  req.result = result;
+  next();
+});
+
+module.exports.setUserCurrGroup = asyncHandler(async (req, _res, next) => {
+  if (!req.body.currGroup) {
+    return next(newError('The currGroup is invalid!', 400));
+  }
+  const query = sql`UPDATE Users SET curr_group = ${req.body.currGroup} WHERE email = ${req.params.userId};`;
   await db.query(query);
   next();
 });
+
+module.exports.removeUserFromGroup = asyncHandler(async (req, _res, next) => {
+  query = sql`UPDATE GroupMembers SET active = FALSE WHERE member_id = ${req.params.userId} and group_id = ${req.params.groupId};`;
+  await db.query(query);
+  query = sql`UPDATE Users SET curr_group = NULL WHERE member_id = ${req.params.userId};`;
+  await db.query(query);
+  next();
+});
+

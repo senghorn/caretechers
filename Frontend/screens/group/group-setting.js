@@ -43,7 +43,7 @@ export default function GroupSettings({ navigation }) {
 
   const LeaveGroup = async () => {
     if (user && user.id && user.curr_group) {
-      const result = await RemoveUserFromGroup(user.id, user.curr_group);
+      const result = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
       if (result == true) {
         navigation.navigate('Login');
       } else {
@@ -123,7 +123,7 @@ export default function GroupSettings({ navigation }) {
                 onPress={async () => {
                   if (user && user.curr_group) {
                     setLoading(true);
-                    const result = await resetGroupPassword(user.curr_group);
+                    const result = await resetGroupPassword(user.curr_group, user.access_token);
                     setPassword(result);
                     setLoading(false);
                   }
