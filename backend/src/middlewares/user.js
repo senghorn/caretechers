@@ -28,8 +28,8 @@ module.exports.verifyCreateUserBody = asyncHandler(async (req, _res, next) => {
 
 module.exports.createNewUser = asyncHandler(async (req, _res, next) => {
   var query = sql`INSERT INTO Users(email, first_name, last_name, phone_num, profile_pic) VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum}, ${req.body.profilePic});`;
-  if (req.body.groupId != null) {
-    query = sql`INSERT INTO Users(email, first_name, last_name, phone_num, group_id, profile_pic) VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum},${req.body.groupId}, ${req.body.profilePic});`;
+  if (req.body.currGroup != null) {
+    query = sql`INSERT INTO Users(email, first_name, last_name, phone_num, curr_group, profile_pic) VALUES(${req.body.email}, ${req.body.firstName}, ${req.body.lastName}, ${req.body.phoneNum},${req.body.currGroup}, ${req.body.profilePic});`;
   }
   await db.query(query);
   next();
@@ -69,15 +69,23 @@ module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res
     return next(newError('Join Group request body is incorrect!', 400));
   }
 
-  let query = sql`UPDATE Users SET group_id = (
+  let query = sql`SELECT * FROM \`Groups\` G
+						WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword}`;
+  let [result] = await db.query(query);
+
+  if (!result) {
+    return next(newError('Group does not exist or password is wrong!', 404));
+  }
+
+  query = sql`INSERT INTO GroupMembers(group_id, member_id, active)
+    VALUES (
+  (
     SELECT id 
     FROM \`Groups\` 
     WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword}
-  ) 
-  WHERE email = ${req.params.userId} AND EXISTS(SELECT * FROM \`Groups\` 
-  WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword});
+  ), ${req.params.userId}, TRUE);
   `
-  const result = await db.query(query);
+  result = await db.query(query);
   if (result.affectedRows == 0) {
     return next(newError('Cannot join the group!', 400));
   }
@@ -97,10 +105,11 @@ module.exports.addUserToGroup = asyncHandler(async (req, _res, next) => {
     return next(newError('This group does not exist!', 404));
   }
 
-  query = sql`UPDATE Users SET group_id = ${req.body.groupId} WHERE email = ${req.params.userId};`;
+  query = sql`INSERT INTO GroupMembers(member_id, group_id, active) VALUES(${req.params.userId}, ${req.body.groupId}, TRUE);`
   await db.query(query);
   next();
 });
+
 
 module.exports.setUserNotificationIdentifier = asyncHandler(async (req, _res, next) => {
   const { userId } = req.params;
@@ -109,8 +118,8 @@ module.exports.setUserNotificationIdentifier = asyncHandler(async (req, _res, ne
   next();
 });
 
-module.exports.getUserGroupByID = asyncHandler(async (req, _res, next) => {
-  const query = sql`SELECT * FROM Users WHERE email = ${req.params.userId};`;
+module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT curr_group FROM Users WHERE email = ${req.params.userId};`;
   const [result] = await db.query(query);
   if (!result) {
     return next(newError('This user does not have a group', 404));
@@ -162,6 +171,7 @@ module.exports.setUserCurrGroup = asyncHandler(async (req, _res, next) => {
   await db.query(query);
   next();
 });
+
 
 module.exports.removeUserFromGroup = asyncHandler(async (req, _res, next) => {
   query = sql`UPDATE GroupMembers SET active = FALSE WHERE member_id = ${req.params.userId} and group_id = ${req.params.groupId};`;

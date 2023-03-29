@@ -19,7 +19,7 @@ module.exports.getMessagesByGroup = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.fetchMoreMessagesByLastMessageId = asyncHandler(async (req, res, next) => {
-	const query = sql`SELECT * FROM Messages WHERE group_id = ${req.params.groupId} AND id > ${req.params.lastId} ORDER BY date_time DESC LIMIT 50;`
+	const query = sql`SELECT * FROM Messages WHERE group_id = ${req.params.groupId} AND id < ${req.params.lastId} ORDER BY date_time DESC LIMIT 50;`
 	let result = await db.query(query);
 
 	result.map(row => row.date_time = new Date(`${row.date_time} UTC`).toString());

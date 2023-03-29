@@ -1,4 +1,4 @@
-import { StyleSheet, View, ActionSheetIOS, Text } from 'react-native';
+import { StyleSheet, View, ActionSheetIOS } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
@@ -23,13 +23,15 @@ export default function Messages({ navigation }) {
   const [users, setUsers] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMode, setSearchMode] = useState(false);
+  const [noEalierMessages, setNoEarlierMessages] = useState(false);
   const { user } = useContext(UserContext);
   const [socket, setSocket] = useContext(SocketContext);
   const getSmallestMessageId = () => {
     let result = 0;
-    if (messages) {
+    if (messages && messages.length > 0) {
+      result = messages[0]._id;
       messages.forEach((message) => {
-        if (message._id > result) {
+        if (message._id < result) {
           result = message._id;
         }
       })
@@ -62,6 +64,9 @@ export default function Messages({ navigation }) {
         var last_id = getSmallestMessageId();
         const more_messages = await fetchMoreMessages(user.curr_group, last_id, users, user.access_token);
         if (more_messages) {
+          if (more_messages.length === 0) {
+            setNoEarlierMessages(true);
+          }
           setMessages(messages.concat(more_messages));
         }
       }
@@ -195,7 +200,7 @@ export default function Messages({ navigation }) {
         user={this_user}
         onLongPress={onLongPress}
         onLoadEarlier={loadEarlier}
-        loadEarlier
+        loadEarlier={!noEalierMessages}
         infiniteScroll
       />
     </View>
