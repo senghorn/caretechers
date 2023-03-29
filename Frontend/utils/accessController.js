@@ -46,7 +46,6 @@ async function validateGoogleToken(token) {
 async function validateApiToken(token) {
     let connection_string =
         config.auth_server + '/validate';
-    // attache the token to the request body
     return await axios
         .post(connection_string, {
             token: token
@@ -55,7 +54,7 @@ async function validateApiToken(token) {
             return true;
         })
         .catch(function (error) {
-            console.log('login request error', error);
+            console.log('validate request error', error);
             return false;
         });
 }
