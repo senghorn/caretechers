@@ -64,27 +64,22 @@ export default function Metrics({ navigation }) {
   const getGraphs = async (token) => {
     let connection_string = config.backend_server + '/graphs/' + user.curr_group + '?limit=7';
     try {
-      setIsLoading(true);
       const response = await axios.get(connection_string, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + token
         }
       });
-      // for (const id of Object.keys(response.data)) {
-      //   if (response.data[id].data.length === 0) {
-      //     delete response.data[id]
-      //   }
-      // }
       setGraphs(response.data);
-      setIsLoading(false);
     } catch (e) {
       console.log(e);
     }
   };
 
   useEffect(() => {
+    setIsLoading(true);
     getGraphs(user.access_token);
+    setIsLoading(false);
   }, []);
 
   return (

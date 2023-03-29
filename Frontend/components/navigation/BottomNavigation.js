@@ -22,7 +22,7 @@ export default function BottomNavigation({ route, navigation }) {
   const { isVisitorToday } = useContext(TodaysVisitorContext);
   const { user } = useContext(UserContext);
   const [socket, setSocket] = useContext(SocketContext);
-
+  axios.defaults.headers.common['Authorization'] = user.access_token;
   useEffect(() => {
     if (user) {
       const fetchToken = async () => {

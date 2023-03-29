@@ -20,18 +20,6 @@ const MeasurementRow = ({ timestamp, measurement, removeMeasurement }) => {
         <Text style={styles.cell}>{timestamp}</Text>
       </View>
       <View style={{ display: 'flex', flexDirection: 'row' }}>
-        {/**
-        <Button
-          mode="contained"
-          uppercase={false}
-          color="#e3f2fd"
-          icon="minus-box"
-          onPress={() => removeMeasurement(timestamp)}
-          style={{marginRight: '4%'}}
-        >
-          Edit
-        </Button>
-        */}
         <Button
           mode="contained"
           uppercase={false}
@@ -80,13 +68,13 @@ export default function EditGraph({ navigation, route }) {
         }
       });
     } catch (e) {
-      console.log(e);
+      console.log('error removing measurement', e);
     }
 
     const graphDataCopy = JSON.parse(JSON.stringify(graphData));
     delete graphDataCopy[timestamp];
     setGraphData(graphDataCopy);
-    await getGraphs()
+    await getGraphs(token)
   }
 
   const getMeasurements = async (token) => {
@@ -152,7 +140,7 @@ export default function EditGraph({ navigation, route }) {
     } catch (e) {
       console.log(e);
     }
-    await getGraphs();
+    await getGraphs(token);
     setShowDeleteConfirmation(false);
     setDeleteLoading(false);
     navigation.goBack();
@@ -187,9 +175,9 @@ export default function EditGraph({ navigation, route }) {
                   key={`${timestamp}${graphData[timestamp]}`}
                   timestamp={timestamp}
                   measurement={graphData[timestamp]}
-                  removeMeasurement={(token) => removeMeasurement(token)}
-                >
-                </MeasurementRow>)
+                removeMeasurement={removeMeasurement}
+              >
+              </MeasurementRow>)
             }
             </ScrollView>
           )
