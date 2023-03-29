@@ -55,13 +55,18 @@ export default function GoogleLogin({ navigation }) {
       setGoogleAccessToken(accessToken);
       const tokenRequest = async () => {
         let serverAccessTokens = await getAccessToken(accessToken);
-        setCookies(serverAccessTokens);
-        if (serverAccessTokens.accessToken) {
-          setAPIAccessToken(serverAccessTokens.accessToken);
+        if (serverAccessTokens && serverAccessTokens.accessToken && serverAccessTokens.refreshToken) {
+          setCookies(serverAccessTokens);
+          if (serverAccessTokens.accessToken) {
+            setAPIAccessToken(serverAccessTokens.accessToken);
+          }
+          if (serverAccessTokens.refreshToken) {
+            setAPIResetToken(serverAccessTokens.refreshToken);
+          }
+        } else {
+          console.log('Fail to get access token from server!');
         }
-        if (serverAccessTokens.refreshToken) {
-          setAPIResetToken(serverAccessTokens.refreshToken);
-        }
+
       }
       tokenRequest();
     }
