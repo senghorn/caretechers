@@ -9,16 +9,15 @@ import {
   PinMessage,
   fetchMoreMessages
 } from '../services/api/messages';
-import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
 import useSWR from 'swr';
 import config from '../constants/config';
+import SocketContext from '../services/context/SocketContext';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function Messages({ navigation }) {
   const [this_user, setThisUser] = useState(null);
-  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [displayMessages, setDisplayMessages] = useState([]);
   const [users, setUsers] = useState(null);
@@ -26,10 +25,8 @@ export default function Messages({ navigation }) {
   const [searchMode, setSearchMode] = useState(false);
   const [noEalierMessages, setNoEarlierMessages] = useState(false);
   const { user } = useContext(UserContext);
-
-  const onToggleSnackBar = () => setNoEarlierMessages(!noEalierMessages);
-
-  const getBiggestIdOfMessages = () => {
+  const [socket, setSocket] = useContext(SocketContext);
+  const getSmallestMessageId = () => {
     let result = 0;
     if (messages && messages.length > 0) {
       result = messages[0]._id;
@@ -42,9 +39,13 @@ export default function Messages({ navigation }) {
     return result;
   }
 
+
   const { data, isLoading, error, mutate } = useSWR(
-    config.backend_server + '/messages/fetch/' + user.group_id,
-    fetcher
+    [config.backend_server + '/messages/fetch/' + user.curr_group,
+      {
+        headers: { 'Authorization': 'Bearer ' + user.access_token }
+      }],
+    ([url, token]) => fetcher(url, token)
   );
 
   useEffect(() => {
@@ -55,27 +56,13 @@ export default function Messages({ navigation }) {
     }
   }, [data, isLoading, users]);
 
-  // Sets up user so GiftedChat recognize who this user is in order
-  // to display correctly
-  useEffect(() => {
-    if (user && !(Object.keys(user).length === 0)) {
-      setThisUser({
-        _id: user.email,
-        name: `${user.first_name} ${user.last_name}`,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        avatar: user.profile_pic,
-        groupId: user.group_id,
-      });
-    }
-  }, [user]);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const loadEarlier = async () => {
-    if (user && users && user.group_id && messages) {
+    if (user && users && user.curr_group && messages) {
       if (!isLoadingData) {
         setIsLoadingData(true);
-        var last_id = getBiggestIdOfMessages();
-        const more_messages = await fetchMoreMessages(user.group_id, last_id, users);
+        var last_id = getSmallestMessageId();
+        const more_messages = await fetchMoreMessages(user.curr_group, last_id, users, user.access_token);
         if (more_messages) {
           if (more_messages.length === 0) {
             setNoEarlierMessages(true);
@@ -88,22 +75,21 @@ export default function Messages({ navigation }) {
 
   // Fetch all the users in the group for their profile photos
   useEffect(() => {
-    if (this_user) {
-      FetchUsers(this_user.groupId, setUsers);
-      setSocket(createSocket(this_user));
+    if (user) {
+      FetchUsers(user, setUsers, setThisUser, user.access_token);
     }
-  }, [this_user]);
+  }, [user]);
 
   useEffect(() => {
     if (
       searchQuery &&
       searchQuery != '' &&
       user &&
-      user.group_id &&
+      user.curr_group &&
       searchMode
     ) {
       const search = async () => {
-        const result = await searchMessage(user.group_id, searchQuery);
+        const result = await searchMessage(user.curr_group, searchQuery, user.access_token);
         const formatted = FormatMessagesForChat(users, result);
         setDisplayMessages(formatted);
       };
@@ -126,38 +112,18 @@ export default function Messages({ navigation }) {
 
   useEffect(() => {
     if (socket) {
-      socket.connect();
-      socket.on('connect_error', (err) => {
-        console.log(err.message);
-        if (err.message === 'invalid username') {
-          console.log('failed to connect to message server');
-        }
-      });
-
       socket.on('message', (msg) => {
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, msg)
         );
       });
-
-      socket.on('disconnect', (reason) => {
-        console.log(reason);
-        socket.disconnect();
-        if (reason === 'io server disconnect') {
-        }
-      });
-
-      // Network clean up: This will clean up any necessary connections with server
-      return () => {
-        socket.disconnect();
-        console.log('cleaning up');
-      };
     }
-  }, [socket]);
+  }, [])
 
   var onMessageSend = useCallback(
     (messages = []) => {
       if (socket) {
+        console.log(messages);
         socket.emit('chat', messages);
       }
     },
@@ -167,8 +133,8 @@ export default function Messages({ navigation }) {
   const [pinMessage, setPinMessage] = useState(null);
 
   useEffect(() => {
-    if (pinMessage && pinMessage._id && user && user.group_id) {
-      PinMessage(pinMessage._id);
+    if (pinMessage && pinMessage._id && user && user.curr_group) {
+      PinMessage(pinMessage._id, user.access_token);
       setPinMessage(null);
     }
 
@@ -200,7 +166,7 @@ export default function Messages({ navigation }) {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == user.email ? 'right' : 'left'}
+        position={message_sender_id == this_user._id ? 'right' : 'left'}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.primary,

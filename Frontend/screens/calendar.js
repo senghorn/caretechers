@@ -60,7 +60,9 @@ export default function Calendar({ navigation }) {
   }, [renderingDataForFlatList]);
 
   const { data, error, isLoading, mutate } = useSWR(
-    `${config.backend_server}/visits/group/${user.group_id}?start=${startDateString}&end=${endDateString}`,
+    [`${config.backend_server}/visits/group/${user.curr_group}?start=${startDateString}&end=${endDateString}`, {
+      headers: { 'Authorization': 'Bearer ' + user.access_token }
+    }],
     fetcher
   );
 
@@ -128,7 +130,7 @@ const getDateToVisitsMap = (visitData) => {
   return visitMap;
 };
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 const createRenderingDataForFlatList = (startDate, endDate) => {
   const numDays = differenceInDays(endDate, startDate);

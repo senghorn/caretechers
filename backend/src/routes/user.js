@@ -17,6 +17,8 @@ router.get('/currentGroup/:userId', [userMiddleware.getUserCurrGroupByID, shared
 
 router.patch('/currentGroup/:userId', [userMiddleware.setUserCurrGroup, sharedMiddleware.sendNoResult]);
 
+router.get('/fetch/userInfo', [userMiddleware.getUserByToken, sharedMiddleware.sendResult]);
+
 router.patch('/:userId', [userMiddleware.verifyCreateUserBody, userMiddleware.editUser, sharedMiddleware.sendNoResult]);
 
 router.delete('/:userId/:groupId', [userMiddleware.removeUserFromGroup, sharedMiddleware.sendNoResult]);

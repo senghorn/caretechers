@@ -48,7 +48,7 @@ export default function Header({
               setQuery(text);
             }}
             onEndEditing={async () => {
-              if (user && user.group_id) {
+              if (user && user.curr_group) {
                 setSearchQuery(searchQuery);
               }
             }}

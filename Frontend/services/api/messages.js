@@ -49,13 +49,18 @@ export async function FetchMessages(
 /*
  * Fetches more messages given last message id and group id
  */
-export async function fetchMoreMessages(group_id, last_id, users) {
+export async function fetchMoreMessages(group_id, last_id, users, cookie) {
   try {
     if (!last_id) {
       return null;
     }
     let url = config.backend_server + `/messages/fetch/${group_id}/${last_id}`;
-    const result = await axios.get(url);
+    const result = await axios.get(url, {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
     if (result.status == 200) {
       var messages = [];
       result.data.forEach(function (message) {
@@ -78,11 +83,23 @@ export async function fetchMoreMessages(group_id, last_id, users) {
   }
 }
 
-export async function searchMessage(group_id, query) {
+/**
+ * Returns relevant messages upon successful search of the given query.
+ * Otherwise, returns null.
+ * @param {string} group_id 
+ * @param {string} query 
+ * @returns 
+ */
+export async function searchMessage(group_id, query, cookie) {
   try {
     let url =
       config.backend_server + '/messages/search/' + group_id + '/' + query;
-    const result = await axios.get(url);
+    const result = await axios.get(url, {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
     if (result.status == 200) {
       return result.data;
     } else {
@@ -91,36 +108,66 @@ export async function searchMessage(group_id, query) {
   } catch (error) {
     console.log('search message error', error);
   }
+  return null;
 }
 
-export async function PinMessage(message_id) {
+/**
+ * Sends a request to the server to pin the message of message_id
+ * @param {string} message_id 
+ * @returns 
+ */
+export async function PinMessage(message_id, cookie) {
   console.log(message_id);
   try {
     let url =
       config.backend_server + '/messages/pin/' + message_id;
-    const result = await axios.post(url);
+    const result = await axios.post(url, [], {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
   } catch (error) {
     console.log('pin message error', error);
   }
   return true;
 }
 
-export async function UnpinMessage(message_id) {
+/**
+ * Sends a request to the server to unpin the message of message_id
+ * @param {string} message_id 
+ * @returns 
+ */
+export async function UnpinMessage(message_id, cookie) {
   try {
     let url =
       config.backend_server + '/messages/unpin/' + message_id;
-    await axios.post(url);
+    await axios.post(url, [], {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
   } catch (error) {
-    console.log('pin message error', error);
+    console.log('unpin message error', error);
   }
   return true;
 }
 
-export async function GetPinnedMessages(group_id) {
+/**
+ * Returns all pinned messages of the given group. Null upon error.
+ * @param {string} group_id 
+ * @returns []
+ */
+export async function GetPinnedMessages(group_id, cookie) {
   try {
     let url = config.backend_server + '/messages/pin/' + group_id;
-    const result = await axios.get(url);
-    console.log(result.data);
+    const result = await axios.get(url, {
+      withCredentials: true,
+      headers: {
+        'Authorization': 'Bearer ' + cookie
+      }
+    });
     return result.data;
   } catch (error) {
     console.log('fetch pinned messages error', error);
@@ -128,29 +175,51 @@ export async function GetPinnedMessages(group_id) {
   return null;
 }
 
-export async function FetchUsers(group_id, setUsers) {
+
+/**
+ * Fetches users that are in the user's group. Upon success, it calls setUsers on all the received data.
+ * It also calls setThisUser on the user that has id matches provided user.
+ * @param {object} user 
+ * @param {function} setUsers 
+ * @param {function} setThisUser 
+ * @param {string} cookie 
+ * @returns 
+ */
+export async function FetchUsers(user, setUsers, setThisUser, cookie) {
   try {
     let connection_string =
-      config.backend_server + '/messages/users/' + group_id;
-    return await axios
-      .get(connection_string, {
-        groupId: group_id,
-      })
+      config.backend_server + '/messages/users/' + user.curr_group;
+    let headers = {
+      Authorization: `Bearer ${cookie}`,
+    };
+    return await axios.get(connection_string, {
+      headers: headers,
+      params: {
+        groupId: user.curr_group
+      }
+    })
       .then((response) => {
         var users = {};
-        response.data.forEach(function (user) {
-          users[user.email] = {
-            _id: user.email,
-            name: user.first_name + ' ' + user.last_name,
-            avatar: user.profile_pic ? user.profile_pic : '',
+        response.data.forEach(function (newUser) {
+          users[newUser.email] = {
+            _id: newUser.email,
+            name: newUser.first_name + ' ' + newUser.last_name,
+            avatar: newUser.profile_pic ? newUser.profile_pic : '',
           };
+          if (user.id === newUser.email) {
+            setThisUser({
+              _id: newUser.email,
+              name: newUser.first_name + ' ' + newUser.last_name,
+              avatar: newUser.profile_pic ? newUser.profile_pic : '',
+            })
+          }
         });
 
         setUsers(users);
         return response.data;
       })
       .catch((error) => {
-        console.log(error);
+        console.log('fetch user error', error);
       });
   } catch (error) {
     console.log(error.message);

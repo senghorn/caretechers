@@ -1,18 +1,21 @@
 import { useEffect, useState, useContext } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
-import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Image, Alert } from 'react-native';
 import COLORS from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import config from '../constants/config';
+import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
-import { fetchUserByEmail } from '../services/api/user';
-const axios = require('axios').default;
+import { fetchUserByCookie, fetchUserByEmail } from '../services/api/user';
+import { getGoogleAccessToken, setGoogleAccessToken, setAPIAccessToken, setAPIResetToken, getAPIAccessToken } from '../services/storage/asyncStorage';
+import { validateTokens } from '../utils/accessController';
+
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleLogin({ navigation }) {
   const { setUser } = useContext(UserContext);
   const [accessToken, setAccessToken] = useState(null);
+  const [cookies, setCookies] = useState(null);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
       '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
@@ -24,38 +27,81 @@ export default function GoogleLogin({ navigation }) {
       '899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com',
   });
 
+  // On load, try logging in automatically
+  useEffect(() => {
+    loginHandler();
+  }, []);
+
+  const loginHandler = async () => {
+    const userAccess = await validateTokens();
+    if (userAccess === "Authenticated") {
+      getUserData();
+    } else if (userAccess === "GoogleAuthenticated") {
+      const googleToken = await getGoogleAccessToken();
+      setAccessToken(googleToken);
+    } else {
+      promptAsync();
+    }
+  }
+
   useEffect(() => {
     if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
-    } else {
     }
   }, [response]);
 
   useEffect(() => {
     if (accessToken != null) {
-      getUserData();
+      setGoogleAccessToken(accessToken);
+      const tokenRequest = async () => {
+        let serverAccessTokens = await getAccessToken(accessToken);
+        setCookies(serverAccessTokens);
+        if (serverAccessTokens.accessToken) {
+          setAPIAccessToken(serverAccessTokens.accessToken);
+        }
+        if (serverAccessTokens.refreshToken) {
+          setAPIResetToken(serverAccessTokens.refreshToken);
+        }
+      }
+      tokenRequest();
     }
   }, [accessToken]);
 
+  useEffect(() => {
+    if (cookies) {
+      getUserData();
+    }
+  }, [cookies]);
+
   async function getUserData() {
-    let userInfoResponse = await fetch(
-      'https://www.googleapis.com/userinfo/v2/me',
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-    const data = await userInfoResponse.json();
-    const result = await fetchUserByEmail(data['email']);
-    if (result) {
-      // set user context
-      setUser(result);
-      if (result.group_id) {
-        navigation.navigate('Home');
+    try {
+      let userInfoResponse = await fetch(
+        'https://www.googleapis.com/userinfo/v2/me',
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      // Request access token from backend and store it in AsyncStorage for later requests
+      let data = await userInfoResponse.json();
+      const access_token = await getAPIAccessToken();
+      const result = await fetchUserByCookie(access_token);
+      if (result) {
+        // set user context 
+        setUser({
+          "access_token": access_token, "curr_group": result.curr_group, "id": result.id,
+          "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+          "phone_num": result.phone_num
+        });
+        if (result.curr_group) {
+          navigation.navigate('Home');
+        } else {
+          navigation.navigate('Group');
+        }
       } else {
-        navigation.navigate('Group');
+        navigation.navigate('RegisterUser', { user: data });
       }
-    } else {
-      navigation.navigate('RegisterUser', { user: data });
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -81,7 +127,7 @@ export default function GoogleLogin({ navigation }) {
             size={35}
             iconStyle={styles.icon}
             onPress={() => {
-              promptAsync();
+              loginHandler();
             }}
           >
             <Text style={styles.loginText}>Login with Google</Text>

@@ -37,7 +37,7 @@ module.exports.createNewUser = asyncHandler(async (req, _res, next) => {
 
 module.exports.editUser = asyncHandler(async (req, _res, next) => {
   const query = sql`UPDATE Users SET Users.email = ${req.body.email}, Users.first_name = ${req.body.firstName}, 
-	Users.last_name = ${req.body.lastName}, Users.phone_num = ${req.body.phoneNum}, Users.curr_group = ${req.body.currGroup}, Users.profile_pic = ${req.body.profilePic}
+	Users.last_name = ${req.body.lastName}, Users.phone_num = ${req.body.phoneNum}, Users.curr_group = ${req.body.groupId}, Users.profile_pic = ${req.body.profilePic}
 	WHERE Users.email = ${req.params.userId};`;
   await db.query(query);
   next();
@@ -128,6 +128,31 @@ module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
   next();
 });
 
+module.exports.getUserByToken = asyncHandler(async (req, _res, next) => {
+
+  query = sql`SELECT * FROM Users WHERE email = ${req.user.id}`;
+  const [result] = await db.query(query);
+  if (!result) {
+    return next(newError('This user does not have a group', 404));
+  }
+  req.result = {
+    curr_group: result.curr_group, id: result.email, first_name: result.first_name,
+    last_name: result.last_name, profile_pic: result.profile_pic, phone_num: result.phone_num,
+    notification_identifier: result.notification_identifier
+  }
+  next();
+});
+
+module.exports.getUserCurrGroupByID = asyncHandler(async (req, _res, next) => {
+  const query = sql`SELECT curr_group FROM Users WHERE email = ${req.params.userId};`;
+  const [result] = await db.query(query);
+  if (!result) {
+    return next(newError('This user does not have a group', 404));
+  }
+  req.result = result;
+  next();
+});
+
 module.exports.getAllUserGroups = asyncHandler(async (req, _res, next) => {
   const query = sql`SELECT group_id FROM GroupMembers WHERE member_id = ${req.params.userId} and active = TRUE;`;
   const [result] = await db.query(query);
@@ -155,3 +180,4 @@ module.exports.removeUserFromGroup = asyncHandler(async (req, _res, next) => {
   await db.query(query);
   next();
 });
+
