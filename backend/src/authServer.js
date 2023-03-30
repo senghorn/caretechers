@@ -23,6 +23,7 @@ function authServer() {
             if (err) return res.sendStatus(403)
             const accessToken = generateAccessToken({ name: user.name })
             res.json({ accessToken: accessToken })
+            return res.sendStatus(200);
         })
     })
 
@@ -71,7 +72,7 @@ function authServer() {
         }
         const user = await getUserData(email);
         const accessToken = generateAccessToken(user)
-        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET)
+        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' })
         refreshTokens.push(refreshToken)
         res.json({ accessToken: accessToken, refreshToken: refreshToken })
     })
@@ -85,7 +86,7 @@ function authServer() {
  * @returns 
  */
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10h' })
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' })
 }
 
 /**

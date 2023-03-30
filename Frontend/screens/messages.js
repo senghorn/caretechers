@@ -123,7 +123,6 @@ export default function Messages({ navigation }) {
   var onMessageSend = useCallback(
     (messages = []) => {
       if (socket) {
-        console.log(messages);
         socket.emit('chat', messages);
       }
     },

@@ -1,6 +1,7 @@
-import { getAPIAccessToken, getGoogleAccessToken } from '../services/storage/asyncStorage';
+import { getAPIAccessToken, getGoogleAccessToken, getAPIResetToken, setAPIAccessToken } from '../services/storage/asyncStorage';
 import config from '../constants/config';
 import axios from 'axios';
+import { regenerateAccessToken } from '../services/api/auth';
 /**
  * Returns "Authenticated" if the app has valid access tokens to backend.
  * Returns "GoogleAuthenticated" if the only has valid Google Access Token.
@@ -14,6 +15,14 @@ export async function validateTokens() {
             const valid = await validateApiToken(accessToken);
             if (valid) {
                 return "Authenticated";
+            } else {
+                const resetToken = await getAPIResetToken();
+                const newToken = await regenerateAccessToken(resetToken);
+                if (newToken) {
+                    setAPIAccessToken(newToken);
+                    return "Authenticated";
+                }
+
             }
         } else {
             const valid = await validateGoogleToken(googleToken);
