@@ -4,7 +4,9 @@ import { Appbar, Avatar, Text, Button, Switch } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import UserContext from '../services/context/UserContext';
+import { clearAsyncStorage } from '../services/storage/asyncStorage';
 import colors from '../constants/colors';
+import SocketContext from '../services/context/SocketContext';
 
 export default function Settings({ navigation }) {
   const [notificationOn, setNotificationOn] = useState(false);
@@ -12,7 +14,7 @@ export default function Settings({ navigation }) {
   const [phone, setPhone] = useState('123-321-1234');
   const [email, setEmail] = useState('johndoe@fakemail.com');
   const [photo, setPhoto] = useState(require('../assets/favicon.png'));
-
+  const [socket, setSocket] = useContext(SocketContext)
   const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
@@ -111,9 +113,14 @@ export default function Settings({ navigation }) {
         icon="logout"
         style={styles.logout}
         labelStyle={styles.logoutButtonText}
-        onPress={() => {
-          navigation.navigate('Login');
-          setUser({});
+        onPress={async () => {
+          const clear = await clearAsyncStorage();
+          if (clear) {
+            socket.disconnect();
+            setSocket(null);
+            setUser({});
+            navigation.navigate('Login');
+          }
         }}
       >
         Logout

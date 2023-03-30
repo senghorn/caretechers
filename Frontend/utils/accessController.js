@@ -28,6 +28,11 @@ export async function validateTokens() {
     return "Unauthenticated";
 }
 
+/**
+ * Returns true if google token is valid. Otherwise, false.
+ * @param {*} token 
+ * @returns 
+ */
 async function validateGoogleToken(token) {
     let userInfoResponse = await fetch(
         'https://www.googleapis.com/userinfo/v2/me',
@@ -43,6 +48,11 @@ async function validateGoogleToken(token) {
     return true;
 }
 
+/**
+ * Returns true if Api token is valid. Otherwise, false.
+ * @param {*} token 
+ * @returns 
+ */
 async function validateApiToken(token) {
     let connection_string =
         config.auth_server + '/validate';

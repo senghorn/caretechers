@@ -1,5 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/**
+ * Stores Google Auth Token in async storage
+ * @param {*} token 
+ */
 export async function setGoogleAccessToken(token) {
     try {
         await AsyncStorage.setItem("google_token", JSON.stringify(token));
@@ -8,6 +12,9 @@ export async function setGoogleAccessToken(token) {
     }
 };
 
+/**
+ * Returns google auth token. Null if does not exist.
+ */
 export async function getGoogleAccessToken() {
     try {
         const savedGoogleToken = await AsyncStorage.getItem("google_token");
@@ -19,6 +26,10 @@ export async function getGoogleAccessToken() {
     return null;
 };
 
+/**
+ * Stores API access token in async storage
+ * @param {*} token 
+ */
 export async function setAPIAccessToken(token) {
     try {
         await AsyncStorage.setItem("api_access_token", JSON.stringify(token));
@@ -27,6 +38,10 @@ export async function setAPIAccessToken(token) {
     }
 };
 
+/**
+ * Returns API access token in async storage
+ * @returns 
+ */
 export async function getAPIAccessToken() {
     try {
         const apiToken = await AsyncStorage.getItem("api_access_token");
@@ -38,6 +53,10 @@ export async function getAPIAccessToken() {
     return null;
 };
 
+/**
+ * Stores token in async storge.
+ * @param {*} token 
+ */
 export async function setAPIResetToken(token) {
     try {
         await AsyncStorage.setItem("api_reset_token", JSON.stringify(token));
@@ -46,6 +65,10 @@ export async function setAPIResetToken(token) {
     }
 };
 
+/**
+ * returns API reset token from async storage.
+ * @returns 
+ */
 export async function getAPIResetToken() {
     try {
         const resetToken = await AsyncStorage.getItem("api_reset_token");
@@ -57,3 +80,17 @@ export async function getAPIResetToken() {
     }
     return null;
 };
+
+/**
+ * Clears app's async storage
+ * @returns 
+ */
+export async function clearAsyncStorage() {
+    try {
+        await AsyncStorage.clear();
+        return true;
+    } catch (error) {
+        console.log('storage clear error: ', error)
+    }
+    return false;
+}
