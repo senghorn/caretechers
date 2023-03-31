@@ -1,8 +1,9 @@
+import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-gesture-handler';
 import Navigation from './components/navigation/Navigation';
 import { NavigationContainer } from '@react-navigation/native';
-import { Linking, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import colors from './constants/colors';
 import { Asset } from 'expo-asset';
 import * as Device from 'expo-device';
@@ -46,6 +47,8 @@ export default function App() {
   const notificationListener = useRef();
   const navigationRef = useRef();
   const responseListener = useRef();
+  const [groupName, setGroupName] = useState('');
+  const [groupPassword, setGroupPassword] = useState('');
 
   const [imagesLoaded] = useImages([
     require('./assets/abstract_background.jpg'),
@@ -59,6 +62,19 @@ export default function App() {
       return { shouldShowAlert: !samePage, shouldPlaySound: true, shouldSetBadge: true };
     },
   });
+
+  const url = Linking.useURL();
+  useEffect(() => {
+    var regex = /[?&]([^=#]+)=([^&#]*)/g,
+    params = {},
+    match;
+    while (match = regex.exec(url)) {
+      params[match[1]] = match[2];
+    }
+    setGroupName(params.name);
+    setGroupPassword(params.pass);
+  }, [url]);
+
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
@@ -81,7 +97,7 @@ export default function App() {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      <Navigation expoPushToken={expoPushToken} />
+      <Navigation expoPushToken={expoPushToken} groupName={groupName} groupPassword={groupPassword}/>
       <StatusBar style="auto" />
     </NavigationContainer>
   );

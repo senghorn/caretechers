@@ -52,6 +52,7 @@ export default function GoogleLogin({ navigation }) {
 
   useEffect(() => {
     if (accessToken != null) {
+      console.log('ACCESS TOKEN: ', accessToken);
       setGoogleAccessToken(accessToken);
       const tokenRequest = async () => {
         let serverAccessTokens = await getAccessToken(accessToken);

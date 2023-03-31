@@ -4,12 +4,13 @@ import { useState, useContext } from 'react';
 import colors from '../../constants/colors';
 import { addUserToGroup, fetchUserByEmail } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
+import GroupContext from '../../services/context/GroupContext';
 
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
-  const [groupName, setGroupName] = useState('');
-  const [password, setPassword] = useState('');
-
+  const groupContext = useContext(GroupContext);
+  const [groupName, setGroupName] = useState(groupContext.groupName);
+  const [password, setPassword] = useState(groupContext.groupPassword);
   return (
     <View style={styles.container}>
       <SafeAreaView>

@@ -2,7 +2,7 @@ const Ajv = require('ajv');
 const ajv = new Ajv();
 const asyncHandler = require('express-async-handler');
 const sql = require('sql-template-strings');
-
+const jwt = require('jsonwebtoken');
 const db = require('../database');
 const { newError } = require('../utls');
 
@@ -80,3 +80,10 @@ module.exports.getGroupInfo = asyncHandler(async (req, _res, next) => {
   req.result = await db.query(query);
   next();
 });
+
+module.exports.generateToken = (req, _res, next) => {
+    req.result = jwt.sign({
+      groupName: req.body.groupName,
+      groupPassword: req.body.groupPassword
+    }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10h' }) 
+};

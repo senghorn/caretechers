@@ -19,6 +19,7 @@ import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshCo
 import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 import SocketContext from '../../services/context/SocketContext';
 import { NotesRefreshProvider } from '../../services/context/NotesRefreshContext';
+import GroupContext from '../../services/context/GroupContext';
 import Note from '../../screens/note/note';
 import NewNote from '../../screens/note/newNote';
 import RecordVisit from '../../screens/recordVisit';
@@ -45,7 +46,7 @@ const initRefreshVisit = () => {
 
 const Stack = createNativeStackNavigator();
 
-export default function Navigation({ expoPushToken }) {
+export default function Navigation({ expoPushToken, groupName, groupPassword }) {
   const [user, setUser] = useState(null);
   const [refreshCalendar, setRefreshCalendar] = useState(() => initRefreshCalendar);
   const [refreshTasks, setRefreshTasks] = useState(() => initRefreshTasks);
@@ -90,21 +91,23 @@ export default function Navigation({ expoPushToken }) {
 
   return (
     <UserProvider user={user} setUser={setUser}>
-      <SocketContext.Provider value={[socket, setSocket]}>
-        <TodaysVisitorContext.Provider value={{ isVisitorToday, refreshTodaysVisitor }}>
-          <CalendarRefreshContext.Provider value={[refreshCalendar, setRefreshCalendar]}>
-            <TasksRefreshContext.Provider value={[refreshTasks, setRefreshTasks]}>
-              <VisitRefreshContext.Provider value={[refreshVisit, setRefreshVisit]}>
-                <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>
-                  <NotesRefreshProvider>
-                    <RecordVisitContext.Provider
-                      value={{
-                        visitNotes,
-                        setVisitNotes,
-                        visitTasks,
-                        setVisitTasks,
-                      }}
-                    >
+      <SocketContext.Provider>
+
+      <TodaysVisitorContext.Provider value={{ isVisitorToday, refreshTodaysVisitor }}>
+        <CalendarRefreshContext.Provider value={[refreshCalendar, setRefreshCalendar]}>
+          <TasksRefreshContext.Provider value={[refreshTasks, setRefreshTasks]}>
+            <VisitRefreshContext.Provider value={[refreshVisit, setRefreshVisit]}>
+              <VisitTasksRefreshContext.Provider value={[refreshVisitTasks, setRefreshVisitTasks]}>
+                <NotesRefreshProvider>
+                  <RecordVisitContext.Provider
+                    value={{
+                      visitNotes,
+                      setVisitNotes,
+                      visitTasks,
+                      setVisitTasks,
+                    }}
+                  >
+                    <GroupContext.Provider value={{ groupName, groupPassword }}>
                       <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
                         <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
                         <Stack.Screen
@@ -113,7 +116,7 @@ export default function Navigation({ expoPushToken }) {
                           options={{ headerShown: false, gestureEnabled: false }}
                         />
                         <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
-                        <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false }} />
+                        <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false, groupNamea: groupName, groupPassworda: groupPassword }} />
                         <Stack.Screen
                           name={'CreateGroup'}
                           component={CreateGroup}
@@ -175,6 +178,7 @@ export default function Navigation({ expoPushToken }) {
                           options={{ headerShown: false }}
                         />
                       </Stack.Navigator>
+                    </GroupContext.Provider>
                     </RecordVisitContext.Provider>
                   </NotesRefreshProvider>
                 </VisitTasksRefreshContext.Provider>
