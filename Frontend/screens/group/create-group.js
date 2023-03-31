@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button, Appbar } from 'react-native-paper';
 import colors from '../../constants/colors';
 import { createNewGroup } from '../../services/api/groups';
-import { addUserToGroup, fetchUserByEmail } from '../../services/api/user';
+import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 
 export default function CreateGroup({ navigation, route }) {
@@ -52,7 +52,7 @@ export default function CreateGroup({ navigation, route }) {
         onPress={async () => {
           const create = await createGroup(groupName, user, navigation);
           if (create) {
-            const fetchedUser = await fetchUserByEmail(user.email);
+            const fetchedUser = await fetchUserByCookie(user.access_token);
             setUser(fetchedUser);
             navigation.navigate('Home');
           }

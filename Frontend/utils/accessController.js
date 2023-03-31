@@ -22,7 +22,6 @@ export async function validateTokens() {
                     setAPIAccessToken(newToken);
                     return "Authenticated";
                 }
-
             }
         } else {
             const valid = await validateGoogleToken(googleToken);

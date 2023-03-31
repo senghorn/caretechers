@@ -49,6 +49,7 @@ function authServer() {
         // Authenticate User
         const token = req.body.token;
         let email = "";
+        console.log('token received', token);
         if (token) {
             try {
                 const userInfoResponse = await axios.get(

@@ -2,12 +2,13 @@ import { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
-import { createUser, fetchUserByEmail } from '../../services/api/user';
+import { createUser, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
 
 export default function Inputs({ route, navigation }) {
-  const { user } = route.params;
+  // const { user } = route.params;
+
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneMissing, setPhoneMissing] = useState(false);
   const [nameMissing, setNameMissing] = useState(true);
@@ -15,17 +16,21 @@ export default function Inputs({ route, navigation }) {
   const [userName, setUserName] = useState('');
   const [lastName, setLastName] = useState('');
   const [missLastName, setMissLastName] = useState(true);
-  const { setUser } = useContext(UserContext);
-  useEffect(() => {
-    if (user != undefined) {
-      setUserName(user['given_name']);
-      setLastName(user['family_name']);
-      setEmail(user['email']);
+  // const { user } = route.params;
+  const { user, setUser } = useContext(UserContext);
+  console.log(user);
 
-      setMissLastName(false);
-      setNameMissing(false);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user != undefined) {
+  //     console.log(user);
+  //     setUserName(user['given_name']);
+  //     setLastName(user['family_name']);
+  //     setEmail(user['email']);
+
+  //     setMissLastName(false);
+  //     setNameMissing(false);
+  //   }
+  // }, [user]);
 
   // Formats the text of the phone number to display nicely
   // E.g., 123-449-4910
@@ -80,7 +85,7 @@ export default function Inputs({ route, navigation }) {
         user['picture']
       );
       if (userCreated == true) {
-        const result = await fetchUserByEmail(email);
+        const result = await fetchUserByCookie(email);
         setUser(result);
         navigation.navigate('Group');
       } else {
@@ -96,7 +101,7 @@ export default function Inputs({ route, navigation }) {
       <TextInput
         right={<TextInput.Icon icon='email' />}
         style={styles.input}
-        value={user['email']}
+        value={''}
         label={'Email'}
         disabled
       />

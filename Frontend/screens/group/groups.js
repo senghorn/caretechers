@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
 import { useState, useContext } from 'react';
 import colors from '../../constants/colors';
-import { addUserToGroup, fetchUserByEmail } from '../../services/api/user';
+import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 
 export default function Groups({ navigation }) {
@@ -57,7 +57,7 @@ export default function Groups({ navigation }) {
           onPress={async () => {
             const result = await joinGroupHandler(user, groupName, password);
             if (result == true && user.email) {
-              const fetchedUser = await fetchUserByEmail(user.email);
+              const fetchedUser = await fetchUserByCookie(user.access_token);
               setUser(fetchedUser);
               navigation.navigate('Home');
             } else {

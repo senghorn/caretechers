@@ -102,7 +102,7 @@ export async function fetchUserByCookie(cookie) {
       return response.data;
     })
     .catch(function (error) {
-      console.log('fetch user by cookie ', error);
+      console.log('fetch user error ', error);
       return null;
     });
 }

@@ -4,9 +4,10 @@ import * as Google from 'expo-auth-session/providers/google';
 import { StyleSheet, Text, View, SafeAreaView, Image, Alert } from 'react-native';
 import COLORS from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import axios from 'axios';
 import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
-import { fetchUserByCookie, fetchUserByEmail } from '../services/api/user';
+import { fetchUserByCookie } from '../services/api/user';
 import { getGoogleAccessToken, setGoogleAccessToken, setAPIAccessToken, setAPIResetToken, getAPIAccessToken } from '../services/storage/asyncStorage';
 import { validateTokens } from '../utils/accessController';
 
@@ -80,16 +81,17 @@ export default function GoogleLogin({ navigation }) {
 
   async function getUserData() {
     try {
-      let userInfoResponse = await fetch(
+      console.log('google access token', accessToken);
+      const userInfoResponse = await axios.get(
         'https://www.googleapis.com/userinfo/v2/me',
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-      // Request access token from backend and store it in AsyncStorage for later requests
-      let data = await userInfoResponse.json();
+      const data = await userInfoResponse.data;
       const access_token = await getAPIAccessToken();
       const result = await fetchUserByCookie(access_token);
+      console.log('result', access_token);
       if (result) {
         // set user context 
         setUser({
