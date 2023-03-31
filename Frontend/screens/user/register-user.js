@@ -5,7 +5,7 @@ import { Divider } from 'react-native-paper';
 import { createUser, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
-
+import { getAccessToken } from '../../services/api/auth';
 export default function Inputs({ route, navigation }) {
   // const { user } = route.params;
 
@@ -16,21 +16,19 @@ export default function Inputs({ route, navigation }) {
   const [userName, setUserName] = useState('');
   const [lastName, setLastName] = useState('');
   const [missLastName, setMissLastName] = useState(true);
-  // const { user } = route.params;
+  const { googleData, googleToken } = route.params;
   const { user, setUser } = useContext(UserContext);
-  console.log(user);
 
-  // useEffect(() => {
-  //   if (user != undefined) {
-  //     console.log(user);
-  //     setUserName(user['given_name']);
-  //     setLastName(user['family_name']);
-  //     setEmail(user['email']);
+  useEffect(() => {
+    if (googleData != undefined) {
+      setUserName(googleData['given_name']);
+      setLastName(googleData['family_name']);
+      setEmail(googleData['email']);
 
-  //     setMissLastName(false);
-  //     setNameMissing(false);
-  //   }
-  // }, [user]);
+      setMissLastName(false);
+      setNameMissing(false);
+    }
+  }, [googleData]);
 
   // Formats the text of the phone number to display nicely
   // E.g., 123-449-4910
@@ -77,15 +75,17 @@ export default function Inputs({ route, navigation }) {
     } else if (phoneNumber.length < 12) {
       setPhoneMissing(true);
     } else {
+      const accessToken = await getAccessToken(googleToken);
       const userCreated = await createUser(
         userName,
         lastName,
         email,
         phoneNumber,
-        user['picture']
+        googleData['picture'],
+        accessToken.accessToken
       );
       if (userCreated == true) {
-        const result = await fetchUserByCookie(email);
+        const result = await fetchUserByCookie(accessToken);
         setUser(result);
         navigation.navigate('Group');
       } else {
@@ -101,7 +101,7 @@ export default function Inputs({ route, navigation }) {
       <TextInput
         right={<TextInput.Icon icon='email' />}
         style={styles.input}
-        value={''}
+        value={email}
         label={'Email'}
         disabled
       />

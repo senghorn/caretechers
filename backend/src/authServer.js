@@ -30,12 +30,17 @@ function authServer() {
     app.post('/validate', (req, res) => {
         const accessToken = req.body.token
         if (accessToken == null) return res.sendStatus(401)
-        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
             if (err) {
                 console.log(err.message);
                 return res.sendStatus(403)
             }
-            return res.sendStatus(200);
+            const registered = await isUserRegistered(user.id);
+            if (registered) {
+                res.json({ registered: true })
+            } else {
+                res.json({ registered: false })
+            }
         })
     })
 
@@ -49,7 +54,6 @@ function authServer() {
         // Authenticate User
         const token = req.body.token;
         let email = "";
-        console.log('token received', token);
         if (token) {
             try {
                 const userInfoResponse = await axios.get(
@@ -72,10 +76,16 @@ function authServer() {
             return res.sendStatus(401);
         }
         const user = await getUserData(email);
-        const accessToken = generateAccessToken(user)
-        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' })
-        refreshTokens.push(refreshToken)
-        res.json({ accessToken: accessToken, refreshToken: refreshToken })
+        const accessToken = generateAccessToken(user);
+        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' });
+        refreshTokens.push(refreshToken);
+
+        const registered = await isUserRegistered(email);
+        if (registered) {
+            res.json({ accessToken: accessToken, refreshToken: refreshToken, registered: true })
+        } else {
+            res.json({ accessToken: accessToken, refreshToken: refreshToken, registered: false })
+        }
     })
 
     app.listen(4000, () => { console.log('Auth server listening on port 4000') })
@@ -101,6 +111,15 @@ async function getUserData(email) {
         return { id: email, curr_group: [], first_name: "", last_name: "" }
     }
     return { id: result.email, curr_group: result.curr_group, first_name: result.first_name, last_name: result.last_name };
+}
+
+async function isUserRegistered(email) {
+    const query = sql`SELECT * FROM Users WHERE email = ${email};`;
+    const [result] = await db.query(query);
+    if (!result) {
+        return false
+    }
+    return true;
 }
 
 module.exports.authServer = authServer;

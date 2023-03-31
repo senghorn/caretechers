@@ -133,7 +133,7 @@ module.exports.getUserByToken = asyncHandler(async (req, _res, next) => {
   query = sql`SELECT * FROM Users WHERE email = ${req.user.id}`;
   const [result] = await db.query(query);
   if (!result) {
-    return next(newError('This user does not have a group', 404));
+    return next(newError('This user does not exist', 404));
   }
   req.result = {
     curr_group: result.curr_group, id: result.email, first_name: result.first_name,

@@ -8,7 +8,7 @@ import axios from 'axios';
 import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
 import { fetchUserByCookie } from '../services/api/user';
-import { getGoogleAccessToken, setGoogleAccessToken, setAPIAccessToken, setAPIResetToken, getAPIAccessToken } from '../services/storage/asyncStorage';
+import { getGoogleAccessToken, setGoogleAccessToken, setAPIAccessToken, setAPIResetToken, getAPIAccessToken, clearAsyncStorage } from '../services/storage/asyncStorage';
 import { validateTokens } from '../utils/accessController';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -17,6 +17,7 @@ export default function GoogleLogin({ navigation }) {
   const { setUser } = useContext(UserContext);
   const [accessToken, setAccessToken] = useState(null);
   const [cookies, setCookies] = useState(null);
+  const [registered, setRegistered] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
       '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
@@ -33,41 +34,54 @@ export default function GoogleLogin({ navigation }) {
     loginHandler();
   }, []);
 
+  // Handles when user clicks on login
   const loginHandler = async () => {
+    // await clearAsyncStorage();
     const userAccess = await validateTokens();
     if (userAccess === "Authenticated") {
+      setRegistered(true);
       getUserData();
-    } else if (userAccess === "GoogleAuthenticated") {
-      const googleToken = await getGoogleAccessToken();
-      setAccessToken(googleToken);
-    } else {
+    }
+    else {
       promptAsync();
     }
   }
 
+  // Called when google login prompt responds
   useEffect(() => {
     if (response?.type === 'success') {
       setAccessToken(response.authentication.accessToken);
     }
   }, [response]);
 
+
+  // Runs when google access token is set
   useEffect(() => {
     if (accessToken != null) {
+
       setGoogleAccessToken(accessToken);
       const tokenRequest = async () => {
+        // Sends google token to backend and try to get access token
         let serverAccessTokens = await getAccessToken(accessToken);
-        if (serverAccessTokens && serverAccessTokens.accessToken && serverAccessTokens.refreshToken) {
+
+        // Server knows whether or not user is registered with the database
+        const registered = serverAccessTokens.registered;
+        setRegistered(registered);
+        if (serverAccessTokens && serverAccessTokens.accessToken
+          && serverAccessTokens.refreshToken) {
+
           setCookies(serverAccessTokens);
+          // Store the tokens in local storage
           if (serverAccessTokens.accessToken) {
             setAPIAccessToken(serverAccessTokens.accessToken);
           }
           if (serverAccessTokens.refreshToken) {
             setAPIResetToken(serverAccessTokens.refreshToken);
           }
+
         } else {
           console.log('Fail to get access token from server!');
         }
-
       }
       tokenRequest();
     }
@@ -81,17 +95,17 @@ export default function GoogleLogin({ navigation }) {
 
   async function getUserData() {
     try {
-      console.log('google access token', accessToken);
-      const userInfoResponse = await axios.get(
+      let userInfoResponse = await fetch(
         'https://www.googleapis.com/userinfo/v2/me',
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-      const data = await userInfoResponse.data;
+      // Request access token from backend and store it in AsyncStorage for later requests
+      let data = await userInfoResponse.json();
+
       const access_token = await getAPIAccessToken();
       const result = await fetchUserByCookie(access_token);
-      console.log('result', access_token);
       if (result) {
         // set user context 
         setUser({
@@ -105,7 +119,7 @@ export default function GoogleLogin({ navigation }) {
           navigation.navigate('Group');
         }
       } else {
-        navigation.navigate('RegisterUser', { user: data });
+        navigation.navigate('RegisterUser', { googleData: data, googleToken: accessToken });
       }
     } catch (error) {
       console.log(error);

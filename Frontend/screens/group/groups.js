@@ -9,7 +9,6 @@ export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
   const [groupName, setGroupName] = useState('');
   const [password, setPassword] = useState('');
-
   return (
     <View style={styles.container}>
       <SafeAreaView>
@@ -56,7 +55,7 @@ export default function Groups({ navigation }) {
           mode='contained'
           onPress={async () => {
             const result = await joinGroupHandler(user, groupName, password);
-            if (result == true && user.email) {
+            if (result == true && user.id) {
               const fetchedUser = await fetchUserByCookie(user.access_token);
               setUser(fetchedUser);
               navigation.navigate('Home');
@@ -75,7 +74,7 @@ export default function Groups({ navigation }) {
 }
 
 const joinGroupHandler = async (user, group, password) => {
-  const joined = await addUserToGroup(user.email, group, password);
+  const joined = await addUserToGroup(user.id, group, password, user.access_token);
 
   if (joined == true) {
     return true;

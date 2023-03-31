@@ -54,24 +54,3 @@ export async function regenerateAccessToken(token) {
         return null;
     }
 }
-
-/**
- * Returns true if Api token is valid. Otherwise, false.
- * @param {*} token 
- * @returns 
- */
-async function validateApiToken(token) {
-    let connection_string =
-        config.auth_server + '/validate';
-    return await axios
-        .post(connection_string, {
-            token: token
-        })
-        .then(function (response) {
-            return true;
-        })
-        .catch(function (error) {
-            console.log('validate request error', error);
-            return false;
-        });
-}
