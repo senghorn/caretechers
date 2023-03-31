@@ -72,7 +72,6 @@ export default function Groups({ navigation }) {
     </View>
   );
 }
-
 const joinGroupHandler = async (user, group, password) => {
   const joined = await addUserToGroup(user.id, group, password, user.access_token);
 

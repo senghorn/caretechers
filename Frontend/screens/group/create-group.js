@@ -50,7 +50,7 @@ export default function CreateGroup({ navigation, route }) {
         icon='check-all'
         mode='contained'
         onPress={async () => {
-          const create = await createGroup(groupName, user, navigation);
+          const create = await createGroup(groupName, user);
           if (create) {
             const fetchedUser = await fetchUserByCookie(user.access_token);
             setUser(fetchedUser);
@@ -72,14 +72,10 @@ export default function CreateGroup({ navigation, route }) {
  * @param {string} groupName
  * @param {json} user
  */
-const createGroup = async (groupName, user, navigation) => {
-  // TODO: get visit frequency and group password below
+const createGroup = async (groupName, user) => {
   const timezone = 'America/Denver';
-  const result = await createNewGroup(groupName, timezone, 4);
-  console.log(result);
+  const result = await createNewGroup(groupName, timezone, 4, user.access_token);
   if (result.groupName != null && result.groupPassword) {
-
-
     const joinGroupWithRetry = async (
       userEmail,
       groupName,
@@ -113,7 +109,7 @@ const createGroup = async (groupName, user, navigation) => {
       }
     };
 
-    return joinGroupWithRetry(user.email, result.groupName, result.groupPassword, 3, 1);
+    return joinGroupWithRetry(user.id, result.groupName, result.groupPassword, 3, 1);
   }
 
   return false;

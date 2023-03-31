@@ -4,11 +4,10 @@ import * as Google from 'expo-auth-session/providers/google';
 import { StyleSheet, Text, View, SafeAreaView, Image, Alert } from 'react-native';
 import COLORS from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import axios from 'axios';
 import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
 import { fetchUserByCookie } from '../services/api/user';
-import { getGoogleAccessToken, setGoogleAccessToken, setAPIAccessToken, setAPIResetToken, getAPIAccessToken, clearAsyncStorage } from '../services/storage/asyncStorage';
+import { setAPIAccessToken, setAPIResetToken, getAPIAccessToken, clearAsyncStorage } from '../services/storage/asyncStorage';
 import { validateTokens } from '../utils/accessController';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -17,7 +16,6 @@ export default function GoogleLogin({ navigation }) {
   const { setUser } = useContext(UserContext);
   const [accessToken, setAccessToken] = useState(null);
   const [cookies, setCookies] = useState(null);
-  const [registered, setRegistered] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
       '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
@@ -36,11 +34,9 @@ export default function GoogleLogin({ navigation }) {
 
   // Handles when user clicks on login
   const loginHandler = async () => {
-    // await clearAsyncStorage();
     const userAccess = await validateTokens();
-    if (userAccess === "Authenticated") {
-      setRegistered(true);
-      getUserData();
+    if (userAccess === "authenticated") {
+      AuthenticatedUserHandler();
     }
     else {
       promptAsync();
@@ -58,29 +54,31 @@ export default function GoogleLogin({ navigation }) {
   // Runs when google access token is set
   useEffect(() => {
     if (accessToken != null) {
-
-      setGoogleAccessToken(accessToken);
       const tokenRequest = async () => {
         // Sends google token to backend and try to get access token
         let serverAccessTokens = await getAccessToken(accessToken);
-
-        // Server knows whether or not user is registered with the database
-        const registered = serverAccessTokens.registered;
-        setRegistered(registered);
-        if (serverAccessTokens && serverAccessTokens.accessToken
-          && serverAccessTokens.refreshToken) {
-
-          setCookies(serverAccessTokens);
-          // Store the tokens in local storage
-          if (serverAccessTokens.accessToken) {
-            setAPIAccessToken(serverAccessTokens.accessToken);
+        if (serverAccessTokens) {
+          if (serverAccessTokens.registered) {
+            setCookies(serverAccessTokens);
+            if (serverAccessTokens.accessToken) {
+              setAPIAccessToken(serverAccessTokens.accessToken);
+            }
+            if (serverAccessTokens.refreshToken) {
+              setAPIResetToken(serverAccessTokens.refreshToken);
+            }
+          } else {
+            let userInfoResponse = await fetch(
+              'https://www.googleapis.com/userinfo/v2/me',
+              {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              }
+            );
+            let data = await userInfoResponse.json();
+            navigation.navigate('RegisterUser', { googleData: data, googleToken: accessToken });
           }
-          if (serverAccessTokens.refreshToken) {
-            setAPIResetToken(serverAccessTokens.refreshToken);
-          }
-
-        } else {
-          console.log('Fail to get access token from server!');
+        }
+        else {
+          console.log('Cannot get access token');
         }
       }
       tokenRequest();
@@ -89,25 +87,15 @@ export default function GoogleLogin({ navigation }) {
 
   useEffect(() => {
     if (cookies) {
-      getUserData();
+      AuthenticatedUserHandler();
     }
   }, [cookies]);
 
-  async function getUserData() {
+  async function AuthenticatedUserHandler() {
     try {
-      let userInfoResponse = await fetch(
-        'https://www.googleapis.com/userinfo/v2/me',
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-      // Request access token from backend and store it in AsyncStorage for later requests
-      let data = await userInfoResponse.json();
-
       const access_token = await getAPIAccessToken();
       const result = await fetchUserByCookie(access_token);
       if (result) {
-        // set user context 
         setUser({
           "access_token": access_token, "curr_group": result.curr_group, "id": result.id,
           "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
@@ -119,10 +107,10 @@ export default function GoogleLogin({ navigation }) {
           navigation.navigate('Group');
         }
       } else {
-        navigation.navigate('RegisterUser', { googleData: data, googleToken: accessToken });
+        console.log('Fetch user data error while trying to retrieve user info.');
       }
     } catch (error) {
-      console.log(error);
+      console.log('get user data error:', error);
     }
   }
 

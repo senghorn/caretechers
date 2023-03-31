@@ -6,6 +6,7 @@ import { createUser, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
 import { getAccessToken } from '../../services/api/auth';
+import { setAPIAccessToken, setAPIResetToken } from '../../services/storage/asyncStorage';
 export default function Inputs({ route, navigation }) {
   // const { user } = route.params;
 
@@ -85,9 +86,13 @@ export default function Inputs({ route, navigation }) {
         accessToken.accessToken
       );
       if (userCreated == true) {
-        const result = await fetchUserByCookie(accessToken);
-        setUser(result);
-        navigation.navigate('Group');
+        setAPIAccessToken(accessToken.accessToken);
+        setAPIAccessToken(accessToken.refreshToken);
+        const result = await fetchUserByCookie(accessToken.accessToken);
+        if (result) {
+          setUser(result);
+          navigation.navigate('Group');
+        }
       } else {
         console.log('user created unsuccessful');
       }

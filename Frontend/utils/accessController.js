@@ -1,37 +1,17 @@
 import { getAPIAccessToken, getGoogleAccessToken, getAPIResetToken, setAPIAccessToken } from '../services/storage/asyncStorage';
 import config from '../constants/config';
 import axios from 'axios';
-import { regenerateAccessToken } from '../services/api/auth';
 
 
 /**
- * Returns "Authenticated" if the app has valid access tokens to backend.
- * Returns "GoogleAuthenticated" if the only has valid Google Access Token.
- * Otherwise, return "Unauthenticated"
+ * Returns "authenticated" if the app has valid access tokens and user is registered.
+ * Returns "unregistered" if the user has valid access token but not registered.
+ * Otherwise, return "unauthenticated".
  */
 export async function validateTokens() {
-    const googleToken = await getGoogleAccessToken();
-    if (googleToken) {
-        const accessToken = await getAPIAccessToken();
-        if (accessToken) {
-            const valid = await validateApiToken(accessToken);
-            if (valid === AUTHENTICATED) {
-                return "Authenticated";
-            }
-            else if (valid === UNREGISTERED) {
-                return "Unregistered"
-            }
-        } else {
-            const valid = await validateGoogleToken(googleToken);
-            if (valid) {
-                return "GoogleAuthenticated"
-            }
-        }
-    } else {
-        return "Unauthenticated";;
-    }
-
-    return "Unauthenticated";
+    const serverAccessToken = await getAPIAccessToken();
+    const authState = await validateApiToken(serverAccessToken);
+    return authState;
 }
 
 /**
