@@ -7,7 +7,7 @@ const axios = require('axios').default;
  * @param {int} visit_frequency
  * @returns
  */
-export async function createNewGroup(groupName, timezone, visit_frequency) {
+export async function createNewGroup(groupName, timezone, visit_frequency, token) {
   const data = {
     name: groupName,
     visitFrequency: visit_frequency,
@@ -16,7 +16,9 @@ export async function createNewGroup(groupName, timezone, visit_frequency) {
   try {
     let connection_string = config.backend_server + '/groups/';
     return await axios
-      .post(connection_string, data)
+      .post(connection_string, data, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
       .then(function (response) {
         return response.data;
       })

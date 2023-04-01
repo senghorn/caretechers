@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button, Appbar } from 'react-native-paper';
 import colors from '../../constants/colors';
 import { createNewGroup } from '../../services/api/groups';
-import { addUserToGroup, fetchUserByEmail } from '../../services/api/user';
+import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 
 export default function CreateGroup({ navigation, route }) {
@@ -50,10 +50,14 @@ export default function CreateGroup({ navigation, route }) {
         icon='check-all'
         mode='contained'
         onPress={async () => {
-          const create = await createGroup(groupName, user, navigation);
+          const create = await createGroup(groupName, user);
           if (create) {
-            const fetchedUser = await fetchUserByEmail(user.email);
-            setUser(fetchedUser);
+            const fetchedUser = await fetchUserByCookie(user.access_token);
+            setUser({
+              "access_token": user.access_token, "curr_group": fetchedUser.curr_group, "id": fetchedUser.id,
+              "first_name": fetchedUser.first_name, "last_name": fetchedUser.last_name, "profile_pic": fetchedUser.profile_pic,
+              "phone_num": fetchedUser.phone_num
+            })
             navigation.navigate('Home');
           }
         }}
@@ -72,14 +76,10 @@ export default function CreateGroup({ navigation, route }) {
  * @param {string} groupName
  * @param {json} user
  */
-const createGroup = async (groupName, user, navigation) => {
-  // TODO: get visit frequency and group password below
+const createGroup = async (groupName, user) => {
   const timezone = 'America/Denver';
-  const result = await createNewGroup(groupName, timezone, 4);
-  console.log(result);
-  if (result.groupName != null && result.groupPassword) {
-
-
+  const result = await createNewGroup(groupName, timezone, 4, user.access_token);
+  if (result && result.groupName && result.groupPassword) {
     const joinGroupWithRetry = async (
       userEmail,
       groupName,
@@ -88,8 +88,7 @@ const createGroup = async (groupName, user, navigation) => {
       attempt = 1
     ) => {
 
-      const joined = await addUserToGroup(userEmail, groupName, groupPassword);
-      console.log(groupName, groupPassword);
+      const joined = await addUserToGroup(userEmail, groupName, groupPassword, user.access_token);
       if (joined) {
         return true;
       } else {
@@ -113,7 +112,7 @@ const createGroup = async (groupName, user, navigation) => {
       }
     };
 
-    return joinGroupWithRetry(user.email, result.groupName, result.groupPassword, 3, 1);
+    return joinGroupWithRetry(user.id, result.groupName, result.groupPassword, 3, 1);
   }
 
   return false;

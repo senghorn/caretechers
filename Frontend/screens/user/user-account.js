@@ -34,7 +34,6 @@ export default function UserAccount({ navigation, route, newUser }) {
       await (async () => {
         const update = await UpdateUserData(email, firstName, lastName, phone, user.curr_group, user.profile_pic, user.access_token);
         if (update) {
-          console.log(user);
           setUser({
             id: user.id,
             first_name: firstName,
@@ -42,6 +41,7 @@ export default function UserAccount({ navigation, route, newUser }) {
             curr_group: user.curr_group,
             profile_pic: user.profile_pic,
             phone_num: phone,
+            access_token: user.access_token,
           });
         }
       })();

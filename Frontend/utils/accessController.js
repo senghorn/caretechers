@@ -1,31 +1,17 @@
-import { getAPIAccessToken, getGoogleAccessToken } from '../services/storage/asyncStorage';
+import { getAPIAccessToken, getGoogleAccessToken, getAPIResetToken, setAPIAccessToken } from '../services/storage/asyncStorage';
 import config from '../constants/config';
 import axios from 'axios';
+
+
 /**
- * Returns "Authenticated" if the app has valid access tokens to backend.
- * Returns "GoogleAuthenticated" if the only has valid Google Access Token.
- * Otherwise, return "Unauthenticated"
+ * Returns "authenticated" if the app has valid access tokens and user is registered.
+ * Returns "unregistered" if the user has valid access token but not registered.
+ * Otherwise, return "unauthenticated".
  */
 export async function validateTokens() {
-    const googleToken = await getGoogleAccessToken();
-    if (googleToken) {
-        const accessToken = await getAPIAccessToken();
-        if (accessToken) {
-            const valid = await validateApiToken(accessToken);
-            if (valid) {
-                return "Authenticated";
-            }
-        } else {
-            const valid = await validateGoogleToken(googleToken);
-            if (valid) {
-                return "GoogleAuthenticated"
-            }
-        }
-    } else {
-        return "Unauthenticated";;
-    }
-
-    return "Unauthenticated";
+    const serverAccessToken = await getAPIAccessToken();
+    const authState = await validateApiToken(serverAccessToken);
+    return authState;
 }
 
 /**
@@ -48,23 +34,26 @@ async function validateGoogleToken(token) {
     return true;
 }
 
+
+const AUTHENTICATED = "authenticated";
+const UNREGISTERED = "unregistered";
+const UNAUTHENTICATED = "unauthenticated";
 /**
- * Returns true if Api token is valid. Otherwise, false.
+ * Returns 'authenticated' if user is registered and has valid token. Returns 'unregistered' if 
+ * token is valid but not registered. Otherwise, returns unauthenticated.
  * @param {*} token 
  * @returns 
  */
 async function validateApiToken(token) {
-    let connection_string =
-        config.auth_server + '/validate';
-    return await axios
-        .post(connection_string, {
-            token: token
-        })
-        .then(function (response) {
-            return true;
-        })
-        .catch(function (error) {
-            console.log('validate request error', error);
-            return false;
-        });
+    let connection_string = config.auth_server + '/validate';
+    try {
+        const response = await axios.post(connection_string, { token: token });
+        if (response.data.registered === true) {
+            return AUTHENTICATED;
+        }
+        return UNREGISTERED;
+    } catch (error) {
+        console.log('validate request error', error);
+        return UNAUTHENTICATED;
+    }
 }

@@ -44,7 +44,7 @@ export async function createUserWithGroup(first, last, email, phone, group, phot
  * @return True : on success
  *         False: on error
  */
-export async function createUser(first, last, email, phone, photo) {
+export async function createUser(first, last, email, phone, photo, access_token) {
   try {
     const data = {
       email: email,
@@ -55,7 +55,12 @@ export async function createUser(first, last, email, phone, photo) {
     };
     let connection_string = config.backend_server + '/user';
     return await axios
-      .post(connection_string, data)
+      .post(connection_string, data, {
+        withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + access_token
+        }
+      })
       .then(function (response) {
         return true;
       })
@@ -102,7 +107,7 @@ export async function fetchUserByCookie(cookie) {
       return response.data;
     })
     .catch(function (error) {
-      console.log('fetch user by cookie ', error);
+      console.log('fetch user error ', error);
       return null;
     });
 }
@@ -113,16 +118,17 @@ export async function fetchUserByCookie(cookie) {
  * @param {int} groupId
  * @returns
  */
-export async function addUserToGroup(email, groupName, password) {
+export async function addUserToGroup(email, groupName, password, token) {
   const data = {
     groupName: groupName,
     groupPassword: password
   };
   try {
-    // /:userId/group/join'
     let connection_string = config.backend_server + '/user/' + email + '/group/join';
     return await axios
-      .post(connection_string, data)
+      .post(connection_string, data, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
       .then(function (response) {
         return true;
       })
