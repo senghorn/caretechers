@@ -11,18 +11,10 @@ import config from '../../constants/config'
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
   const inviteLinkContext = useContext(InviteLinkContext);
-  // console.log('INVITELINK', inviteLinkContext);
-  // const [groupName, setGroupName] = useState(inviteLinkContext.groupName);
-  // const [password, setPassword] = useState(inviteLinkContext.groupPassword);
   const [groupName, setGroupName] = useState('');
   const [password, setPassword] = useState('');
 
   const processInviteLink = async () => {
-    const info = {
-      groupName: '',
-      groupPassword: ''
-    }
-    console.log('INVITELINK', inviteLinkContext);
     if (inviteLinkContext) {
       try {
         const response = await axios.get(`${config.backend_server}/groups/info/token/${inviteLinkContext}`, {
@@ -30,7 +22,6 @@ export default function Groups({ navigation }) {
             'authorization': `Bearer ${user.access_token}`
           }
         });
-        console.log('RESPONSE', response.data);
         setGroupName(response.data.groupName);
         setPassword(response.data.groupPassword);
 
