@@ -98,6 +98,7 @@ export async function fetchUserByEmail(email, cookie) {
  */
 export async function fetchUserByCookie(cookie) {
   let connection_string = config.backend_server + '/user/fetch/userInfo';
+  console.log('user cookie', cookie);
   let headers = {
     Authorization: `Bearer ${cookie}`,
   };

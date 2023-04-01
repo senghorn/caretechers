@@ -75,7 +75,7 @@ export default function CreateGroup({ navigation, route }) {
 const createGroup = async (groupName, user) => {
   const timezone = 'America/Denver';
   const result = await createNewGroup(groupName, timezone, 4, user.access_token);
-  if (result.groupName != null && result.groupPassword) {
+  if (result && result.groupName && result.groupPassword) {
     const joinGroupWithRetry = async (
       userEmail,
       groupName,

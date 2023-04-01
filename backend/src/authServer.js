@@ -32,7 +32,7 @@ function authServer() {
         if (accessToken == null) return res.sendStatus(401)
         jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
             if (err) {
-                console.log(err.message);
+                console.log('validate token error', err.message);
                 return res.sendStatus(403)
             }
             const registered = await isUserRegistered(user.id);

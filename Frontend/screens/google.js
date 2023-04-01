@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useCallback } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { StyleSheet, Text, View, SafeAreaView, Image, Alert } from 'react-native';
@@ -30,10 +30,10 @@ export default function GoogleLogin({ navigation }) {
   // On load, try logging in automatically
   useEffect(() => {
     loginHandler();
-  }, []);
+  }, [promptAsync]);
 
   // Handles when user clicks on login
-  const loginHandler = async () => {
+  const loginHandler = useCallback(async () => {
     const userAccess = await validateTokens();
     if (userAccess === "authenticated") {
       AuthenticatedUserHandler();
@@ -41,7 +41,7 @@ export default function GoogleLogin({ navigation }) {
     else {
       promptAsync();
     }
-  }
+  }, [promptAsync])
 
   // Called when google login prompt responds
   useEffect(() => {
