@@ -77,19 +77,28 @@ module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res
     return next(newError('Group does not exist or password is wrong!', 404));
   }
 
-  query = sql`INSERT INTO GroupMembers(group_id, member_id, active)
-    VALUES (
-  (
-    SELECT id 
-    FROM \`Groups\` 
-    WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword}
-  ), ${req.params.userId}, TRUE);
-  `
-  result = await db.query(query);
-  if (result.affectedRows == 0) {
-    return next(newError('Cannot join the group!', 400));
+  query = sql`SELECT id FROM \`Groups\` G WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword}`
+  const [group] = await db.query(query);
+  try {
+    // Execute the first query
+    console.log("group id", group.id, "user id ", req.params.userId);
+    query = sql`INSERT INTO GroupMembers(group_id, member_id, active)
+              VALUES ( ${group.id}, ${req.params.userId}, TRUE)`;
+    result = await db.query(query);
+    if (result.affectedRows == 0) {
+      return next(newError('Cannot join the group!', 400));
+    }
+    // Execute the second query
+    query = sql`UPDATE Users SET curr_group=${group.id} WHERE email=${req.params.userId}`;
+    result = await db.query(query);
+    if (result.affectedRows == 0) {
+      console.log(result);
+      return next(newError('Cannot join the group!', 400));
+    }
+    next();
+  } catch (error) {
+    return next(newError("Fail to join the group!", 500));
   }
-  next();
 });
 
 module.exports.addUserToGroup = asyncHandler(async (req, _res, next) => {
