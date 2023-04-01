@@ -84,7 +84,7 @@ const createGroup = async (groupName, user) => {
       attempt = 1
     ) => {
 
-      const joined = await addUserToGroup(userEmail, groupName, groupPassword);
+      const joined = await addUserToGroup(userEmail, groupName, groupPassword, user.access_token);
       console.log(groupName, groupPassword);
       if (joined) {
         return true;

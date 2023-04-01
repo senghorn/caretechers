@@ -54,10 +54,15 @@ export default function Groups({ navigation }) {
           icon='check-all'
           mode='contained'
           onPress={async () => {
-            const result = await joinGroupHandler(user, groupName, password);
-            if (result == true && user.id) {
-              const fetchedUser = await fetchUserByCookie(user.access_token);
-              setUser(fetchedUser);
+            const joined = await joinGroupHandler(user, groupName, password);
+            if (joined == true && user.id) {
+              const result = await fetchUserByCookie(user.access_token);
+              setUser(result);
+              setUser({
+                "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
+                "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+                "phone_num": result.phone_num
+              });
               navigation.navigate('Home');
             } else {
               alert('Group name and password are incorrect!');

@@ -78,9 +78,14 @@ module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res
   }
 
   query = sql`INSERT INTO GroupMembers(group_id, member_id, active)
-    VALUES (${id}, ${req.params.userId}, TRUE);
+    VALUES (
+  (
+    SELECT id 
+    FROM \`Groups\` 
+    WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword}
+  ), ${req.params.userId}, TRUE);
   `
-  const result = await db.query(query);
+  result = await db.query(query);
   if (result.affectedRows == 0) {
     return next(newError('Cannot join the group!', 400));
   }

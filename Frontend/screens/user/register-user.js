@@ -87,10 +87,14 @@ export default function Inputs({ route, navigation }) {
       );
       if (userCreated == true) {
         setAPIAccessToken(accessToken.accessToken);
-        setAPIAccessToken(accessToken.refreshToken);
-        const result = await fetchUserByCookie(accessToken.accessToken);
+        setAPIResetToken(accessToken.refreshToken);
+        let result = await fetchUserByCookie(accessToken.accessToken);
         if (result) {
-          setUser(result);
+          setUser({
+            "access_token": accessToken.accessToken, "curr_group": result.curr_group, "id": result.id,
+            "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+            "phone_num": result.phone_num
+          });
           navigation.navigate('Group');
         }
       } else {
