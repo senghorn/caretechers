@@ -24,8 +24,6 @@ export default function BottomNavigation({ route, navigation }) {
     if (user) {
       const fetchToken = async () => {
         const token = await getAPIAccessToken();
-        console.log('api access token', token);
-        console.log('web token', token);
         const newSocket = createSocket(user, token);
         newSocket.connect();
         setSocket(newSocket);

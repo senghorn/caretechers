@@ -57,7 +57,6 @@ export default function Groups({ navigation }) {
             const joined = await joinGroupHandler(user, groupName, password);
             if (joined == true && user.id) {
               const result = await fetchUserByCookie(user.access_token);
-              setUser(result);
               setUser({
                 "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
                 "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,

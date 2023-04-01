@@ -71,19 +71,15 @@ module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res
 
   let query = sql`SELECT id FROM \`Groups\` G
 						WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword}`;
-  let [id] = await db.query(query);
+  let [group] = await db.query(query);
 
-  if (!id) {
+  if (!group) {
     return next(newError('Group does not exist or password is wrong!', 404));
   }
 
   query = sql`INSERT INTO GroupMembers(group_id, member_id, active)
-    VALUES (
-  (
-    SELECT id 
-    FROM \`Groups\` 
-    WHERE name = ${req.body.groupName} AND password = ${req.body.groupPassword}
-  ), ${req.params.userId}, TRUE);
+    VALUES (${group.id}, ${req.params.userId}, TRUE);UPDATE Users SET curr_group=${group.id}
+    WHERE email=${req.params.userId};
   `
   result = await db.query(query);
   if (result.affectedRows == 0) {

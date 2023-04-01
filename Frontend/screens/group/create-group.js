@@ -53,7 +53,11 @@ export default function CreateGroup({ navigation, route }) {
           const create = await createGroup(groupName, user);
           if (create) {
             const fetchedUser = await fetchUserByCookie(user.access_token);
-            setUser(fetchedUser);
+            setUser({
+              "access_token": user.access_token, "curr_group": fetchedUser.curr_group, "id": fetchedUser.id,
+              "first_name": fetchedUser.first_name, "last_name": fetchedUser.last_name, "profile_pic": fetchedUser.profile_pic,
+              "phone_num": fetchedUser.phone_num
+            })
             navigation.navigate('Home');
           }
         }}
@@ -85,7 +89,6 @@ const createGroup = async (groupName, user) => {
     ) => {
 
       const joined = await addUserToGroup(userEmail, groupName, groupPassword, user.access_token);
-      console.log(groupName, groupPassword);
       if (joined) {
         return true;
       } else {

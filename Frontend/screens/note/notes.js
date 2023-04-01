@@ -7,16 +7,13 @@ import Header from '../../components/notes/header';
 import config from '../../constants/config';
 import UserContext from '../../services/context/UserContext';
 import useSWR from 'swr';
-import axios from 'axios';
 import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
-import { getAPIAccessToken } from '../../services/storage/asyncStorage';
 import { SearchNotes } from '../../services/api/notes';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function Notes({ navigation, route }) {
   const { user } = useContext(UserContext);
-  console.log('user information', user);
   const { refresh, sort, searchMode } = useContext(NotesRefreshContext);
   const [searchResult, setSearchResult] = useState([]);
   const { data, isLoading, error, mutate } = useSWR(
