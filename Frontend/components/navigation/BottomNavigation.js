@@ -14,15 +14,12 @@ import UserContext from "../../services/context/UserContext";
 import SocketContext from '../../services/context/SocketContext';
 import { getAPIAccessToken } from '../../services/storage/asyncStorage';
 
-const axios = require('axios').default;
-
 const Tab = createMaterialBottomTabNavigator();
 
 export default function BottomNavigation({ route, navigation }) {
   const { isVisitorToday } = useContext(TodaysVisitorContext);
   const { user } = useContext(UserContext);
   const [socket, setSocket] = useContext(SocketContext);
-  axios.defaults.headers.common['Authorization'] = user.access_token;
   useEffect(() => {
     if (user) {
       const fetchToken = async () => {
@@ -32,6 +29,8 @@ export default function BottomNavigation({ route, navigation }) {
         setSocket(newSocket);
       }
       fetchToken();
+    } else {
+      console.log('User is null');
     }
   }, [user]);
 

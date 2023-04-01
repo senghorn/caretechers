@@ -7,9 +7,7 @@ import Header from '../../components/notes/header';
 import config from '../../constants/config';
 import UserContext from '../../services/context/UserContext';
 import useSWR from 'swr';
-import axios from 'axios';
 import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
-import { getAPIAccessToken } from '../../services/storage/asyncStorage';
 import { SearchNotes } from '../../services/api/notes';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());

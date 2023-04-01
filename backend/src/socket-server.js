@@ -82,6 +82,7 @@ function decodeToken(token) {
   let decodedUser = null;
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
+      console.log('given token', user);
       console.log('token decoded error', err)
       return res.sendStatus(403)
     }

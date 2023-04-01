@@ -2,15 +2,20 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
 import { useState, useContext } from 'react';
 import colors from '../../constants/colors';
-import { addUserToGroup, fetchUserByEmail } from '../../services/api/user';
+import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 import GroupContext from '../../services/context/GroupContext';
 
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
+<<<<<<< HEAD
   const groupContext = useContext(GroupContext);
   const [groupName, setGroupName] = useState(groupContext.groupName);
   const [password, setPassword] = useState(groupContext.groupPassword);
+=======
+  const [groupName, setGroupName] = useState('');
+  const [password, setPassword] = useState('');
+>>>>>>> e9214d51e13d519b95a219547b2404c4eddce40a
   return (
     <View style={styles.container}>
       <SafeAreaView>
@@ -56,10 +61,14 @@ export default function Groups({ navigation }) {
           icon='check-all'
           mode='contained'
           onPress={async () => {
-            const result = await joinGroupHandler(user, groupName, password);
-            if (result == true && user.email) {
-              const fetchedUser = await fetchUserByEmail(user.email);
-              setUser(fetchedUser);
+            const joined = await joinGroupHandler(user, groupName, password);
+            if (joined == true && user.id) {
+              const result = await fetchUserByCookie(user.access_token);
+              setUser({
+                "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
+                "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+                "phone_num": result.phone_num
+              });
               navigation.navigate('Home');
             } else {
               alert('Group name and password are incorrect!');
@@ -74,9 +83,8 @@ export default function Groups({ navigation }) {
     </View>
   );
 }
-
 const joinGroupHandler = async (user, group, password) => {
-  const joined = await addUserToGroup(user.email, group, password);
+  const joined = await addUserToGroup(user.id, group, password, user.access_token);
 
   if (joined == true) {
     return true;
