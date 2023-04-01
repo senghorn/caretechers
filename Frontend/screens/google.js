@@ -54,11 +54,6 @@ export default function GoogleLogin({ navigation }) {
   // Runs when google access token is set
   useEffect(() => {
     if (accessToken != null) {
-<<<<<<< HEAD
-      console.log('ACCESS TOKEN: ', accessToken);
-      setGoogleAccessToken(accessToken);
-=======
->>>>>>> e9214d51e13d519b95a219547b2404c4eddce40a
       const tokenRequest = async () => {
         // Sends google token to backend and try to get access token
         let serverAccessTokens = await getAccessToken(accessToken);

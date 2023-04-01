@@ -3,12 +3,12 @@ import { Appbar, IconButton, Avatar, Divider, Text, TextInput, ActivityIndicator
 import { useState, useEffect, useContext } from 'react';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
-import GroupContext from '../../services/context/GroupContext';
+import GroupContext from '../../services/context/InviteLinkContext';
 import { resetGroupPassword } from '../../services/api/groups';
 import { RemoveUserFromGroup } from '../../services/api/user';
 import config from '../../constants/config';
 import useSWR from 'swr';
-import { sign } from 'react-native-pure-jwt';
+import axios from 'axios';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
@@ -69,39 +69,27 @@ export default function GroupSettings({ navigation }) {
     console.log('Change Group Name Pressed');
   };
 
-  const createToken = async () => {
-    try {
-      await RNPureJwt.sign(
-        {
-          iss: "luisfelipez@live.com",
-          exp: 1000, // expiration date, required, in ms, absolute to 1/1/1970
-          additional: "payload"
-        }, // body
-        "my-secret", // secret
-        {
-          alg: "HS256"
-        }
-      )
-    } catch (e) {
-      console.error(e )
-    }
-
-  }
-
   const onShare = async () => {
-    sign(
-      {
-        iss: "luisfelipez@live.com",
-        exp: new Date().getTime() + 3600 * 1000, // expiration date, required, in ms, absolute to 1/1/1970
-        additional: "payload"
-      }, // body
-      "my-secret", // secret
-      {
-        alg: "HS256"
+    const response = await axios.get(`${config.backend_server}/groups/token`, {
+      headers: {
+        'authorization': `Bearer ${user.access_token}`
       }
-    )
-      .then(console.log) // token as the only argument
-      .catch(console.error); // possible errors
+    });
+    console.log(response.data);
+    try {
+      const result = await Share.share({
+        message: `Join our caretaking group!\n\nexp://${config.ip}:19000/?token=${response.data}\n\nThis link will expire in 5 minutes!`,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      }
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (

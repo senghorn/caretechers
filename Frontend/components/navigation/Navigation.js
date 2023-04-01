@@ -18,7 +18,7 @@ import TasksRefreshContext from '../../services/context/TasksRefreshContext';
 import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
 import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 import SocketContext from '../../services/context/SocketContext';
-import GroupContext from '../../services/context/GroupContext';
+import InviteLinkContext from '../../services/context/InviteLinkContext';
 import { NotesRefreshProvider } from '../../services/context/NotesRefreshContext';
 import Note from '../../screens/note/note';
 import NewNote from '../../screens/note/newNote';
@@ -31,6 +31,7 @@ import config from '../../constants/config';
 import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
 import RecordVisitContext from '../../services/context/RecordVisitContext';
 import { setUserNotificationIdentifier } from '../../services/api/user';
+import axios from 'axios';
 
 const initRefreshCalendar = () => {
   console.log('calendar refresh not set');
@@ -46,7 +47,7 @@ const initRefreshVisit = () => {
 
 const Stack = createNativeStackNavigator();
 
-export default function Navigation({ expoPushToken, groupName, groupPassword }) {
+export default function Navigation({ expoPushToken, inviteToken }) {
   const [user, setUser] = useState(null);
   const [refreshCalendar, setRefreshCalendar] = useState(() => initRefreshCalendar);
   const [refreshTasks, setRefreshTasks] = useState(() => initRefreshTasks);
@@ -106,7 +107,7 @@ export default function Navigation({ expoPushToken, groupName, groupPassword }) 
                         setVisitTasks,
                       }}
                     >
-                      <GroupContext.Provider value={{ groupName, groupPassword }}>
+                      <InviteLinkContext.Provider value={inviteToken}>
                         <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
                           <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
                           <Stack.Screen
@@ -115,7 +116,7 @@ export default function Navigation({ expoPushToken, groupName, groupPassword }) 
                             options={{ headerShown: false, gestureEnabled: false }}
                           />
                           <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
-                          <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false, groupNamea: groupName, groupPassworda: groupPassword }} />
+                          <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false }} />
                           <Stack.Screen
                             name={'CreateGroup'}
                             component={CreateGroup}
@@ -177,7 +178,7 @@ export default function Navigation({ expoPushToken, groupName, groupPassword }) 
                             options={{ headerShown: false }}
                           />
                         </Stack.Navigator>
-                      </GroupContext.Provider>
+                      </InviteLinkContext.Provider>
                     </RecordVisitContext.Provider>
                   </NotesRefreshProvider>
                 </VisitTasksRefreshContext.Provider>

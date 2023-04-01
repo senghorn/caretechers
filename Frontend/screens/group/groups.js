@@ -1,21 +1,50 @@
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import colors from '../../constants/colors';
 import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
-import GroupContext from '../../services/context/GroupContext';
+import InviteLinkContext from '../../services/context/InviteLinkContext';
+import axios from 'axios';
+import config from '../../constants/config'
 
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
-<<<<<<< HEAD
-  const groupContext = useContext(GroupContext);
-  const [groupName, setGroupName] = useState(groupContext.groupName);
-  const [password, setPassword] = useState(groupContext.groupPassword);
-=======
+  const inviteLinkContext = useContext(InviteLinkContext);
+  // console.log('INVITELINK', inviteLinkContext);
+  // const [groupName, setGroupName] = useState(inviteLinkContext.groupName);
+  // const [password, setPassword] = useState(inviteLinkContext.groupPassword);
   const [groupName, setGroupName] = useState('');
   const [password, setPassword] = useState('');
->>>>>>> e9214d51e13d519b95a219547b2404c4eddce40a
+
+  const processInviteLink = async () => {
+    const info = {
+      groupName: '',
+      groupPassword: ''
+    }
+    console.log('INVITELINK', inviteLinkContext);
+    if (inviteLinkContext) {
+      try {
+        const response = await axios.get(`${config.backend_server}/groups/info/token/${inviteLinkContext}`, {
+          headers: {
+            'authorization': `Bearer ${user.access_token}`
+          }
+        });
+        console.log('RESPONSE', response.data);
+        setGroupName(response.data.groupName);
+        setPassword(response.data.groupPassword);
+
+      } catch (e) {
+        console.log(e);
+        console.log('COULD NOT FETCH NAME AND PASSWORD FROM LINK.');
+      }
+    }
+  }
+  
+  useEffect(() => {
+    processInviteLink();
+  }, [inviteLinkContext]);
+
   return (
     <View style={styles.container}>
       <SafeAreaView>

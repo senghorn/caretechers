@@ -9,6 +9,7 @@ import { Asset } from 'expo-asset';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -47,8 +48,7 @@ export default function App() {
   const notificationListener = useRef();
   const navigationRef = useRef();
   const responseListener = useRef();
-  const [groupName, setGroupName] = useState('');
-  const [groupPassword, setGroupPassword] = useState('');
+  const [inviteToken, setInviteToken] = useState(null);
 
   const [imagesLoaded] = useImages([
     require('./assets/abstract_background.jpg'),
@@ -63,6 +63,7 @@ export default function App() {
     },
   });
 
+  // used for deep linking
   const url = Linking.useURL();
   useEffect(() => {
     var regex = /[?&]([^=#]+)=([^&#]*)/g,
@@ -71,8 +72,7 @@ export default function App() {
     while (match = regex.exec(url)) {
       params[match[1]] = match[2];
     }
-    setGroupName(params.name);
-    setGroupPassword(params.pass);
+    setInviteToken(params.token)
   }, [url]);
 
 
@@ -97,7 +97,7 @@ export default function App() {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      <Navigation expoPushToken={expoPushToken} groupName={groupName} groupPassword={groupPassword}/>
+      <Navigation expoPushToken={expoPushToken} inviteToken={inviteToken}/>
       <StatusBar style="auto" />
     </NavigationContainer>
   );
