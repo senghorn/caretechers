@@ -11,6 +11,17 @@ router.post('/', [
 	sharedMiddleware.sendResult
 ]);
 
+router.get('/token', [
+	groupMiddleware.getGroupNameAndPassword,
+	groupMiddleware.generateToken,
+	sharedMiddleware.sendResult
+])
+
+router.get('/info/token/:token', [
+	groupMiddleware.verifyToken,
+	sharedMiddleware.sendResult
+]);
+
 router.get('/password/:groupId',[
 	groupMiddleware.checkIfGroupExists,
 	groupMiddleware.getGroupPassword,

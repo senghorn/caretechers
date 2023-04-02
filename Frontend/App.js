@@ -1,13 +1,15 @@
+import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-gesture-handler';
 import Navigation from './components/navigation/Navigation';
 import { NavigationContainer } from '@react-navigation/native';
-import { Linking, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import colors from './constants/colors';
 import { Asset } from 'expo-asset';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -46,6 +48,7 @@ export default function App() {
   const notificationListener = useRef();
   const navigationRef = useRef();
   const responseListener = useRef();
+  const [inviteToken, setInviteToken] = useState(null);
 
   const [imagesLoaded] = useImages([
     require('./assets/abstract_background.jpg'),
@@ -59,6 +62,19 @@ export default function App() {
       return { shouldShowAlert: !samePage, shouldPlaySound: true, shouldSetBadge: true };
     },
   });
+
+  // used for deep linking
+  const url = Linking.useURL();
+  useEffect(() => {
+    var regex = /[?&]([^=#]+)=([^&#]*)/g,
+    params = {},
+    match;
+    while (match = regex.exec(url)) {
+      params[match[1]] = match[2];
+    }
+    setInviteToken(params.token)
+  }, [url]);
+
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
@@ -81,7 +97,7 @@ export default function App() {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      <Navigation expoPushToken={expoPushToken} />
+      <Navigation expoPushToken={expoPushToken} inviteToken={inviteToken}/>
       <StatusBar style="auto" />
     </NavigationContainer>
   );

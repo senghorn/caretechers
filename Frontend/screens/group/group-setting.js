@@ -3,10 +3,12 @@ import { Appbar, IconButton, Avatar, Divider, Text, TextInput, ActivityIndicator
 import { useState, useEffect, useContext } from 'react';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
+import GroupContext from '../../services/context/InviteLinkContext';
 import { resetGroupPassword } from '../../services/api/groups';
 import { RemoveUserFromGroup } from '../../services/api/user';
 import config from '../../constants/config';
 import useSWR from 'swr';
+import axios from 'axios';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
@@ -68,9 +70,15 @@ export default function GroupSettings({ navigation }) {
   };
 
   const onShare = async () => {
+    const response = await axios.get(`${config.backend_server}/groups/token`, {
+      headers: {
+        'authorization': `Bearer ${user.access_token}`
+      }
+    });
+    console.log(response.data);
     try {
       const result = await Share.share({
-        message: `Join our caretaking group through CareCoord! Group Name:"${group.name}" and password: ${password} `,
+        message: `Join our caretaking group!\n\nexp://${config.ip}:19000/?token=${response.data}\n\nThis link will expire in 5 minutes!`,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -78,8 +86,6 @@ export default function GroupSettings({ navigation }) {
         } else {
           // shared
         }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
       }
     } catch (error) {
       alert(error.message);

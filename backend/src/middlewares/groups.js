@@ -2,7 +2,7 @@ const Ajv = require('ajv');
 const ajv = new Ajv();
 const asyncHandler = require('express-async-handler');
 const sql = require('sql-template-strings');
-
+const jwt = require('jsonwebtoken');
 const db = require('../database');
 const { newError } = require('../utls');
 
@@ -60,6 +60,14 @@ module.exports.getGroupsDeprecated = asyncHandler(async (req, res, next) => {
   next();
 });
 
+module.exports.getGroupNameAndPassword = asyncHandler(async (req, res, next) => {
+  const query = sql`SELECT name, password FROM \`Groups\` G
+	WHERE id = ${req.user.curr_group}`;
+  const [result] = await db.query(query);
+  req.groupInfo = result;
+  next();
+})
+
 module.exports.getGroupPassword = asyncHandler(async (req, res, next) => {
   const query = sql`SELECT password FROM \`Groups\` G
 	WHERE id = ${req.params.groupId}`;
@@ -80,3 +88,24 @@ module.exports.getGroupInfo = asyncHandler(async (req, _res, next) => {
   req.result = await db.query(query);
   next();
 });
+
+module.exports.generateToken = (req, _res, next) => {
+  const token  = jwt.sign({
+    groupName: req.groupInfo.name,
+    groupPassword: req.groupInfo.password
+  }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m' });
+
+  req.result = token;
+  next();
+};
+
+module.exports.verifyToken = (req, res, next) => {
+  try {
+    const info = jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET);
+    req.result = info;
+    next();
+  } catch (e) {
+    console.error(e);
+    res.status(500).send('Link verification failed');
+  }
+};

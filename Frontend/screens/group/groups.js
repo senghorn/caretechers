@@ -1,14 +1,41 @@
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import colors from '../../constants/colors';
 import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
+import InviteLinkContext from '../../services/context/InviteLinkContext';
+import axios from 'axios';
+import config from '../../constants/config'
 
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
+  const inviteLinkContext = useContext(InviteLinkContext);
   const [groupName, setGroupName] = useState('');
   const [password, setPassword] = useState('');
+
+  const processInviteLink = async () => {
+    if (inviteLinkContext) {
+      try {
+        const response = await axios.get(`${config.backend_server}/groups/info/token/${inviteLinkContext}`, {
+          headers: {
+            'authorization': `Bearer ${user.access_token}`
+          }
+        });
+        setGroupName(response.data.groupName);
+        setPassword(response.data.groupPassword);
+
+      } catch (e) {
+        console.log(e);
+        console.log('COULD NOT FETCH NAME AND PASSWORD FROM LINK.');
+      }
+    }
+  }
+  
+  useEffect(() => {
+    processInviteLink();
+  }, [inviteLinkContext]);
+
   return (
     <View style={styles.container}>
       <SafeAreaView>
