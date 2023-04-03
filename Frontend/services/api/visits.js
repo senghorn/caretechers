@@ -26,11 +26,16 @@ export const deleteVisit = async (visitId, token) => {
   try {
     const config = {
       headers: {
-        Authorization: `Bearer ${token}`,
-      },
+        'Authorization': `Bearer ${token}`,
+      }
     };
-    await axios.delete(`${config.backend_server}/visits/${visitId}`, config);
+    await axios.delete(`${config.backend_server}/visits/${visitId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
   } catch (error) {
+    console.log('delete error', token);
     console.log(error);
   } finally {
     return;
@@ -40,9 +45,9 @@ export const deleteVisit = async (visitId, token) => {
 export const volunteerForVisit = async (date, user, token) => {
   const newVisit = {
     date,
-    userEmail: user.email,
+    userEmail: user.id,
   };
-
+  console.log('user value', user);
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,

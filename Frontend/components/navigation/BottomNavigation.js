@@ -18,22 +18,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 export default function BottomNavigation({ route, navigation }) {
   const { isVisitorToday } = useContext(TodaysVisitorContext);
-  const { user } = useContext(UserContext);
-  const [socket, setSocket] = useContext(SocketContext);
-  useEffect(() => {
-    if (user) {
-      const fetchToken = async () => {
-        const token = await getAPIAccessToken();
-        const newSocket = createSocket(user, token);
-        newSocket.connect();
-        setSocket(newSocket);
-      }
-      fetchToken();
-    } else {
-      console.log('User is null');
-    }
-  }, [user]);
-
+  const { socket } = useContext(SocketContext);
   useEffect(() => {
     if (socket) {
       socket.on('connect_error', (err) => {

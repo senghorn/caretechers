@@ -63,7 +63,7 @@ export default function Calendar({ navigation }) {
     [`${config.backend_server}/visits/group/${user.curr_group}?start=${startDateString}&end=${endDateString}`, {
       headers: { 'Authorization': 'Bearer ' + user.access_token }
     }],
-    fetcher
+    ([url, token]) => fetcher(url, token)
   );
 
   useEffect(() => {

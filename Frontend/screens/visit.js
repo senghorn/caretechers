@@ -49,11 +49,15 @@ export default function Visit({ route, navigation }) {
     headers: { 'Authorization': 'Bearer ' + user.access_token }
   }],
     ([url, token]) => fetcher(url, token));
+
   useEffect(() => {
     setRefreshVisit(() => visitMutate);
   }, [visitMutate]);
 
-  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR(tasksURL, fetcher);
+  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR([tasksURL, {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }],
+    ([url, token]) => fetcher(url, token));
 
   const { refreshTodaysVisitor } = useContext(TodaysVisitorContext);
 
@@ -82,7 +86,7 @@ export default function Visit({ route, navigation }) {
         />
       </View>
       <View style={styles.messageContainer}>
-        {visit && visit.visitor && visit.visitor !== user.email && (
+        {visit && visit.visitor && visit.visitor !== user.id && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
@@ -116,7 +120,7 @@ export default function Visit({ route, navigation }) {
             </View>
           </TouchableHighlight>
         )}
-        {visit && visit.visitor === user.email && visit.date >= getDateString(new Date()) && (
+        {visit && visit.visitor === user.id && visit.date >= getDateString(new Date()) && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
