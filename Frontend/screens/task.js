@@ -16,7 +16,7 @@ import VisitRefreshContext from '../services/context/VisitRefreshContext';
 import { getLabel, REPEAT_CODES } from '../utils/tasks';
 import RecordVisitContext from '../services/context/RecordVisitContext';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function Task({ route, navigation }) {
   const { title, id, dateString } = route.params;
@@ -61,7 +61,9 @@ export default function Task({ route, navigation }) {
     data: taskData,
     isLoading: isTaskLoading,
     error: taskError,
-  } = id ? useSWR(`${config.backend_server}/tasks/group/${user.group_id}/task/${id}`, fetcher) : undefined;
+  } = id ? useSWR([`${config.backend_server}/tasks/group/${user.curr_group}/task/${id}`, {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }], ([url, token]) => fetcher(url, token)) : undefined;
 
   useEffect(() => {
     if (id !== 'new') {
@@ -77,7 +79,10 @@ export default function Task({ route, navigation }) {
     data: repeatsData,
     isLoading: isRepeatsLoading,
     error: repeatsError,
-  } = id ? useSWR(`${config.backend_server}/tasks/${id}/repeats`, fetcher) : undefined;
+  } = id ? useSWR([`${config.backend_server}/tasks/${id}/repeats`, {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }],
+    ([url, token]) => fetcher(url, token)) : undefined;
 
   useEffect(() => {
     if (id !== 'new') {
@@ -160,7 +165,7 @@ export default function Task({ route, navigation }) {
                 description: editDescription,
                 start_date: getDateString(max([editStartDate, new Date()])),
                 repeat_pattern: editRepeat,
-                groupId: user.group_id,
+                groupId: user.curr_group,
               };
 
               await saveTask(
@@ -210,7 +215,7 @@ const saveTask = async (
   setLoading(true);
   const url =
     id === 'new'
-      ? `${config.backend_server}/tasks/group/${user.group_id}`
+      ? `${config.backend_server}/tasks/group/${user.curr_group}`
       : `${config.backend_server}/tasks/${id}?end_date=${getCurrentDateString()}`;
   const method = id === 'new' ? 'POST' : 'PUT';
   let newId = id;

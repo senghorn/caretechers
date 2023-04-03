@@ -57,12 +57,13 @@ export default function Navigation({ expoPushToken, inviteToken }) {
   const [groupId, setGroupId] = useState('');
   const [socket, setSocket] = useState(null);
   const { data, error, isLoading, mutate } = useSWR(
-    `${config.backend_server}/visits/group/${groupId}?start=${dateString}&end=${dateString}`,
-    fetcher
-  );
+    [`${config.backend_server}/visits/group/${groupId}?start=${dateString}&end=${dateString}`,
+      {
+        headers: { 'Authorization': 'Bearer ' }
+      }], ([url, token]) => fetcher(url, token));
   useEffect(() => {
-    if (user && user.group_id) {
-      setGroupId(user.group_id);
+    if (user && user.curr_group) {
+      setGroupId(user.curr_group);
     }
   }, [user]);
 

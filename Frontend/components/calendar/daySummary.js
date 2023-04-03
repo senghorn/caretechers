@@ -23,6 +23,10 @@ export default function DaySummary({
   const [visitInfo, setVisitInfo] = useState(visitInfoOverride);
   const [error, setError] = useState(errorOverride);
 
+  if (visitInfoOverride) {
+    console.log('visit info', visitInfoOverride);
+  }
+
   useEffect(() => {
     if (isLoadingOverride) {
       setIsLoading(isLoadingOverride);
