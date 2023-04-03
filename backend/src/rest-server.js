@@ -63,10 +63,8 @@ function CreateRESTServer() {
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization']
-  console.log(authHeader)
   const token = authHeader && authHeader.split(' ')[1]
-  console.log('token \n', token);
-  if (token == null) {
+  if (!token) {
     console.log('No request token');
     return res.sendStatus(401)
   }
@@ -74,7 +72,7 @@ function authenticateToken(req, res, next) {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
 
     if (err) {
-      console.log('token invalid', err);
+      console.log(`token invalid ${token}`, err.message);
       return res.sendStatus(403)
     }
     req.user = user

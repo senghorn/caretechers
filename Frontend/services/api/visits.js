@@ -1,7 +1,7 @@
-import axios from 'axios';
+
 import config from '../../constants/config';
 import { schedulePushNotification } from '../notifications/schedule';
-
+const axios = require('axios').default;
 const headers = {
   'Content-Type': 'application/json',
 };
@@ -24,14 +24,9 @@ export const recordVisit = async (visitId, date, completedTasks, notes, token) =
 
 export const deleteVisit = async (visitId, token) => {
   try {
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      }
-    };
     await axios.delete(`${config.backend_server}/visits/${visitId}`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        'Authorization': 'Bearer ' + token
       }
     });
   } catch (error) {
@@ -47,7 +42,6 @@ export const volunteerForVisit = async (date, user, token) => {
     date,
     userEmail: user.id,
   };
-  console.log('user value', user);
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
