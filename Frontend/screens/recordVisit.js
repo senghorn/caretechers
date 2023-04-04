@@ -16,7 +16,6 @@ import { recordVisit } from '../services/api/visits';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
 
-
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function RecordVisit({ navigation }) {
@@ -38,17 +37,34 @@ export default function RecordVisit({ navigation }) {
     error: visitError,
     isLoading: visitLoading,
     mutate: visitMutate,
-  } = useSWR([`${config.backend_server}/visits/group/${user.curr_group}?start=${dateString}&end=${dateString}`, {
-    headers: { 'Authorization': 'Bearer ' + user.access_token }
-  }], ([url, token]) => fetcher(url, token));
+  } = useSWR(
+    [
+      `${config.backend_server}/visits/group/${user.curr_group}?start=${dateString}&end=${dateString}`,
+      {
+        headers: { Authorization: 'Bearer ' + user.access_token },
+      },
+    ],
+    ([url, token]) => fetcher(url, token)
+  );
 
   useEffect(() => {
     setRefreshVisit(() => visitMutate);
   }, [visitMutate]);
 
-  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR([tasksURL, {
-    headers: { 'Authorization': 'Bearer ' + user.access_token }
-  }], ([url, token]) => fetcher(url, token));
+  const {
+    data: tasks,
+    error: tasksError,
+    isLoading: tasksLoading,
+    mutate: taskMutate,
+  } = useSWR(
+    [
+      tasksURL,
+      {
+        headers: { Authorization: 'Bearer ' + user.access_token },
+      },
+    ],
+    ([url, token]) => fetcher(url, token)
+  );
 
   useEffect(() => {
     setRefreshVisitTasks(() => taskMutate);
