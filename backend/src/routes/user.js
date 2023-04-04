@@ -11,7 +11,13 @@ router.post('/:userId/group', [userMiddleware.verifyUserExists, userMiddleware.a
 
 router.post('/', [userMiddleware.verifyCreateUserBody, userMiddleware.createNewUser, sharedMiddleware.sendNoResult]);
 
-router.get('/groupId/:userId', [userMiddleware.getUserGroupByID, sharedMiddleware.sendResult]);
+router.get('/groups/:userId', [userMiddleware.getAllUserGroups, sharedMiddleware.sendResult]);
+
+router.get('/currentGroup/:userId', [userMiddleware.getUserCurrGroupByID, sharedMiddleware.sendResult]);
+
+router.patch('/currentGroup/:userId', [userMiddleware.setUserCurrGroup, sharedMiddleware.sendNoResult]);
+
+router.get('/fetch/userInfo', [userMiddleware.getUserByToken, sharedMiddleware.sendResult]);
 
 router.patch('/:userId', [userMiddleware.verifyCreateUserBody, userMiddleware.editUser, sharedMiddleware.sendNoResult]);
 

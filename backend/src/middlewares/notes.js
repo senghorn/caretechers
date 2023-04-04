@@ -4,7 +4,7 @@ const sql = require('sql-template-strings');
 const db = require('../database');
 const { newError, getUTCDateTime } = require('../utls');
 
-module.exports.getNotesByGroupId = asyncHandler(async(req, _res, next) => {
+module.exports.getNotesByGroupId = asyncHandler(async (req, _res, next) => {
 	const query = sql`SELECT N.id, N.title, N.content, N.last_edited FROM \`Groups\` G
 						JOIN Notes N ON G.id = N.group_id
 						WHERE N.group_id = ${req.params.groupId}`;
@@ -32,7 +32,7 @@ module.exports.checkIfNoteIsValid = asyncHandler(async (req, _res, next) => {
 	next();
 });
 
-module.exports.createNewNote = asyncHandler(async(req, _res, next) => {
+module.exports.createNewNote = asyncHandler(async (req, _res, next) => {
 	let query;
 
 	if (req.body.content) {
@@ -41,7 +41,7 @@ module.exports.createNewNote = asyncHandler(async(req, _res, next) => {
 		query = sql`INSERT INTO Notes(group_id, title, last_edited) VALUES(${req.params.groupId}, ${req.body.title}, ${getUTCDateTime()})`;
 	}
 	const result = await db.query(query);
-	req.result = {noteId: result.insertId};
+	req.result = { noteId: result.insertId };
 	next();
 });
 

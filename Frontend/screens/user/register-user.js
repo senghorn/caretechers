@@ -2,12 +2,14 @@ import { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Divider } from 'react-native-paper';
-import { createUser, fetchUserByEmail } from '../../services/api/user';
+import { createUser, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
-
+import { getAccessToken } from '../../services/api/auth';
+import { setAPIAccessToken, setAPIResetToken } from '../../services/storage/asyncStorage';
 export default function Inputs({ route, navigation }) {
-  const { user } = route.params;
+  // const { user } = route.params;
+
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneMissing, setPhoneMissing] = useState(false);
   const [nameMissing, setNameMissing] = useState(true);
@@ -15,17 +17,19 @@ export default function Inputs({ route, navigation }) {
   const [userName, setUserName] = useState('');
   const [lastName, setLastName] = useState('');
   const [missLastName, setMissLastName] = useState(true);
-  const { setUser } = useContext(UserContext);
+  const { googleData, googleToken } = route.params;
+  const { user, setUser } = useContext(UserContext);
+
   useEffect(() => {
-    if (user != undefined) {
-      setUserName(user['given_name']);
-      setLastName(user['family_name']);
-      setEmail(user['email']);
+    if (googleData != undefined) {
+      setUserName(googleData['given_name']);
+      setLastName(googleData['family_name']);
+      setEmail(googleData['email']);
 
       setMissLastName(false);
       setNameMissing(false);
     }
-  }, [user]);
+  }, [googleData]);
 
   // Formats the text of the phone number to display nicely
   // E.g., 123-449-4910
@@ -72,17 +76,27 @@ export default function Inputs({ route, navigation }) {
     } else if (phoneNumber.length < 12) {
       setPhoneMissing(true);
     } else {
+      const accessToken = await getAccessToken(googleToken);
       const userCreated = await createUser(
         userName,
         lastName,
         email,
         phoneNumber,
-        user['picture']
+        googleData['picture'],
+        accessToken.accessToken
       );
       if (userCreated == true) {
-        const result = await fetchUserByEmail(email);
-        setUser(result);
-        navigation.navigate('Group');
+        setAPIAccessToken(accessToken.accessToken);
+        setAPIResetToken(accessToken.refreshToken);
+        let result = await fetchUserByCookie(accessToken.accessToken);
+        if (result) {
+          setUser({
+            "access_token": accessToken.accessToken, "curr_group": result.curr_group, "id": result.id,
+            "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+            "phone_num": result.phone_num
+          });
+          navigation.navigate('Group');
+        }
       } else {
         console.log('user created unsuccessful');
       }
@@ -96,7 +110,7 @@ export default function Inputs({ route, navigation }) {
       <TextInput
         right={<TextInput.Icon icon='email' />}
         style={styles.input}
-        value={user['email']}
+        value={email}
         label={'Email'}
         disabled
       />

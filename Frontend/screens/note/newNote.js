@@ -93,9 +93,9 @@ export default function NewNote({ navigation, route }) {
                       id: noteId,
                       title: editTitle,
                       content: editContent,
-                    });
+                    }, user.access_token);
                     toggleRefresh();
-                  } else await addNote(editTitle, editContent, user.group_id, navigation, setEditMode, toggleRefresh);
+                  } else await addNote(editTitle, editContent, user.curr_group, navigation, setEditMode, toggleRefresh, user.access_token);
                 }}
               />
             )}
@@ -115,7 +115,7 @@ export default function NewNote({ navigation, route }) {
                       {
                         text: 'Confirm',
                         onPress: async () => {
-                          await RemoveNote(noteId);
+                          await RemoveNote(noteId, user.access_token);
                           toggleRefresh();
                           navigation.goBack();
                         },
@@ -176,14 +176,13 @@ export default function NewNote({ navigation, route }) {
   );
 }
 
-const addNote = async (noteTitle, noteContent, groupId, navigation, setEditMode, toggleRefresh) => {
+const addNote = async (noteTitle, noteContent, groupId, navigation, setEditMode, toggleRefresh, cookie) => {
   if (noteTitle && noteContent) {
-    CreateNote({ title: noteTitle, content: noteContent }, groupId)
+    CreateNote({ title: noteTitle, content: noteContent }, groupId, cookie)
       .then((noteId) => {
         setEditMode(false);
         if (noteId) {
           toggleRefresh();
-          //navigation.goBack();
         }
       })
       .catch((error) => console.error(error));

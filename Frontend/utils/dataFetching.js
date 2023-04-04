@@ -1,1 +1,2 @@
-export const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+export const fetcher = (url, token) => fetch(url, token).then((res) => res.json());

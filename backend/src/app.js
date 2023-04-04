@@ -1,7 +1,9 @@
 const rest_server = require('./rest-server');
 const web_socket_server = require('./socket-server');
+const auth_server = require('./authServer');
 const port = 3000;
 
+auth_server.authServer();
 const app = rest_server.CreateRESTServer();
 
 app.listen(port, () => {

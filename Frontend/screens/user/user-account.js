@@ -23,7 +23,7 @@ export default function UserAccount({ navigation, route, newUser }) {
       setFirstName(user.first_name);
       setLastName(user.last_name);
       setPhone(user.phone_num);
-      setEmail(user.email);
+      setEmail(user.id);
       setProfile({ uri: user.profile_pic });
     }
   };
@@ -32,15 +32,16 @@ export default function UserAccount({ navigation, route, newUser }) {
     setSaving(true);
     if (user && phone.length == 12 && firstName.length > 0 && lastName.length > 0) {
       await (async () => {
-        const update = await UpdateUserData(email, firstName, lastName, phone, user.group_id, user.profile_pic);
+        const update = await UpdateUserData(email, firstName, lastName, phone, user.curr_group, user.profile_pic, user.access_token);
         if (update) {
           setUser({
-            email: user.email,
+            id: user.id,
             first_name: firstName,
             last_name: lastName,
-            group_id: user.group_id,
+            curr_group: user.curr_group,
             profile_pic: user.profile_pic,
             phone_num: phone,
+            access_token: user.access_token,
           });
         }
       })();

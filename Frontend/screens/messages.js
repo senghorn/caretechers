@@ -1,4 +1,4 @@
-import { StyleSheet, View, ActionSheetIOS, Text } from 'react-native';
+import { StyleSheet, View, ActionSheetIOS } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
@@ -7,27 +7,45 @@ import {
   FetchUsers,
   searchMessage,
   PinMessage,
+  fetchMoreMessages
 } from '../services/api/messages';
-import createSocket from '../components/messages/socket';
 import UserContext from '../services/context/UserContext';
 import useSWR from 'swr';
 import config from '../constants/config';
+import SocketContext from '../services/context/SocketContext';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function Messages({ navigation }) {
   const [this_user, setThisUser] = useState(null);
-  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [displayMessages, setDisplayMessages] = useState([]);
   const [users, setUsers] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMode, setSearchMode] = useState(false);
+  const [noEalierMessages, setNoEarlierMessages] = useState(false);
   const { user } = useContext(UserContext);
+  const [socket, setSocket] = useContext(SocketContext);
+  const getSmallestMessageId = () => {
+    let result = 0;
+    if (messages && messages.length > 0) {
+      result = messages[0]._id;
+      messages.forEach((message) => {
+        if (message._id < result) {
+          result = message._id;
+        }
+      })
+    }
+    return result;
+  }
+
 
   const { data, isLoading, error, mutate } = useSWR(
-    config.backend_server + '/messages/' + user.group_id,
-    fetcher
+    [config.backend_server + '/messages/fetch/' + user.curr_group,
+      {
+        headers: { 'Authorization': 'Bearer ' + user.access_token }
+      }],
+    ([url, token]) => fetcher(url, token)
   );
 
   useEffect(() => {
@@ -38,39 +56,40 @@ export default function Messages({ navigation }) {
     }
   }, [data, isLoading, users]);
 
-  // Sets up user so GiftedChat recognize who this user is in order
-  // to display correctly
-  useEffect(() => {
-    if (user && !(Object.keys(user).length === 0)) {
-      setThisUser({
-        _id: user.email,
-        name: `${user.first_name} ${user.last_name}`,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        avatar: user.profile_pic,
-        groupId: user.group_id,
-      });
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const loadEarlier = async () => {
+    if (user && users && user.curr_group && messages) {
+      if (!isLoadingData) {
+        setIsLoadingData(true);
+        var last_id = getSmallestMessageId();
+        const more_messages = await fetchMoreMessages(user.curr_group, last_id, users, user.access_token);
+        if (more_messages) {
+          if (more_messages.length === 0) {
+            setNoEarlierMessages(true);
+          }
+          setMessages(messages.concat(more_messages));
+        }
+      }
     }
-  }, [user]);
+  }
 
   // Fetch all the users in the group for their profile photos
   useEffect(() => {
-    if (this_user) {
-      FetchUsers(this_user.groupId, setUsers);
-      setSocket(createSocket(this_user));
+    if (user) {
+      FetchUsers(user, setUsers, setThisUser, user.access_token);
     }
-  }, [this_user]);
+  }, [user]);
 
   useEffect(() => {
     if (
       searchQuery &&
       searchQuery != '' &&
       user &&
-      user.group_id &&
+      user.curr_group &&
       searchMode
     ) {
       const search = async () => {
-        const result = await searchMessage(user.group_id, searchQuery);
+        const result = await searchMessage(user.curr_group, searchQuery, user.access_token);
         const formatted = FormatMessagesForChat(users, result);
         setDisplayMessages(formatted);
       };
@@ -88,35 +107,18 @@ export default function Messages({ navigation }) {
   }, [messages]);
 
   useEffect(() => {
-    if (socket) {
-      socket.connect();
-      socket.on('connect_error', (err) => {
-        console.log(err.message);
-        if (err.message === 'invalid username') {
-          console.log('failed to connect to message server');
-        }
-      });
+    setIsLoadingData(false);
+  }, [displayMessages]);
 
+  useEffect(() => {
+    if (socket) {
       socket.on('message', (msg) => {
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, msg)
         );
       });
-
-      socket.on('disconnect', (reason) => {
-        console.log(reason);
-        socket.disconnect();
-        if (reason === 'io server disconnect') {
-        }
-      });
-
-      // Network clean up: This will clean up any necessary connections with server
-      return () => {
-        socket.disconnect();
-        console.log('cleaning up');
-      };
     }
-  }, [socket]);
+  }, [])
 
   var onMessageSend = useCallback(
     (messages = []) => {
@@ -130,8 +132,8 @@ export default function Messages({ navigation }) {
   const [pinMessage, setPinMessage] = useState(null);
 
   useEffect(() => {
-    if (pinMessage && pinMessage._id && user && user.group_id) {
-      PinMessage(pinMessage._id);
+    if (pinMessage && pinMessage._id && user && user.curr_group) {
+      PinMessage(pinMessage._id, user.access_token);
       setPinMessage(null);
     }
 
@@ -163,7 +165,7 @@ export default function Messages({ navigation }) {
     return (
       <Bubble
         {...props}
-        position={message_sender_id == user.email ? 'right' : 'left'}
+        position={message_sender_id == this_user._id ? 'right' : 'left'}
         wrapperStyle={{
           right: {
             backgroundColor: COLORS.primary,
@@ -196,6 +198,9 @@ export default function Messages({ navigation }) {
         onSend={(messages) => onMessageSend(messages)}
         user={this_user}
         onLongPress={onLongPress}
+        onLoadEarlier={loadEarlier}
+        loadEarlier={!noEalierMessages}
+        infiniteScroll
       />
     </View>
   );
@@ -225,7 +230,7 @@ const FormatMessagesForChat = (all_users, messages) => {
         text: message.content,
         createdAt: message.date_time,
         _id: message.id,
-        user: all_users[message.sender],
+        user: all_users[message.sender] ? all_users[message.sender] : { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
       });
     });
   }

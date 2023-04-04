@@ -5,18 +5,42 @@ import Messages from '../../screens/messages';
 import Metrics from '../../screens/metrics';
 import Calendar from '../../screens/calendar';
 import Tasks from '../../screens/tasks';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
-
+import createSocket from '../messages/socket';
 import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
-
-const axios = require('axios').default;
+import UserContext from "../../services/context/UserContext";
+import SocketContext from '../../services/context/SocketContext';
+import { getAPIAccessToken } from '../../services/storage/asyncStorage';
 
 const Tab = createMaterialBottomTabNavigator();
 
 export default function BottomNavigation({ route, navigation }) {
   const { isVisitorToday } = useContext(TodaysVisitorContext);
+  const { socket } = useContext(SocketContext);
+  useEffect(() => {
+    if (socket) {
+      socket.on('connect_error', (err) => {
+        if (err.message === 'invalid username') {
+          console.log('failed to connect to message server');
+        }
+      });
+
+      socket.on('disconnect', (reason) => {
+        console.log(reason);
+        socket.disconnect();
+        if (reason === 'io server disconnect') {
+        }
+      });
+
+      // Network clean up: This will clean up any necessary connections with server
+      return () => {
+        socket.disconnect();
+        console.log('cleaning up');
+      };
+    }
+  }, [socket]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>

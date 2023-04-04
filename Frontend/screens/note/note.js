@@ -53,7 +53,7 @@ export default function Note({ navigation, route }) {
                     id: noteId,
                     title: noteTitle,
                     content: noteContent,
-                  });
+                  }, user.access_token);
                   toggleRefresh();
                 }}
               />
@@ -62,7 +62,7 @@ export default function Note({ navigation, route }) {
               <Appbar.Action
                 icon="trash-can"
                 onPress={async () => {
-                  await RemoveNote(noteId);
+                  await RemoveNote(noteId, user.access_token);
                   toggleRefresh();
                   navigation.goBack();
                 }}
@@ -100,7 +100,7 @@ export default function Note({ navigation, route }) {
                 Keyboard.dismiss();
                 setEditing(false);
                 toggleRefresh();
-                await addNote(noteTitle, noteContent, user.group_id, navigation);
+                await addNote(noteTitle, noteContent, user.curr_group, navigation, user.access_token);
               }}
             />
           </Appbar.Header>
@@ -135,9 +135,9 @@ export default function Note({ navigation, route }) {
   );
 }
 
-const addNote = async (noteTitle, noteContent, groupId, navigation) => {
+const addNote = async (noteTitle, noteContent, groupId, navigation, cookie) => {
   if (noteTitle && noteContent) {
-    CreateNote({ title: noteTitle, content: noteContent }, groupId)
+    CreateNote({ title: noteTitle, content: noteContent }, groupId, cookie)
       .then((noteId) => {
         if (noteId) {
           navigation.goBack();

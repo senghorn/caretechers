@@ -14,7 +14,7 @@ import ViewSetter from '../components/tasks/viewSetter';
 import { getNextDateFromRepeatBehavior, REPEAT_CODES } from '../utils/tasks';
 import colors from '../constants/colors';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 const getFilteredTasks = (tasks, filter) => {
   switch (filter) {
@@ -46,11 +46,13 @@ export default function Tasks({ navigation }) {
 
   const { user } = useContext(UserContext);
 
-  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}?after_date=${getCurrentDateString()}`;
+  const tasksURL = `${config.backend_server}/tasks/group/${user.curr_group}?after_date=${getCurrentDateString()}`;
 
   const [, setRefreshTasks] = useContext(TasksRefreshContext);
 
-  const { data, isLoading, error, mutate } = useSWR(tasksURL, fetcher);
+  const { data, isLoading, error, mutate } = useSWR([tasksURL, {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }], ([url, token]) => fetcher(url, token));
 
   const [filter, setFilter] = useState(null);
 
