@@ -32,7 +32,6 @@ import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
 import RecordVisitContext from '../../services/context/RecordVisitContext';
 import { setUserNotificationIdentifier } from '../../services/api/user';
 import createSocket from '../messages/socket';
-import { getAPIAccessToken } from '../../services/storage/asyncStorage';
 
 const initRefreshCalendar = () => {
   console.log('calendar refresh not set');
@@ -60,24 +59,22 @@ export default function Navigation({ expoPushToken, inviteToken }) {
 
   useEffect(() => {
     if (user && user.access_token) {
-      const fetchToken = async () => {
-        const token = await getAPIAccessToken();
-        const newSocket = createSocket(user, token);
-        newSocket.connect();
-        setSocket(newSocket);
-      }
-      fetchToken();
-    } else {
-      console.log('User is null');
+      const newSocket = createSocket(user, user.access_token);
+      newSocket.connect();
+      setSocket(newSocket);
     }
   }, [user]);
 
   // { data: null, error: false, isLoading: true, mutate: () => { } } :
-  const { data, error, isLoading, mutate } = useSWR(
-    [`${config.backend_server}/visits/group/${groupId}?start=${dateString}&end=${dateString}`,
+  const { data, mutate } = useSWR(
+    [
+      `${config.backend_server}/visits/group/${groupId}?start=${dateString}&end=${dateString}`,
       {
-        headers: { 'Authorization': `Bearer ${user?.access_token}` }
-      }], ([url, token]) => fetcher(url, token));
+        headers: { Authorization: `Bearer ${user?.access_token}` },
+      },
+    ],
+    ([url, token]) => fetcher(url, token)
+  );
 
   useEffect(() => {
     if (user && user.curr_group) {
@@ -135,67 +132,27 @@ export default function Navigation({ expoPushToken, inviteToken }) {
                             options={{ headerShown: false, gestureEnabled: false }}
                           />
                           <Stack.Screen name={'RegisterUser'} component={RegisterUser} options={{ headerShown: false }} />
-                          <Stack.Screen name={'Group'} component={Groups} options={{ headerShown: false, gestureEnabled: false }} />
+                          <Stack.Screen
+                            name={'Group'}
+                            component={Groups}
+                            options={{ headerShown: false, gestureEnabled: false }}
+                          />
                           <Stack.Screen
                             name={'CreateGroup'}
                             component={CreateGroup}
                             options={{ headerShown: false, gestureEnabled: false }}
                           />
-                          <Stack.Screen
-                            name='Visit'
-                            component={Visit}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='Record Visit'
-                            component={RecordVisit}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='Task'
-                            component={Task}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='Note'
-                            component={Note}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='New Note'
-                            component={NewNote}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='Settings'
-                            component={Settings}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='UserAccount'
-                            component={UserAccount}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='GroupSettings'
-                            component={GroupSettings}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='Metrics'
-                            component={Metrics}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='EditGraph'
-                            component={EditGraph}
-                            options={{ headerShown: false }}
-                          />
-                          <Stack.Screen
-                            name='PinnedMessages'
-                            component={PinnedMessages}
-                            options={{ headerShown: false }}
-                          />
+                          <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
+                          <Stack.Screen name="Record Visit" component={RecordVisit} options={{ headerShown: false }} />
+                          <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
+                          <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
+                          <Stack.Screen name="New Note" component={NewNote} options={{ headerShown: false }} />
+                          <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+                          <Stack.Screen name="UserAccount" component={UserAccount} options={{ headerShown: false }} />
+                          <Stack.Screen name="GroupSettings" component={GroupSettings} options={{ headerShown: false }} />
+                          <Stack.Screen name="Metrics" component={Metrics} options={{ headerShown: false }} />
+                          <Stack.Screen name="EditGraph" component={EditGraph} options={{ headerShown: false }} />
+                          <Stack.Screen name="PinnedMessages" component={PinnedMessages} options={{ headerShown: false }} />
                         </Stack.Navigator>
                       </InviteLinkContext.Provider>
                     </RecordVisitContext.Provider>

@@ -20,17 +20,21 @@ export default function VolunteerButton({ date, visitFirst = false }) {
   return (
     <TouchableHighlight
       onPress={async () => {
-        setVolunteerLoading(true);
-        await volunteerForVisit(date, user, user.access_token);
-        if (visitFirst) {
-          await refreshVisit();
-          refreshCalendar();
-        } else {
-          await refreshCalendar();
-          refreshVisit();
+        try {
+          setVolunteerLoading(true);
+          await volunteerForVisit(date, user, user.access_token);
+          if (visitFirst) {
+            await refreshVisit();
+            refreshCalendar();
+          } else {
+            await refreshCalendar();
+            refreshVisit();
+          }
+          refreshTodaysVisitor();
+          setVolunteerLoading(false);
+        } catch (error) {
+          console.log('Error volunteering for visit (from button):', error);
         }
-        refreshTodaysVisitor();
-        setVolunteerLoading(false);
       }}
       style={styles.buttonContainer}
       underlayColor="#ededed"

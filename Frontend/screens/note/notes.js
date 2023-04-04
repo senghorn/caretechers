@@ -17,23 +17,24 @@ export default function Notes({ navigation, route }) {
   const { refresh, sort, searchMode } = useContext(NotesRefreshContext);
   const [searchResult, setSearchResult] = useState([]);
   const { data, isLoading, error, mutate } = useSWR(
-    [config.backend_server + '/notes/group/' + user.curr_group,
+    [
+      config.backend_server + '/notes/group/' + user?.curr_group,
       {
-        headers: { 'Authorization': 'Bearer ' + user.access_token }
-      }],
+        headers: { Authorization: 'Bearer ' + user?.access_token },
+      },
+    ],
     ([url, token]) => fetcher(url, token)
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [notesList, setNotesList] = useState([]);
   const onRefresh = useCallback(async () => {
-    if (user != null && user !== {}) {
+    if (user !== null && user !== {}) {
       setRefreshing(true);
       await mutate();
       setRefreshing(false);
     }
   }, [user, mutate]);
-
 
   useEffect(() => {
     if (user != null && !isLoading && data) {
@@ -45,9 +46,7 @@ export default function Notes({ navigation, route }) {
       setNotesList(
         <ScrollView
           style={styles.tasksContainer}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
           {sortedNotes.map((note) => (
             <Note key={note.id} note={note} navigation={navigation} />
@@ -75,22 +74,11 @@ export default function Notes({ navigation, route }) {
   return (
     <Provider>
       <View style={styles.container}>
-        <Header
-          title={'Notes'}
-          sort={true}
-          navigation={navigation}
-          setSearchQuery={setSearchQuery}
-        />
-        {isLoading && (
-          <ActivityIndicator
-            size='large'
-            color='#2196f3'
-            style={styles.loader}
-          />
-        )}
+        <Header title={'Notes'} sort={true} navigation={navigation} setSearchQuery={setSearchQuery} />
+        {isLoading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
         {notesList}
         <FAB
-          icon='note-plus-outline'
+          icon="note-plus-outline"
           style={styles.fab}
           color={'white'}
           onPress={() => {
