@@ -193,10 +193,6 @@ export default function Task({ route, navigation }) {
   );
 }
 
-const headers = {
-  'Content-Type': 'application/json',
-};
-
 const saveTask = async (
   id,
   body,
@@ -213,6 +209,11 @@ const saveTask = async (
   setVisitTasks
 ) => {
   setLoading(true);
+  const auth_token = user.access_token;
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${auth_token}`
+  };
   const url =
     id === 'new'
       ? `${config.backend_server}/tasks/group/${user.curr_group}`
