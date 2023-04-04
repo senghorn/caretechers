@@ -15,6 +15,7 @@ import RecordVisitContext from '../services/context/RecordVisitContext';
 import { recordVisit } from '../services/api/visits';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
+import SocketContext from '../services/context/SocketContext';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
@@ -25,6 +26,7 @@ export default function RecordVisit({ navigation }) {
   const [selected, setSelected] = useState('Tasks');
 
   const { user } = useContext(UserContext);
+  const [socket] = useContext(SocketContext);
 
   const [refreshVisitTasks, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
   const [refreshVisit, setRefreshVisit] = useContext(VisitRefreshContext);
@@ -111,6 +113,7 @@ export default function RecordVisit({ navigation }) {
                   onPress: async () => {
                     setRecordingVisit(true);
                     await recordVisit(visit.visitId, getCurrentDateString(), visitTasks, visitNotes, user.access_token);
+                    socket.emit('refreshCalendar');
                     refreshVisit();
                     refreshVisitTasks();
                     refreshTodaysVisitor();

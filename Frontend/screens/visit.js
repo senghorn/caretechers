@@ -21,8 +21,12 @@ import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
 import { ActivityIndicator } from 'react-native-paper';
 import VisitNotes from '../components/visit/notes';
 import { cancelPushNotification } from '../services/notifications/schedule';
+import SocketContext from '../services/context/SocketContext';
 
-const fetcher = (url, token) => fetch(url, token).then((res) => res.json()).catch((err) => console.log('visit fetch error', err));
+const fetcher = (url, token) =>
+  fetch(url, token)
+    .then((res) => res.json())
+    .catch((err) => console.log('visit fetch error', err));
 
 export default function Visit({ route, navigation }) {
   const { dateString } = route.params;
@@ -31,6 +35,7 @@ export default function Visit({ route, navigation }) {
   const [selected, setSelected] = useState('Tasks');
 
   const { user } = useContext(UserContext);
+  const [socket] = useContext(SocketContext);
 
   const [, setRefreshVisitTasks] = useContext(VisitTasksRefreshContext);
   const [, setRefreshVisit] = useContext(VisitRefreshContext);
@@ -44,20 +49,34 @@ export default function Visit({ route, navigation }) {
     error: visitError,
     isLoading: visitLoading,
     mutate: visitMutate,
-  } = useSWR([`${config.backend_server}/visits/group/${user.curr_group}?start=${dateString}&end=${dateString}`,
-  {
-    headers: { 'Authorization': 'Bearer ' + user.access_token }
-  }],
-    ([url, token]) => fetcher(url, token));
+  } = useSWR(
+    [
+      `${config.backend_server}/visits/group/${user.curr_group}?start=${dateString}&end=${dateString}`,
+      {
+        headers: { Authorization: 'Bearer ' + user.access_token },
+      },
+    ],
+    ([url, token]) => fetcher(url, token)
+  );
 
   useEffect(() => {
     setRefreshVisit(() => visitMutate);
   }, [visitMutate]);
 
-  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR([tasksURL, {
-    headers: { 'Authorization': 'Bearer ' + user.access_token }
-  }],
-    ([url, token]) => fetcher(url, token));
+  const {
+    data: tasks,
+    error: tasksError,
+    isLoading: tasksLoading,
+    mutate: taskMutate,
+  } = useSWR(
+    [
+      tasksURL,
+      {
+        headers: { Authorization: 'Bearer ' + user.access_token },
+      },
+    ],
+    ([url, token]) => fetcher(url, token)
+  );
 
   const { refreshTodaysVisitor } = useContext(TodaysVisitorContext);
 
@@ -139,6 +158,7 @@ export default function Visit({ route, navigation }) {
                       cancelPushNotification(visit.notification_identifier);
                       await deleteVisit(visit.visitId, user.access_token);
                       taskMutate();
+                      socket.emit('refreshCalendar');
                       refreshCalendar();
                       refreshTodaysVisitor();
                       await visitMutate();

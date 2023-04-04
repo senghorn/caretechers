@@ -58,12 +58,20 @@ export default function Navigation({ expoPushToken, inviteToken }) {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    if (user && user.access_token) {
+    if (socket) {
+      socket.on('refreshCalendar', () => {
+        refreshCalendar();
+      });
+    }
+  }, [socket, refreshCalendar]);
+
+  useEffect(() => {
+    if (user && user.access_token && !socket) {
       const newSocket = createSocket(user, user.access_token);
       newSocket.connect();
       setSocket(newSocket);
     }
-  }, [user]);
+  }, [user, socket]);
 
   // { data: null, error: false, isLoading: true, mutate: () => { } } :
   const { data, mutate } = useSWR(
