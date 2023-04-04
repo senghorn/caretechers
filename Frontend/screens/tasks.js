@@ -63,7 +63,9 @@ export default function Tasks({ navigation }) {
   }, [mutate]);
 
   const renderTasks = (tasks) => {
-    const filteredTasks = getFilteredTasks(tasks, filter).filter((task) => task.title.includes(query));
+    const filteredTasks = getFilteredTasks(tasks, filter).filter((task) =>
+      task.title.toLowerCase().includes(query.toLowerCase())
+    );
     switch (sort) {
       case SORT_LABELS.alphabet:
         filteredTasks.sort((task1, task2) => task1.title.localeCompare(task2.title));
