@@ -21,7 +21,7 @@ export default function VolunteerButton({ date, visitFirst = false }) {
     <TouchableHighlight
       onPress={async () => {
         setVolunteerLoading(true);
-        await volunteerForVisit(date, user);
+        await volunteerForVisit(date, user, user.access_token);
         if (visitFirst) {
           await refreshVisit();
           refreshCalendar();

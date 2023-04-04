@@ -31,7 +31,8 @@ import config from '../../constants/config';
 import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
 import RecordVisitContext from '../../services/context/RecordVisitContext';
 import { setUserNotificationIdentifier } from '../../services/api/user';
-import axios from 'axios';
+import createSocket from '../messages/socket';
+import { getAPIAccessToken } from '../../services/storage/asyncStorage';
 
 const initRefreshCalendar = () => {
   console.log('calendar refresh not set');
@@ -56,13 +57,31 @@ export default function Navigation({ expoPushToken, inviteToken }) {
   const [dateString, setDateString] = useState(getDateString(new Date()));
   const [groupId, setGroupId] = useState('');
   const [socket, setSocket] = useState(null);
-  const { data, error, isLoading, mutate } = useSWR(
-    `${config.backend_server}/visits/group/${groupId}?start=${dateString}&end=${dateString}`,
-    fetcher
-  );
+
   useEffect(() => {
-    if (user && user.group_id) {
-      setGroupId(user.group_id);
+    if (user && user.access_token) {
+      const fetchToken = async () => {
+        const token = await getAPIAccessToken();
+        const newSocket = createSocket(user, token);
+        newSocket.connect();
+        setSocket(newSocket);
+      }
+      fetchToken();
+    } else {
+      console.log('User is null');
+    }
+  }, [user]);
+
+  // { data: null, error: false, isLoading: true, mutate: () => { } } :
+  const { data, error, isLoading, mutate } = useSWR(
+    [`${config.backend_server}/visits/group/${groupId}?start=${dateString}&end=${dateString}`,
+      {
+        headers: { 'Authorization': `Bearer ${user?.access_token}` }
+      }], ([url, token]) => fetcher(url, token));
+
+  useEffect(() => {
+    if (user && user.curr_group) {
+      setGroupId(user.curr_group);
     }
   }, [user]);
 
@@ -73,8 +92,8 @@ export default function Navigation({ expoPushToken, inviteToken }) {
   }, [groupId]);
 
   useEffect(() => {
-    if (user && user.email) {
-      setUserNotificationIdentifier(user.email, expoPushToken);
+    if (user && user.id) {
+      setUserNotificationIdentifier(user.id, expoPushToken);
     }
   }, [user, expoPushToken]);
 
@@ -82,7 +101,7 @@ export default function Navigation({ expoPushToken, inviteToken }) {
   const [isVisitorToday, setIsVisitorToday] = useState(false);
 
   useEffect(() => {
-    if (data && data.length > 0 && data[0].visitor === user.email && !data[0].visitCompleted) {
+    if (data && data.length > 0 && data[0].visitor === user.id && !data[0].visitCompleted) {
       setIsVisitorToday(true);
     } else setIsVisitorToday(false);
   }, [data]);

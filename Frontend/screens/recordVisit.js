@@ -16,7 +16,8 @@ import { recordVisit } from '../services/api/visits';
 import CalendarRefreshContext from '../services/context/CalendarRefreshContext';
 import TodaysVisitorContext from '../services/context/TodaysVisitorContext';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function RecordVisit({ navigation }) {
   const date = new Date();
@@ -30,20 +31,24 @@ export default function RecordVisit({ navigation }) {
   const [refreshVisit, setRefreshVisit] = useContext(VisitRefreshContext);
   const [refreshCalendar] = useContext(CalendarRefreshContext);
 
-  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
+  const tasksURL = `${config.backend_server}/tasks/group/${user.curr_group}/range?start=${dateString}&end=${dateString}`;
 
   const {
     data: visits,
     error: visitError,
     isLoading: visitLoading,
     mutate: visitMutate,
-  } = useSWR(`${config.backend_server}/visits/group/${user.group_id}?start=${dateString}&end=${dateString}`, fetcher);
+  } = useSWR([`${config.backend_server}/visits/group/${user.curr_group}?start=${dateString}&end=${dateString}`, {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }], ([url, token]) => fetcher(url, token));
 
   useEffect(() => {
     setRefreshVisit(() => visitMutate);
   }, [visitMutate]);
 
-  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR(tasksURL, fetcher);
+  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR([tasksURL, {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }], ([url, token]) => fetcher(url, token));
 
   useEffect(() => {
     setRefreshVisitTasks(() => taskMutate);
@@ -89,7 +94,7 @@ export default function RecordVisit({ navigation }) {
                   text: 'Confirm',
                   onPress: async () => {
                     setRecordingVisit(true);
-                    await recordVisit(visit.visitId, getCurrentDateString(), visitTasks, visitNotes);
+                    await recordVisit(visit.visitId, getCurrentDateString(), visitTasks, visitNotes, user.access_token);
                     refreshVisit();
                     refreshVisitTasks();
                     refreshTodaysVisitor();

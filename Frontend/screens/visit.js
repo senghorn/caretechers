@@ -22,7 +22,7 @@ import { ActivityIndicator } from 'react-native-paper';
 import VisitNotes from '../components/visit/notes';
 import { cancelPushNotification } from '../services/notifications/schedule';
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (url, token) => fetch(url, token).then((res) => res.json()).catch((err) => console.log('visit fetch error', err));
 
 export default function Visit({ route, navigation }) {
   const { dateString } = route.params;
@@ -37,20 +37,27 @@ export default function Visit({ route, navigation }) {
 
   const [refreshCalendar] = useContext(CalendarRefreshContext);
 
-  const tasksURL = `${config.backend_server}/tasks/group/${user.group_id}/range?start=${dateString}&end=${dateString}`;
+  const tasksURL = `${config.backend_server}/tasks/group/${user.curr_group}/range?start=${dateString}&end=${dateString}`;
 
   const {
     data: visits,
     error: visitError,
     isLoading: visitLoading,
     mutate: visitMutate,
-  } = useSWR(`${config.backend_server}/visits/group/${user.group_id}?start=${dateString}&end=${dateString}`, fetcher);
+  } = useSWR([`${config.backend_server}/visits/group/${user.curr_group}?start=${dateString}&end=${dateString}`,
+  {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }],
+    ([url, token]) => fetcher(url, token));
 
   useEffect(() => {
     setRefreshVisit(() => visitMutate);
   }, [visitMutate]);
 
-  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR(tasksURL, fetcher);
+  const { data: tasks, error: tasksError, isLoading: tasksLoading, mutate: taskMutate } = useSWR([tasksURL, {
+    headers: { 'Authorization': 'Bearer ' + user.access_token }
+  }],
+    ([url, token]) => fetcher(url, token));
 
   const { refreshTodaysVisitor } = useContext(TodaysVisitorContext);
 
@@ -79,7 +86,7 @@ export default function Visit({ route, navigation }) {
         />
       </View>
       <View style={styles.messageContainer}>
-        {visit && visit.visitor && visit.visitor !== user.email && (
+        {visit && visit.visitor && visit.visitor !== user.id && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
@@ -113,7 +120,7 @@ export default function Visit({ route, navigation }) {
             </View>
           </TouchableHighlight>
         )}
-        {visit && visit.visitor === user.email && visit.date >= getDateString(new Date()) && (
+        {visit && visit.visitor === user.id && visit.date >= getDateString(new Date()) && (
           <TouchableHighlight
             underlayColor="#ededed"
             onPress={async () => {
@@ -130,7 +137,7 @@ export default function Visit({ route, navigation }) {
                     onPress: async () => {
                       setIsDropping(true);
                       cancelPushNotification(visit.notification_identifier);
-                      await deleteVisit(visit.visitId);
+                      await deleteVisit(visit.visitId, user.access_token);
                       taskMutate();
                       refreshCalendar();
                       refreshTodaysVisitor();

@@ -8,12 +8,14 @@ import TasksRefreshContext from '../../services/context/TasksRefreshContext';
 import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
 import { getCurrentDateString } from '../../utils/date';
+import UserContext from '../../services/context/UserContext';
 
 export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
   const [refreshTasks] = useContext(TasksRefreshContext);
   const [refreshVisitTasks] = useContext(VisitTasksRefreshContext);
   const [refreshVisit] = useContext(VisitRefreshContext);
   const [refreshCalendar] = useContext(CalendarRefreshContext);
+  const { user } = useContext(UserContext);
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
@@ -60,7 +62,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
                     {
                       text: 'Confirm',
                       onPress: async () => {
-                        await deleteTask(id, refreshTasks, refreshVisit, refreshVisitTasks, refreshCalendar);
+                        await deleteTask(id, refreshTasks, refreshVisit, refreshVisitTasks, refreshCalendar, user.access_token);
                         navigation.goBack();
                       },
                       style: 'destructive',
@@ -83,10 +85,16 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refreshCalendar) => {
+const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refreshCalendar, token) => {
   const currDate = getCurrentDateString();
   const url = `${config.backend_server}/tasks/${id}?end_date=${currDate}`;
   const method = 'DELETE';
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
+
   try {
     await fetch(url, {
       method: method,
@@ -101,6 +109,7 @@ const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refr
     refreshCalendar();
   }
 };
+
 
 const styles = StyleSheet.create({
   outerContainer: {
