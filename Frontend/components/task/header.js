@@ -9,6 +9,7 @@ import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 import VisitTasksRefreshContext from '../../services/context/VisitTasksRefreshContext';
 import { getCurrentDateString } from '../../utils/date';
 import UserContext from '../../services/context/UserContext';
+import SocketContext from '../../services/context/SocketContext';
 
 export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
   const [refreshTasks] = useContext(TasksRefreshContext);
@@ -16,6 +17,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
   const [refreshVisit] = useContext(VisitRefreshContext);
   const [refreshCalendar] = useContext(CalendarRefreshContext);
   const { user } = useContext(UserContext);
+  const [socket] = useContext(SocketContext);
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
@@ -107,9 +109,9 @@ const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refr
     refreshVisit();
     refreshVisitTasks();
     refreshCalendar();
+    socket.emit('refreshCalendar');
   }
 };
-
 
 const styles = StyleSheet.create({
   outerContainer: {

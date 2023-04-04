@@ -8,11 +8,8 @@ import Tasks from '../../screens/tasks';
 import { useContext, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
-import createSocket from '../messages/socket';
 import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
-import UserContext from "../../services/context/UserContext";
 import SocketContext from '../../services/context/SocketContext';
-import { getAPIAccessToken } from '../../services/storage/asyncStorage';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -46,67 +43,41 @@ export default function BottomNavigation({ route, navigation }) {
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <Tab.Navigator>
         <Tab.Screen
-          name='Notes'
+          name="Notes"
           component={Notes}
           options={{
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name='notebook' color={color} size={26} />
-            ),
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="notebook" color={color} size={26} />,
           }}
         />
         <Tab.Screen
-          name='Messages'
+          name="Messages"
           component={Messages}
           options={{
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons
-                name='android-messages'
-                color={color}
-                size={26}
-              />
-            ),
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="android-messages" color={color} size={26} />,
           }}
         />
         <Tab.Screen
-          name='Calendar'
+          name="Calendar"
           component={Calendar}
           navigation={navigation}
           options={{
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons
-                name='calendar-heart'
-                color={color}
-                size={26}
-              />
-            ),
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="calendar-heart" color={color} size={26} />,
             tabBarBadge: isVisitorToday,
           }}
         />
         <Tab.Screen
-          name='Metrics'
+          name="Metrics"
           component={Metrics}
           options={{
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons
-                name='chart-box'
-                color={color}
-                size={26}
-              />
-            ),
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="chart-box" color={color} size={26} />,
           }}
         />
         <Tab.Screen
-          name='Tasks'
+          name="Tasks"
           component={Tasks}
           navigation={navigation}
           options={{
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons
-                name='checkbox-multiple-marked'
-                color={color}
-                size={26}
-              />
-            ),
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="checkbox-multiple-marked" color={color} size={26} />,
           }}
         />
       </Tab.Navigator>

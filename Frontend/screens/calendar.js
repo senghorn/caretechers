@@ -60,9 +60,12 @@ export default function Calendar({ navigation }) {
   }, [renderingDataForFlatList]);
 
   const { data, error, isLoading, mutate } = useSWR(
-    [`${config.backend_server}/visits/group/${user.curr_group}?start=${startDateString}&end=${endDateString}`, {
-      headers: { 'Authorization': 'Bearer ' + user.access_token }
-    }],
+    [
+      `${config.backend_server}/visits/group/${user?.curr_group}?start=${startDateString}&end=${endDateString}`,
+      {
+        headers: { Authorization: 'Bearer ' + user?.access_token },
+      },
+    ],
     ([url, token]) => fetcher(url, token)
   );
 

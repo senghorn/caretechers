@@ -1,8 +1,8 @@
-require('dotenv').config()
+require('dotenv').config();
 
 const sql = require('sql-template-strings');
 const db = require('./database');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 const { sendNotificationsToGroup } = require('./notifications/sendNotifications');
 
@@ -19,6 +19,10 @@ function CreateWebSocketServer(app) {
     console.log(`User ${socket.username} connected!`);
     const groupId = socket.groupId;
     socket.join(groupId);
+
+    socket.on('refreshCalendar', () => {
+      socket.broadcast.to(groupId).emit('refreshCalendar');
+    });
 
     socket.on('chat', async (messages) => {
       var messageData = messages[0];
@@ -40,7 +44,6 @@ function CreateWebSocketServer(app) {
       } catch (err) {
         console.log(err);
       }
-
     });
 
     socket.on('disconnect', (reason) => {
@@ -83,12 +86,12 @@ function decodeToken(token) {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
       console.log('given token', user);
-      console.log('token decoded error', err)
-      return res.sendStatus(403)
+      console.log('token decoded error', err);
+      return res.sendStatus(403);
     }
     decodedUser = user;
     return user;
-  })
+  });
 
   return decodedUser;
 }

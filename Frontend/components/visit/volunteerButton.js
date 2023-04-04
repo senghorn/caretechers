@@ -8,6 +8,7 @@ import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
 import UserContext from '../../services/context/UserContext';
 import { volunteerForVisit } from '../../services/api/visits';
 import colors from '../../constants/colors';
+import SocketContext from '../../services/context/SocketContext';
 
 export default function VolunteerButton({ date, visitFirst = false }) {
   const [volunteerLoading, setVolunteerLoading] = useState(false);
@@ -17,12 +18,14 @@ export default function VolunteerButton({ date, visitFirst = false }) {
 
   const { refreshTodaysVisitor } = useContext(TodaysVisitorContext);
   const { user } = useContext(UserContext);
+  const [socket] = useContext(SocketContext);
   return (
     <TouchableHighlight
       onPress={async () => {
         try {
           setVolunteerLoading(true);
           await volunteerForVisit(date, user, user.access_token);
+          socket.emit('refreshCalendar');
           if (visitFirst) {
             await refreshVisit();
             refreshCalendar();
