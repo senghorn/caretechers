@@ -8,12 +8,13 @@ import { resetGroupPassword } from '../../services/api/groups';
 import { RemoveUserFromGroup } from '../../services/api/user';
 import config from '../../constants/config';
 import useSWR from 'swr';
+import SocketContext from '../../services/context/SocketContext';
 import axios from 'axios';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function GroupSettings({ navigation }) {
-  const { user } = useContext(UserContext);
+  const { setUser, user } = useContext(UserContext);
   const { data, isLoading, error, mutate } = useSWR([config.backend_server + '/groups/info/' + user.curr_group,
   {
     headers: { 'Authorization': 'Bearer ' + user.access_token }
@@ -24,6 +25,7 @@ export default function GroupSettings({ navigation }) {
   const [password, setPassword] = useState('');
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(isLoading);
+  const [socket, setSocket] = useContext(SocketContext);
   const [group, setGroup] = useState({
     name: '',
   });
@@ -44,11 +46,17 @@ export default function GroupSettings({ navigation }) {
   };
 
   const LeaveGroup = async () => {
+    console.log('leaving group');
     if (user && user.id && user.curr_group) {
       const result = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
       if (result == true) {
-        await clearAsyncStorage();
-        navigation.navigate('Login');
+        const clear = await clearAsyncStorage();
+        if (clear) {
+          socket.disconnect();
+          setSocket(null);
+          setUser({});
+          navigation.navigate('Login');
+        }
       } else {
         alert('Cannot leave group.');
       }
@@ -59,8 +67,8 @@ export default function GroupSettings({ navigation }) {
     setShowAlert(true);
   };
   const handleConfirmLeaveGroup = async () => {
-    await LeaveGroup();
     setShowAlert(false);
+    await LeaveGroup();
   };
   const handleCancelLeaveGroup = () => {
     setShowAlert(false);
