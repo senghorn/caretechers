@@ -3,7 +3,7 @@ import { Appbar, IconButton, Avatar, Divider, Text, TextInput, ActivityIndicator
 import { useState, useEffect, useContext } from 'react';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
-import GroupContext from '../../services/context/InviteLinkContext';
+import { clearAsyncStorage } from '../../services/storage/asyncStorage';
 import { resetGroupPassword } from '../../services/api/groups';
 import { RemoveUserFromGroup } from '../../services/api/user';
 import config from '../../constants/config';
@@ -47,6 +47,7 @@ export default function GroupSettings({ navigation }) {
     if (user && user.id && user.curr_group) {
       const result = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
       if (result == true) {
+        await clearAsyncStorage();
         navigation.navigate('Login');
       } else {
         alert('Cannot leave group.');
