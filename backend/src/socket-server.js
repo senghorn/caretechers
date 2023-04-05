@@ -26,6 +26,7 @@ function CreateWebSocketServer(app) {
 
     socket.on('chat', async (messages) => {
       var messageData = messages[0];
+      console.log('chat received', messageData);
       try {
         const date = new Date();
         const query = sql`INSERT INTO Messages VALUES(NULL, ${socket.username}, ${date}, ${messageData.text}, ${groupId}, 0)`;
@@ -65,12 +66,14 @@ function CreateWebSocketServer(app) {
     const accessToken = socket.handshake.auth.token;
     if (accessToken) {
       const decodedUser = decodeToken(accessToken);
+      console.log(decodedUser);
       if (decodedUser && decodedUser.id && decodedUser.curr_group) {
         socket.username = decodedUser.id;
         socket.groupId = decodedUser.curr_group;
         socket.first_name = decodedUser.first_name;
         socket.last_name = decodedUser.last_name;
       } else {
+        console.log('token not valid');
         return next(new Error('invalid token'));
       }
     }
@@ -83,6 +86,7 @@ function CreateWebSocketServer(app) {
 
 function decodeToken(token) {
   let decodedUser = null;
+  console.log('decoding token', token);
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
       console.log('given token', user);
