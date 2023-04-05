@@ -26,6 +26,7 @@ function CreateWebSocketServer(app) {
 
     socket.on('chat', async (messages) => {
       var messageData = messages[0];
+      console.log('chat received', messageData);
       try {
         const date = new Date();
         const query = sql`INSERT INTO Messages VALUES(NULL, ${socket.username}, ${date}, ${messageData.text}, ${groupId}, 0)`;
@@ -58,18 +59,23 @@ function CreateWebSocketServer(app) {
   });
 
   // Register middleware function that gets called every incoming socket
-  io.use((socket, next) => {
+  io.use(async (socket, next) => {
     if (!socket.handshake.auth || !socket.handshake.auth.token) {
       return next(new Error('invalid token'));
     }
     const accessToken = socket.handshake.auth.token;
     if (accessToken) {
       const decodedUser = decodeToken(accessToken);
-      if (decodedUser && decodedUser.id && decodedUser.curr_group) {
-        socket.username = decodedUser.id;
-        socket.groupId = decodedUser.curr_group;
-        socket.first_name = decodedUser.first_name;
-        socket.last_name = decodedUser.last_name;
+      if (decodedUser && decodedUser.id) {
+        const userData = await getUserData(decodedUser.id);
+        if (userData && userData.first_name && userData.last_name && userData.curr_group) {
+          socket.username = decodedUser.id;
+          socket.groupId = userData.curr_group;
+          socket.first_name = userData.first_name;
+          socket.last_name = userData.last_name;
+        } else {
+          return next(new Error('User not found'));
+        }
       } else {
         return next(new Error('invalid token'));
       }
@@ -79,6 +85,16 @@ function CreateWebSocketServer(app) {
   });
 
   return httpServer;
+}
+
+/**
+ * Given user email, fetch user data from the database and return.
+ */
+async function getUserData(email) {
+  const query = sql`SELECT * FROM Users
+  WHERE Users.email = ${email};`;
+  const [result] = await db.query(query);
+  return result;
 }
 
 function decodeToken(token) {

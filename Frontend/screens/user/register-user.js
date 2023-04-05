@@ -8,8 +8,6 @@ import colors from '../../constants/colors';
 import { getAccessToken } from '../../services/api/auth';
 import { setAPIAccessToken, setAPIResetToken } from '../../services/storage/asyncStorage';
 export default function Inputs({ route, navigation }) {
-  // const { user } = route.params;
-
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneMissing, setPhoneMissing] = useState(false);
   const [nameMissing, setNameMissing] = useState(true);
