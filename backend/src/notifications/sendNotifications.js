@@ -8,8 +8,8 @@ const expo = new Expo();
 
 // see info about push notification json bodies @ https://docs.expo.dev/push-notifications/sending-notifications/
 module.exports.sendNotificationsToGroup = async (groupId, notification, toExclude) => {
-  const query = sql`SELECT notification_identifier FROM Users WHERE curr_group = ${groupId} AND notification_identifier IS NOT NULL `;
-  const toAppend = toExclude ? ` AND email NOT IN (${toExclude});` : ';';
+  const query = sql`SELECT u.notification_identifier FROM GroupMembers gm JOIN Users u ON gm.member_id = u.email AND gm.active = 1 WHERE gm.group_id = ${groupId} AND u.notification_identifier IS NOT NULL `;
+  const toAppend = toExclude ? ` AND u.email NOT IN (${toExclude});` : ';';
   query.append(toAppend);
   const toSendTo = await db.query(query);
 
