@@ -17,7 +17,7 @@ describe('user', () => {
   });
 
   afterAll(async () => {
-    const deleteUserQuery = sql`DELETE FROM Users WHERE email = ${testUserEmail} AND group_id = ${groupId};`;
+    const deleteUserQuery = sql`DELETE FROM Users WHERE email = ${testUserEmail} AND curr_group = ${groupId};`;
     await db.query(deleteUserQuery);
     const deleteGroupQuery = sql`DELETE FROM \`Groups\` WHERE id = ${groupId};`;
     await db.query(deleteGroupQuery);

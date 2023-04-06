@@ -18,7 +18,7 @@ describe('visits', () => {
                                  ("Test_Group_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
     const groupInsertResult = await db.query(insertGroupQuery);
     groupId = groupInsertResult.insertId;
-    const userInsertQuery = sql`INSERT INTO Users (email, first_name, last_name, phone_num, group_id)
+    const userInsertQuery = sql`INSERT INTO Users (email, first_name, last_name, phone_num, curr_group)
                                 VALUES (${testUserEmail}, "test_first", "test_last", "999-999-9999", ${groupId});`;
     await db.query(userInsertQuery);
   });
@@ -26,7 +26,7 @@ describe('visits', () => {
   afterAll(async () => {
     const deleteVisitsQuery = sql`DELETE FROM Visits WHERE visitor = ${testUserEmail};`;
     await db.query(deleteVisitsQuery);
-    const deleteUserQuery = sql`DELETE FROM Users WHERE email = ${testUserEmail} AND group_id = ${groupId};`;
+    const deleteUserQuery = sql`DELETE FROM Users WHERE email = ${testUserEmail} AND curr_group = ${groupId};`;
     await db.query(deleteUserQuery);
     const deleteGroupQuery = sql`DELETE FROM \`Groups\` WHERE id = ${groupId};`;
     await db.query(deleteGroupQuery);
