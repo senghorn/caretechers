@@ -17,6 +17,7 @@ import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor'
 import { CreateNote, RemoveNote, UpdateNote } from '../../services/api/notes';
 import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
 import UserContext from '../../services/context/UserContext';
+import * as ImagePicker from 'expo-image-picker';
 
 const { height } = Dimensions.get('window');
 
@@ -89,13 +90,25 @@ export default function NewNote({ navigation, route }) {
                 onPress={async () => {
                   if (noteId) {
                     setEditMode(false);
-                    await UpdateNote({
-                      id: noteId,
-                      title: editTitle,
-                      content: editContent,
-                    }, user.access_token);
+                    await UpdateNote(
+                      {
+                        id: noteId,
+                        title: editTitle,
+                        content: editContent,
+                      },
+                      user.access_token
+                    );
                     toggleRefresh();
-                  } else await addNote(editTitle, editContent, user.curr_group, navigation, setEditMode, toggleRefresh, user.access_token);
+                  } else
+                    await addNote(
+                      editTitle,
+                      editContent,
+                      user.curr_group,
+                      navigation,
+                      setEditMode,
+                      toggleRefresh,
+                      user.access_token
+                    );
                 }}
               />
             )}
@@ -151,10 +164,21 @@ export default function NewNote({ navigation, route }) {
             <RichToolbar
               editor={richText}
               selectedIconTint={'#2095F2'}
+              onPressAddImage={async () => {
+                const result = await ImagePicker.launchImageLibraryAsync({
+                  mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                  quality: 1,
+                  base64: true,
+                });
+                if (!result.canceled) {
+                  richText.current?.insertImage(`data:image/jpeg;base64,${result.assets[0].base64}`);
+                }
+              }}
               actions={[
                 actions.setBold,
                 actions.setItalic,
                 actions.setUnderline,
+                actions.insertImage,
                 actions.insertBulletsList,
                 actions.insertOrderedList,
                 actions.alignLeft,

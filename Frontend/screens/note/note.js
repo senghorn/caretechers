@@ -49,11 +49,14 @@ export default function Note({ navigation, route }) {
                 onPress={async () => {
                   Keyboard.dismiss();
                   setEditing(false);
-                  await UpdateNote({
-                    id: noteId,
-                    title: noteTitle,
-                    content: noteContent,
-                  }, user.access_token);
+                  await UpdateNote(
+                    {
+                      id: noteId,
+                      title: noteTitle,
+                      content: noteContent,
+                    },
+                    user.access_token
+                  );
                   toggleRefresh();
                 }}
               />
