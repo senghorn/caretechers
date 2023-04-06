@@ -1,6 +1,7 @@
 const rest_server = require('./rest-server');
 const web_socket_server = require('./socket-server');
 const auth_server = require('./authServer');
+const jobRunner = require('./jobRunner');
 const port = 3000;
 
 auth_server.authServer();
@@ -12,3 +13,5 @@ app.listen(port, () => {
 
 const httpServer = web_socket_server.CreateWebSocketServer(app);
 httpServer.listen(3001, () => console.log('Chat server listening on port 3001'));
+
+jobRunner.startJobs();
