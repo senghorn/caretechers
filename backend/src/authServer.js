@@ -19,11 +19,15 @@ function authServer() {
         const refreshToken = req.body.token
         if (refreshToken == null) return res.sendStatus(401)
         if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403)
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-            if (err) return res.sendStatus(403)
-            const accessToken = generateAccessToken({ name: user.name })
-            res.json({ accessToken: accessToken })
-            return res.sendStatus(200);
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
+            if (err) {
+                console.log('token error', err);
+                return res.sendStatus(403);
+            }
+            const userData = await getUserData(user.email);
+            const accessToken = generateAccessToken(userData);
+            res.json({ accessToken: accessToken });
+            res.end();
         })
     })
 
@@ -108,9 +112,9 @@ async function getUserData(email) {
     const query = sql`SELECT * FROM Users WHERE email = ${email};`;
     const [result] = await db.query(query);
     if (!result) {
-        return { id: email, curr_group: [], first_name: "", last_name: "" }
+        return { id: email }
     }
-    return { id: result.email, curr_group: result.curr_group, first_name: result.first_name, last_name: result.last_name };
+    return { id: result.email };
 }
 
 async function isUserRegistered(email) {
