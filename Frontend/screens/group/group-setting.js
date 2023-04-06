@@ -3,7 +3,6 @@ import { Appbar, IconButton, Avatar, Divider, Text, TextInput, ActivityIndicator
 import { useState, useEffect, useContext } from 'react';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
-import { clearAsyncStorage } from '../../services/storage/asyncStorage';
 import { resetGroupPassword } from '../../services/api/groups';
 import { RemoveUserFromGroup } from '../../services/api/user';
 import config from '../../constants/config';
@@ -41,22 +40,17 @@ export default function GroupSettings({ navigation }) {
     setLoading(isLoading);
   }, [user, data, isLoading]);
 
-  const InviteToJoin = async () => {
-    console.log('sharing invitation link to other users!');
-  };
-
   const LeaveGroup = async () => {
-    console.log('leaving group');
     if (user && user.id && user.curr_group) {
       const result = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
       if (result == true) {
-        const clear = await clearAsyncStorage();
-        if (clear) {
-          socket.disconnect();
-          setSocket(null);
-          setUser({});
-          navigation.navigate('Login');
-        }
+        socket.disconnect();
+        setSocket(null);
+        setUser(prevUser => ({
+          ...prevUser,
+          curr_group: null
+        }));
+        navigation.navigate('Group');
       } else {
         alert('Cannot leave group.');
       }
@@ -64,10 +58,25 @@ export default function GroupSettings({ navigation }) {
   };
 
   const handleLeaveGroup = () => {
-    setShowAlert(true);
+    Alert.alert(
+      'Leave Group',
+      'Are you sure you want to leave this group?',
+      [
+        {
+          text: 'Cancel',
+          onPress: handleCancelLeaveGroup,
+          style: 'cancel',
+        },
+        {
+          text: 'Leave',
+          onPress: handleConfirmLeaveGroup,
+          style: 'destructive',
+        },
+      ],
+      { cancelable: false }
+    )
   };
   const handleConfirmLeaveGroup = async () => {
-    setShowAlert(false);
     await LeaveGroup();
   };
   const handleCancelLeaveGroup = () => {

@@ -174,6 +174,7 @@ export async function UpdateUserData(email, first_name, last_name, phone, group_
 
 export async function RemoveUserFromGroup(user_id, group_id, token) {
   let url = config.backend_server + '/user/' + user_id + '/' + group_id;
+  console.log(token);
   try {
     const result = await axios.delete(url, {
       headers: {
