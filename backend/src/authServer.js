@@ -123,3 +123,4 @@ async function isUserRegistered(email) {
 }
 
 module.exports.authServer = authServer;
+module.exports.generateAccessToken = generateAccessToken;
