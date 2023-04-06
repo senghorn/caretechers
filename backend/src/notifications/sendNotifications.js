@@ -7,9 +7,10 @@ const expo = new Expo();
 // TO-DO: handle message receipt errors
 
 // see info about push notification json bodies @ https://docs.expo.dev/push-notifications/sending-notifications/
-module.exports.sendNotificationsToGroup = async (groupId, notification, toExclude = []) => {
-  const query = sql`SELECT notification_identifier FROM Users WHERE curr_group = ${groupId} AND notification_identifier IS NOT NULL
-                     AND email NOT IN (${toExclude});`;
+module.exports.sendNotificationsToGroup = async (groupId, notification, toExclude) => {
+  const query = sql`SELECT notification_identifier FROM Users WHERE curr_group = ${groupId} AND notification_identifier IS NOT NULL `;
+  const toAppend = toExclude ? ` AND email NOT IN (${toExclude});` : ';';
+  query.append(toAppend);
   const toSendTo = await db.query(query);
 
   const messages = toSendTo.map((user) => {
