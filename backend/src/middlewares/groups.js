@@ -90,7 +90,7 @@ module.exports.getGroupInfo = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.generateToken = (req, _res, next) => {
-  const token  = jwt.sign({
+  const token = jwt.sign({
     groupName: req.groupInfo.name,
     groupPassword: req.groupInfo.password
   }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m' });

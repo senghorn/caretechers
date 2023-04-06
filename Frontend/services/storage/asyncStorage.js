@@ -1,7 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import UserContext from '../context/UserContext';
-import { useContext } from 'react';
-import SocketContext from '../context/SocketContext';
+
 /**
  * Stores Google Auth Token in async storage
  * @param {*} token 
@@ -89,13 +87,6 @@ export async function getAPIResetToken() {
  */
 export async function clearAsyncStorage() {
     try {
-        const [socket, setSocket] = useContext(SocketContext);
-        const { setUser } = useContext(UserContext);
-        setUser({});
-        if (socket) {
-            socket.disconnect();
-        }
-        setSocket(null);
         await AsyncStorage.clear();
         return true;
     } catch (error) {

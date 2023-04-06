@@ -8,7 +8,6 @@ import InviteLinkContext from '../../services/context/InviteLinkContext';
 import axios from 'axios';
 import config from '../../constants/config'
 import SocketContext from '../../services/context/SocketContext';
-import { clearAsyncStorage } from '../../services/storage/asyncStorage';
 
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
@@ -86,13 +85,19 @@ export default function Groups({ navigation }) {
             const joined = await joinGroupHandler(user, groupName, password);
             if (joined == true && user.id) {
               const result = await fetchUserByCookie(user.access_token);
-              if (result) {
-                await clearAsyncStorage();
-                navigation.navigate('Login');
+              if (result && result.curr_group) {
+                setUser({
+                  "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
+                  "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+                  "phone_num": result.phone_num
+                });
+                socket.disconnect();
+                setSocket(null);
+                navigation.navigate('Home');
+              } else {
+                console.log('Fetch user data error');
               }
-              else {
-                alert('Cannot fetch user data after joining group');
-              }
+
             } else {
               alert('Group name and/or password are incorrect!');
             }
