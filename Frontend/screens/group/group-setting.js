@@ -1,6 +1,7 @@
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Alert, Share } from 'react-native';
 import { Appbar, IconButton, Avatar, Divider, Text, TextInput, ActivityIndicator } from 'react-native-paper';
 import { useState, useEffect, useContext } from 'react';
+import { Bullets } from "react-native-easy-content-loader";
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
 import { resetGroupPassword } from '../../services/api/groups';
@@ -9,7 +10,7 @@ import config from '../../constants/config';
 import useSWR from 'swr';
 import SocketContext from '../../services/context/SocketContext';
 import axios from 'axios';
-
+import Spinner from 'react-native-loading-spinner-overlay';
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function GroupSettings({ navigation }) {
@@ -24,6 +25,7 @@ export default function GroupSettings({ navigation }) {
   const [password, setPassword] = useState('');
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(isLoading);
+  const [waitingToLeave, setWaitToLeave] = useState(false);
   const [socket, setSocket] = useContext(SocketContext);
   const [group, setGroup] = useState({
     name: '',
@@ -77,7 +79,9 @@ export default function GroupSettings({ navigation }) {
     )
   };
   const handleConfirmLeaveGroup = async () => {
+    setWaitToLeave(true);
     await LeaveGroup();
+    setWaitToLeave(false);
   };
   const handleCancelLeaveGroup = () => {
     setShowAlert(false);
@@ -112,6 +116,12 @@ export default function GroupSettings({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Spinner
+        color='#add8e6'
+        visible={waitingToLeave}
+        textStyle={styles.spinnerTextStyle}
+        size={'large'}
+      />
       <Appbar.Header style={styles.headerContainer}>
         <Appbar.Action
           icon={'arrow-left'}
@@ -166,9 +176,9 @@ export default function GroupSettings({ navigation }) {
             <Text style={styles.buttonTitle}>Leave</Text>
           </View>
         </View>
-        {loading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
         <View style={styles.memberListBox}>
           <Text style={styles.membersTitle}>Members</Text>
+          <Bullets active listSize={5} loading={loading} />
           <GroupMemberList members={members} />
         </View>
       </View>
