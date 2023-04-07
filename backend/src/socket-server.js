@@ -26,21 +26,33 @@ function CreateWebSocketServer(app) {
 
     socket.on('chat', async (messages) => {
       var messageData = messages[0];
+      const date = new Date();
       try {
-        const date = new Date();
-        const query = sql`INSERT INTO Messages VALUES(NULL, ${socket.username}, ${date}, ${messageData.text}, ${groupId}, 0)`;
+        let messageType = 'T';
+        if (messageData.messageType === 'I') {
+          messageType = 'I';
+        }
+
+        const query = sql`INSERT INTO Messages
+         VALUES(NULL, ${socket.username}, ${date}, ${messageData.text}, ${groupId}, 0, ${messageType})`;
         const result = await db.query(query);
-        messageData._id = result.insertId;
-        io.to(groupId).emit('message', messageData);
-        sendNotificationsToGroup(
-          groupId,
-          {
-            title: `${socket.first_name} ${socket.last_name}`,
-            body: messageData.text,
-            data: { url: 'Messages' },
-          },
-          [socket.username]
-        );
+
+        const insertedMessageQuery = sql`SELECT * FROM Messages WHERE id = ${result.insertId}`;
+        const data = await db.query(insertedMessageQuery);
+
+        if (data.length > 0) {
+          io.to(groupId).emit('message', data[0]);
+          sendNotificationsToGroup(
+            groupId,
+            {
+              title: `${socket.first_name} ${socket.last_name}`,
+              body: data[0].messageType === "T" ? messageData.text : "Image",
+              data: { url: 'Messages' },
+            },
+            [`'${socket.username}'`]
+          );
+        }
+
       } catch (err) {
         console.log(err);
       }
