@@ -99,14 +99,6 @@ export default function Messages({ navigation }) {
     if (!result.canceled) {
       try {
         const imageUrl = await uploadImage(result.assets[0].base64);
-        const imageMessage = {
-          user: this_user,
-          createdAt: Date.now(),
-          _id: uuidv4(),
-          messageType: "image",
-          image: imageUrl,
-        };
-        // Backend expects an array of images
         const imageData = [{
           text: imageUrl,
           messageType: 'I'
@@ -161,7 +153,7 @@ export default function Messages({ navigation }) {
     if (socket && users) {
       socket.on('message', (message) => {
         const msg = {
-          text: message.content,
+          text: message.messageType === "I" ? "" : message.content,
           createdAt: message.date_time,
           _id: message.id,
           messageType: message.messageType === "I" ? "image" : "text",
@@ -169,7 +161,6 @@ export default function Messages({ navigation }) {
           user: users[message.sender] ? users[message.sender] :
             { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
         }
-        console.log('received messages', msg);
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, msg)
         );
@@ -299,7 +290,7 @@ const FormatMessagesForChat = (all_users, messages) => {
   if (all_users) {
     messages.forEach(function (message) {
       formatted_messages.push({
-        text: message.content,
+        text: message.messageType === "I" ? "" : message.content,
         createdAt: message.date_time,
         _id: message.id,
         messageType: message.messageType === "I" ? "image" : "text",
