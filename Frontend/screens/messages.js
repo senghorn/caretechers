@@ -1,5 +1,6 @@
 import { StyleSheet, View, ActionSheetIOS } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import { ActivityIndicator } from 'react-native-paper';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
 import Header from '../components/notes/header';
@@ -13,7 +14,6 @@ import UserContext from '../services/context/UserContext';
 import useSWR from 'swr';
 import config from '../constants/config';
 import SocketContext from '../services/context/SocketContext';
-
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function Messages({ navigation }) {
@@ -25,6 +25,7 @@ export default function Messages({ navigation }) {
   const [searchMode, setSearchMode] = useState(false);
   const [noEalierMessages, setNoEarlierMessages] = useState(false);
   const { user } = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useContext(SocketContext);
   const getSmallestMessageId = () => {
     let result = 0;
@@ -53,6 +54,9 @@ export default function Messages({ navigation }) {
       const formatted = FormatMessagesForChat(users, data);
       setMessages(formatted);
       setDisplayMessages(formatted);
+    }
+    if (!isLoading) {
+      setLoading(false);
     }
   }, [data, isLoading, users]);
 
@@ -180,7 +184,6 @@ export default function Messages({ navigation }) {
   };
 
   return (
-
     <View style={styles.container}>
       <Header
         title={'Messages'}
@@ -189,6 +192,7 @@ export default function Messages({ navigation }) {
         setSearchQuery={setSearchQuery}
         setSearchingMode={setSearchMode}
       />
+      {loading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
       <GiftedChat
         renderBubble={renderBubble}
         wrapInSafeArea={false}
@@ -219,6 +223,10 @@ const styles = StyleSheet.create({
     borderWidth: 0.2,
     padding: 10,
     borderRadius: 10,
+  },
+  loader: {
+    height: '100%',
+    transform: [{ translateY: -16 }],
   },
 });
 
