@@ -1,6 +1,6 @@
 import { StyleSheet, View, ActionSheetIOS } from 'react-native';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, Button, IconButton } from 'react-native-paper';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
 import Header from '../components/notes/header';
@@ -14,6 +14,10 @@ import UserContext from '../services/context/UserContext';
 import useSWR from 'swr';
 import config from '../constants/config';
 import SocketContext from '../services/context/SocketContext';
+import uploadImage from '../services/s3/uploadImage';
+import * as ImagePicker from 'expo-image-picker';
+import { v4 as uuidv4 } from 'uuid';
+
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function Messages({ navigation }) {
@@ -27,6 +31,9 @@ export default function Messages({ navigation }) {
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useContext(SocketContext);
+  const [imageUploading, setImageUploading] = useState(false);
+
+
   const getSmallestMessageId = () => {
     let result = 0;
     if (messages && messages.length > 0) {
@@ -39,7 +46,6 @@ export default function Messages({ navigation }) {
     }
     return result;
   }
-
 
   const { data, isLoading, error, mutate } = useSWR(
     [config.backend_server + '/messages/fetch/' + user.curr_group,
@@ -76,6 +82,43 @@ export default function Messages({ navigation }) {
       }
     }
   }
+
+  const addImage = async (isCamera = false) => {
+    setImageUploading(true);
+    const result = isCamera
+      ? await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.5,
+        base64: true,
+      })
+      : await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.5,
+        base64: true,
+      });
+    if (!result.canceled) {
+      try {
+        const imageUrl = await uploadImage(result.assets[0].base64);
+        const imageMessage = {
+          user: this_user,
+          createdAt: Date.now(),
+          _id: uuidv4(),
+          messageType: "image",
+          image: imageUrl,
+        };
+        // Backend expects an array of images
+        const imageData = [{
+          text: imageUrl,
+          messageType: 'I'
+        }];
+        onMessageSend(imageData);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setImageUploading(false);
+      }
+    } else setImageUploading(false);
+  };
 
   // Fetch all the users in the group for their profile photos
   useEffect(() => {
@@ -115,14 +158,24 @@ export default function Messages({ navigation }) {
   }, [displayMessages]);
 
   useEffect(() => {
-    if (socket) {
-      socket.on('message', (msg) => {
+    if (socket && users) {
+      socket.on('message', (message) => {
+        const msg = {
+          text: message.content,
+          createdAt: message.date_time,
+          _id: message.id,
+          messageType: message.messageType === "I" ? "image" : "text",
+          image: message.messageType === "I" ? message.content : null,
+          user: users[message.sender] ? users[message.sender] :
+            { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
+        }
+        console.log('received messages', msg);
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, msg)
         );
       });
     }
-  }, [])
+  }, [socket, users])
 
   var onMessageSend = useCallback(
     (messages = []) => {
@@ -163,6 +216,16 @@ export default function Messages({ navigation }) {
 
   };
 
+  const CameraButton = () => {
+    return (
+      <IconButton
+        icon="image-plus"
+        size={25}
+        onPress={() => addImage(true)}
+      />
+    )
+  }
+
   // Message render bubble
   const renderBubble = (props) => {
     const message_sender_id = props.currentMessage.user._id;
@@ -194,6 +257,7 @@ export default function Messages({ navigation }) {
       />
       {loading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
       <GiftedChat
+        renderActions={CameraButton}
         renderBubble={renderBubble}
         wrapInSafeArea={false}
         showUserAvatar={true}
@@ -238,6 +302,8 @@ const FormatMessagesForChat = (all_users, messages) => {
         text: message.content,
         createdAt: message.date_time,
         _id: message.id,
+        messageType: message.messageType === "I" ? "image" : "text",
+        image: message.messageType === "I" ? message.content : null,
         user: all_users[message.sender] ? all_users[message.sender] : { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
       });
     });
