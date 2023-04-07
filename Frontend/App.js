@@ -9,7 +9,6 @@ import { Asset } from 'expo-asset';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 
 async function registerForPushNotificationsAsync() {
   let token;
