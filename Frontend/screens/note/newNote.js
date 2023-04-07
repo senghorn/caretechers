@@ -12,12 +12,13 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Appbar, TextInput } from 'react-native-paper';
+import { ActivityIndicator, Appbar, TextInput } from 'react-native-paper';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 import { CreateNote, RemoveNote, UpdateNote } from '../../services/api/notes';
 import { NotesRefreshContext } from '../../services/context/NotesRefreshContext';
 import UserContext from '../../services/context/UserContext';
 import * as ImagePicker from 'expo-image-picker';
+import uploadImage from '../../services/s3/uploadImage';
 
 const { height } = Dimensions.get('window');
 
@@ -29,6 +30,39 @@ export default function NewNote({ navigation, route }) {
   const [editContent, setEditContent] = useState('');
   const [editTime, setEditTime] = useState('');
   const [noteId, setNoteId] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const addImage = async (isCamera = false) => {
+    setImageUploading(true);
+    const result = isCamera
+      ? await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.5,
+          base64: true,
+        })
+      : await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.5,
+          base64: true,
+        });
+    if (!result.canceled) {
+      try {
+        const imageUrl = await uploadImage(result.assets[0].base64);
+        console.log(imageUrl);
+        richText.current?.insertHTML(
+          `
+            <div align="center" >
+              <img src="${imageUrl}" style="height: 500px;" />
+            </div>
+          `
+        );
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setImageUploading(false);
+      }
+    } else setImageUploading(false);
+  };
 
   useEffect(() => {
     if (note && note.last_edited) {
@@ -90,6 +124,7 @@ export default function NewNote({ navigation, route }) {
                 onPress={async () => {
                   if (noteId) {
                     setEditMode(false);
+                    console.log(editContent);
                     await UpdateNote(
                       {
                         id: noteId,
@@ -154,31 +189,26 @@ export default function NewNote({ navigation, route }) {
               onChange={(newText) => {
                 setEditContent(newText);
               }}
-              initialHeight={height}
               disabled={!editMode}
               initialContentHTML={editContent}
+              initialHeight={height}
               initialFocus={true}
+              style={styles.richEditor}
             />
           </ScrollView>
           {editMode && (
             <RichToolbar
               editor={richText}
               selectedIconTint={'#2095F2'}
-              onPressAddImage={async () => {
-                const result = await ImagePicker.launchImageLibraryAsync({
-                  mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                  quality: 1,
-                  base64: true,
-                });
-                if (!result.canceled) {
-                  richText.current?.insertImage(`data:image/jpeg;base64,${result.assets[0].base64}`);
-                }
+              onPressAddImage={() => {
+                addImage(false);
               }}
               actions={[
                 actions.setBold,
                 actions.setItalic,
                 actions.setUnderline,
                 actions.insertImage,
+                'insertCamera',
                 actions.insertBulletsList,
                 actions.insertOrderedList,
                 actions.alignLeft,
@@ -189,12 +219,20 @@ export default function NewNote({ navigation, route }) {
                 actions.redo,
               ]}
               iconMap={{
-                [actions.heading1]: ({ tintColor }) => <Text style={[{ color: tintColor }]}>H1</Text>,
+                insertCamera: ({ tintColor }) => <Text style={[{ color: tintColor }]}>CAM</Text>,
                 [actions.heading2]: ({ tintColor }) => <Text style={[{ color: tintColor }]}>H1</Text>,
+              }}
+              insertCamera={() => {
+                addImage(true);
               }}
             />
           )}
         </KeyboardAvoidingView>
+        {imageUploading && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
       </SafeAreaView>
     </Fragment>
   );
@@ -234,7 +272,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   scrollView: {
-    paddingHorizontal: 4,
     backgroundColor: '#fff',
   },
   titleInput: {
@@ -248,5 +285,15 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: 10,
     fontSize: 12,
+  },
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 60,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.1)',
   },
 });
