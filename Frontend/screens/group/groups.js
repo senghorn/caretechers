@@ -8,13 +8,14 @@ import InviteLinkContext from '../../services/context/InviteLinkContext';
 import axios from 'axios';
 import config from '../../constants/config'
 import SocketContext from '../../services/context/SocketContext';
-
+import Spinner from 'react-native-loading-spinner-overlay';
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
   const inviteLinkContext = useContext(InviteLinkContext);
   const [groupName, setGroupName] = useState('');
   const [password, setPassword] = useState('');
   const [socket, setSocket] = useContext(SocketContext);
+  const [loading, setLoading] = useState(false);
   const processInviteLink = async () => {
     if (inviteLinkContext) {
       try {
@@ -40,6 +41,13 @@ export default function Groups({ navigation }) {
   return (
     <View style={styles.container}>
       <SafeAreaView>
+        <Spinner
+          color='#add8e6'
+          visible={loading}
+          textStyle={styles.spinnerTextStyle}
+          size={'large'}
+          animation='slide'
+        />
         <Button
           icon='home-plus'
           mode='contained'
@@ -82,6 +90,7 @@ export default function Groups({ navigation }) {
           icon='check-all'
           mode='contained'
           onPress={async () => {
+            setLoading(true);
             const joined = await joinGroupHandler(user, groupName, password);
             if (joined == true && user.id) {
               const result = await fetchUserByCookie(user.access_token);
@@ -101,6 +110,7 @@ export default function Groups({ navigation }) {
             } else {
               alert('Group name and/or password are incorrect!');
             }
+            setLoading(false);
           }}
           style={styles.createButton}
           color={colors.primary}
@@ -150,5 +160,9 @@ const styles = StyleSheet.create({
   createButton: {
     marginTop: 10,
     margin: 10,
+  },
+  spinnerTextStyle: {
+    color: '#FFF',
+    fontSize: 12
   },
 });
