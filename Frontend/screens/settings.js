@@ -7,7 +7,7 @@ import UserContext from '../services/context/UserContext';
 import { clearAsyncStorage } from '../services/storage/asyncStorage';
 import colors from '../constants/colors';
 import SocketContext from '../services/context/SocketContext';
-
+import Spinner from 'react-native-loading-spinner-overlay';
 export default function Settings({ navigation }) {
   const [notificationOn, setNotificationOn] = useState(false);
   const [username, setUsername] = useState('John Doe');
@@ -16,7 +16,7 @@ export default function Settings({ navigation }) {
   const [photo, setPhoto] = useState(require('../assets/favicon.png'));
   const [socket, setSocket] = useContext(SocketContext)
   const { user, setUser } = useContext(UserContext);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (user) {
       setUsername(user.first_name + ' ' + user.last_name);
@@ -28,6 +28,12 @@ export default function Settings({ navigation }) {
 
   return (
     <View>
+      <Spinner
+        color='#add8e6'
+        visible={loading}
+        textStyle={styles.spinnerTextStyle}
+        size={'large'}
+      />
       <Appbar.Header style={styles.headerContainer}>
         <Appbar.Action
           icon={'arrow-left'}
@@ -38,6 +44,7 @@ export default function Settings({ navigation }) {
         <Appbar.Content title={'Settings'} titleStyle={styles.title} />
       </Appbar.Header>
       <View style={styles.topHalf}>
+
         <View style={styles.profileContainer}>
           <View style={styles.leftContainer}>
             <Avatar.Image size={65} source={photo} style={styles.photo} />
@@ -114,6 +121,7 @@ export default function Settings({ navigation }) {
         style={styles.logout}
         labelStyle={styles.logoutButtonText}
         onPress={async () => {
+          setLoading(true);
           const clear = await clearAsyncStorage();
           if (clear) {
             socket.disconnect();
@@ -121,6 +129,7 @@ export default function Settings({ navigation }) {
             setUser({});
             navigation.navigate('Login');
           }
+          setLoading(false);
         }}
       >
         Logout

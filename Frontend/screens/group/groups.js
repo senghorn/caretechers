@@ -46,7 +46,6 @@ export default function Groups({ navigation }) {
           visible={loading}
           textStyle={styles.spinnerTextStyle}
           size={'large'}
-          animation='slide'
         />
         <Button
           icon='home-plus'
