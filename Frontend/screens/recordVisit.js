@@ -155,11 +155,7 @@ export default function RecordVisit({ navigation }) {
               canCheck={true}
             />
           )}
-          {selected === 'Notes' && (
-            <SafeAreaView style={styles.taskAndNotesContainer}>
-              <VisitNotes editMode editContent={visitNotes} setEditContent={setVisitNotes} />
-            </SafeAreaView>
-          )}
+          {selected === 'Notes' && <VisitNotes editMode editContent={visitNotes} setEditContent={setVisitNotes} />}
         </View>
       </View>
     </View>

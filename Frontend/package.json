@@ -48,6 +48,7 @@
     "react-native-gesture-handler": "~2.8.0",
     "react-native-get-random-values": "^1.8.0",
     "react-native-gifted-chat": "^1.0.4",
+    "react-native-keyboard-aware-scrollview": "^2.1.0",
     "react-native-paper": "^4.12.5",
     "react-native-pell-rich-editor": "^1.8.8",
     "react-native-pure-jwt": "^3.0.1",

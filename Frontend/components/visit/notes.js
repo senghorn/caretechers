@@ -1,47 +1,103 @@
 import { Fragment, useRef, useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, View, ScrollView, StyleSheet, Text } from 'react-native';
+import { Dimensions, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
+
+import { ActivityIndicator } from 'react-native-paper';
+import * as ImagePicker from 'expo-image-picker';
+import uploadImage from '../../services/s3/uploadImage';
 
 const { height } = Dimensions.get('window').height;
 
 export default function VisitNotes({ editMode, editContent, setEditContent }) {
   const richText = useRef();
+
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const addImage = async (isCamera = false) => {
+    setImageUploading(true);
+    const result = isCamera
+      ? await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.5,
+          base64: true,
+        })
+      : await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.5,
+          base64: true,
+        });
+    if (!result.canceled) {
+      try {
+        const imageUrl = await uploadImage(result.assets[0].base64);
+        console.log(imageUrl);
+        richText.current?.insertHTML(
+          `
+            <div align="center" >
+              <img src="${imageUrl}" style="height: 500px;" />
+            </div>
+          `
+        );
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setImageUploading(false);
+      }
+    } else setImageUploading(false);
+  };
+
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-      {editMode && (
-        <RichToolbar
-          editor={richText}
-          selectedIconTint={'#2095F2'}
-          actions={[
-            actions.setBold,
-            actions.setItalic,
-            actions.setUnderline,
-            actions.insertBulletsList,
-            actions.insertOrderedList,
-            actions.alignLeft,
-            actions.alignCenter,
-            actions.alignRight,
-            actions.undo,
-            actions.redo,
-          ]}
-          iconMap={{
-            [actions.heading1]: ({ tintColor }) => <Text style={[{ color: tintColor }]}>H1</Text>,
-            [actions.heading2]: ({ tintColor }) => <Text style={[{ color: tintColor }]}>H1</Text>,
-          }}
-        />
+    <Fragment>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+        {editMode && (
+          <RichToolbar
+            editor={richText}
+            selectedIconTint={'#2095F2'}
+            onPressAddImage={() => {
+              addImage(false);
+            }}
+            actions={[
+              actions.setBold,
+              actions.setItalic,
+              actions.setUnderline,
+              actions.insertImage,
+              'insertCamera',
+              actions.insertBulletsList,
+              actions.insertOrderedList,
+              actions.alignLeft,
+              actions.alignCenter,
+              actions.alignRight,
+              actions.heading2,
+              actions.undo,
+              actions.redo,
+            ]}
+            iconMap={{
+              insertCamera: ({ tintColor }) => <Text style={[{ color: tintColor }]}>CAM</Text>,
+              [actions.heading2]: ({ tintColor }) => <Text style={[{ color: tintColor }]}>H1</Text>,
+            }}
+            insertCamera={() => {
+              addImage(true);
+            }}
+          />
+        )}
+        <ScrollView style={styles.scrollView}>
+          <RichEditor
+            ref={richText}
+            onChange={(newText) => {
+              setEditContent(newText);
+            }}
+            initialHeight={height}
+            initialFocus={true}
+            disabled={!editMode}
+            initialContentHTML={editContent}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
+      {imageUploading && (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" style={{ transform: [{ translateY: -200 }] }} />
+        </View>
       )}
-      <ScrollView style={styles.scrollView}>
-        <RichEditor
-          ref={richText}
-          onChange={(newText) => {
-            setEditContent(newText);
-          }}
-          initialHeight={height}
-          disabled={!editMode}
-          initialContentHTML={editContent}
-        />
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </Fragment>
   );
 }
 
@@ -63,7 +119,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollView: {
-    paddingHorizontal: 4,
     backgroundColor: '#fff',
+  },
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.1)',
   },
 });
