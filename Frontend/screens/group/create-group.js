@@ -5,10 +5,13 @@ import colors from '../../constants/colors';
 import { createNewGroup } from '../../services/api/groups';
 import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
-
+import SocketContext from '../../services/context/SocketContext';
+import Spinner from 'react-native-loading-spinner-overlay';
 export default function CreateGroup({ navigation, route }) {
   const { user, setUser } = useContext(UserContext);
   const [groupName, setGroupName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [socket, setSocket] = useContext(SocketContext);
   useEffect(() => {
     if (user != null && user.first_name) {
       setGroupName(user.first_name + ' ' + user.last_name + ' Family');
@@ -17,6 +20,12 @@ export default function CreateGroup({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Spinner
+        color='#add8e6'
+        visible={loading}
+        textStyle={styles.spinnerTextStyle}
+        size={'large'}
+      />
       <Appbar.Header style={styles.appbar}>
         <Appbar.Action
           icon='chevron-left'
@@ -50,16 +59,22 @@ export default function CreateGroup({ navigation, route }) {
         icon='check-all'
         mode='contained'
         onPress={async () => {
+          setLoading(true);
           const create = await createGroup(groupName, user);
           if (create) {
             const fetchedUser = await fetchUserByCookie(user.access_token);
+            console.log('fetched user', fetchedUser);
             setUser({
               "access_token": user.access_token, "curr_group": fetchedUser.curr_group, "id": fetchedUser.id,
               "first_name": fetchedUser.first_name, "last_name": fetchedUser.last_name, "profile_pic": fetchedUser.profile_pic,
               "phone_num": fetchedUser.phone_num
             })
+            socket.disconnect();
+            setSocket(null);
+            setLoading(false);
             navigation.navigate('Home');
           }
+          setLoading(false);
         }}
         style={styles.createButton}
         color={colors.primary}
