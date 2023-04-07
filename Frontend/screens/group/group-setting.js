@@ -1,6 +1,7 @@
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Alert, Share } from 'react-native';
 import { Appbar, IconButton, Avatar, Divider, Text, TextInput, ActivityIndicator } from 'react-native-paper';
 import { useState, useEffect, useContext } from 'react';
+import { ContentLoader, Bullets } from "react-native-easy-content-loader";
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
 import { resetGroupPassword } from '../../services/api/groups';
@@ -166,9 +167,9 @@ export default function GroupSettings({ navigation }) {
             <Text style={styles.buttonTitle}>Leave</Text>
           </View>
         </View>
-        {loading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
         <View style={styles.memberListBox}>
           <Text style={styles.membersTitle}>Members</Text>
+          <Bullets active listSize={5} loading={loading} />
           <GroupMemberList members={members} />
         </View>
       </View>
