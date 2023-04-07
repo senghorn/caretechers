@@ -77,9 +77,12 @@ export default function Metrics({ navigation }) {
   };
 
   useEffect(() => {
-    setIsLoading(true);
-    getGraphs(user.access_token);
-    setIsLoading(false);
+    const fetcher = async () => {
+      setIsLoading(true);
+      await getGraphs(user.access_token);
+      setIsLoading(false);
+    }
+    fetcher();
   }, []);
 
   return (

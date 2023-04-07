@@ -9,13 +9,14 @@ import UserContext from '../services/context/UserContext';
 import { fetchUserByCookie } from '../services/api/user';
 import { setAPIAccessToken, setAPIResetToken, getAPIAccessToken, clearAsyncStorage } from '../services/storage/asyncStorage';
 import { validateTokens } from '../utils/accessController';
-
+import Spinner from 'react-native-loading-spinner-overlay';
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleLogin({ navigation }) {
   const { setUser } = useContext(UserContext);
   const [accessToken, setAccessToken] = useState(null);
   const [cookies, setCookies] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
       '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
@@ -74,10 +75,12 @@ export default function GoogleLogin({ navigation }) {
               }
             );
             let data = await userInfoResponse.json();
+            setLoading(false);
             navigation.navigate('RegisterUser', { googleData: data, googleToken: accessToken });
           }
         }
         else {
+          setLoading(false);
           console.log('Cannot get access token');
         }
       }
@@ -102,8 +105,10 @@ export default function GoogleLogin({ navigation }) {
           "phone_num": result.phone_num
         });
         if (result.curr_group) {
+          setLoading(false);
           navigation.navigate('Home');
         } else {
+          setLoading(false);
           navigation.navigate('Group');
         }
       } else {
@@ -112,11 +117,18 @@ export default function GoogleLogin({ navigation }) {
     } catch (error) {
       console.log('get user data error:', error);
     }
+    setLoading(false);
   }
 
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.container}>
+        <Spinner
+          color='#add8e6'
+          visible={loading}
+          textStyle={styles.spinnerTextStyle}
+          size={'large'}
+        />
         <View style={styles.wFull}>
           <View style={styles.row}>
             <Text style={styles.welcomeText}>Welcome to CareCoord!</Text>
@@ -135,8 +147,9 @@ export default function GoogleLogin({ navigation }) {
             backgroundColor='#FFFFFF'
             size={35}
             iconStyle={styles.icon}
-            onPress={() => {
-              loginHandler();
+            onPress={async () => {
+              setLoading(true);
+              await loginHandler();
             }}
           >
             <Text style={styles.loginText}>Login with Google</Text>
