@@ -5,6 +5,7 @@ import { Divider } from 'react-native-paper';
 import { createUser, fetchUserByCookie } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
+import Spinner from 'react-native-loading-spinner-overlay';
 import { getAccessToken } from '../../services/api/auth';
 import { setAPIAccessToken, setAPIResetToken } from '../../services/storage/asyncStorage';
 export default function Inputs({ route, navigation }) {
@@ -17,7 +18,7 @@ export default function Inputs({ route, navigation }) {
   const [missLastName, setMissLastName] = useState(true);
   const { googleData, googleToken } = route.params;
   const { user, setUser } = useContext(UserContext);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (googleData != undefined) {
       setUserName(googleData['given_name']);
@@ -74,6 +75,7 @@ export default function Inputs({ route, navigation }) {
     } else if (phoneNumber.length < 12) {
       setPhoneMissing(true);
     } else {
+      setLoading(true);
       const accessToken = await getAccessToken(googleToken);
       const userCreated = await createUser(
         userName,
@@ -93,16 +95,24 @@ export default function Inputs({ route, navigation }) {
             "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
             "phone_num": result.phone_num
           });
+          setLoading(false);
           navigation.navigate('Group');
         }
       } else {
         console.log('user created unsuccessful');
       }
+      setLoading(false);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <Spinner
+        color='#add8e6'
+        visible={loading}
+        textStyle={styles.spinnerTextStyle}
+        size={'large'}
+      />
       <Text style={styles.title}>Register User</Text>
       <Divider />
       <TextInput
