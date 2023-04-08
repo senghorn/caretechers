@@ -33,20 +33,7 @@ export default function Messages({ navigation }) {
   const [socket, setSocket] = useContext(SocketContext);
   const [imageUploading, setImageUploading] = useState(false);
 
-
-  const getSmallestMessageId = () => {
-    let result = 0;
-    if (messages && messages.length > 0) {
-      result = messages[0]._id;
-      messages.forEach((message) => {
-        if (message._id < result) {
-          result = message._id;
-        }
-      })
-    }
-    return result;
-  }
-
+  // *****Fetch initial data*****
   const { data, isLoading, error, mutate } = useSWR(
     [config.backend_server + '/messages/fetch/' + user.curr_group,
       {
@@ -54,6 +41,12 @@ export default function Messages({ navigation }) {
       }],
     ([url, token]) => fetcher(url, token)
   );
+  useEffect(() => {
+    if (user) {
+      FetchUsers(user, setUsers, setThisUser, user.access_token);
+    }
+  }, [user]);
+
 
   useEffect(() => {
     if (!isLoading && data && users) {
@@ -83,16 +76,44 @@ export default function Messages({ navigation }) {
     }
   }
 
+  const getSmallestMessageId = () => {
+    let result = 0;
+    if (messages && messages.length > 0) {
+      result = messages[0]._id;
+      messages.forEach((message) => {
+        if (message._id < result) {
+          result = message._id;
+        }
+      })
+    }
+    return result;
+  }
+
+  // *****Image handlers*****
   const addImage = async (isCamera = false) => {
+    if (isCamera) {
+      const camPermission = await ImagePicker.getCameraPermissionsAsync();
+      if (!camPermission.granted) {
+        await ImagePicker.requestCameraPermissionsAsync();
+      }
+    } else {
+      const mediaPermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+      if (!mediaPermission.granted) {
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      }
+    }
+
     setImageUploading(true);
     const result = isCamera
       ? await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
         quality: 0.5,
         base64: true,
       })
       : await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
         quality: 0.5,
         base64: true,
       });
@@ -112,12 +133,15 @@ export default function Messages({ navigation }) {
     } else setImageUploading(false);
   };
 
-  // Fetch all the users in the group for their profile photos
+  // Getting user permission to access photo gallery
+  const [hasGalPermission, setGalPermission] = useState(null);
   useEffect(() => {
-    if (user) {
-      FetchUsers(user, setUsers, setThisUser, user.access_token);
-    }
-  }, [user]);
+    (async () => {
+      const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
+      setGalPermission(galleryStatus.status === "granted");
+    })();
+  }, []);
+
 
   useEffect(() => {
     if (
