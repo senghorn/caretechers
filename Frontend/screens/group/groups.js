@@ -1,5 +1,5 @@
 import { SafeAreaView, StyleSheet, View } from 'react-native';
-import { TextInput, Text, Button } from 'react-native-paper';
+import { TextInput, Text, Button, Appbar } from 'react-native-paper';
 import { useState, useContext, useEffect } from 'react';
 import colors from '../../constants/colors';
 import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
@@ -47,6 +47,10 @@ export default function Groups({ navigation }) {
           textStyle={styles.spinnerTextStyle}
           size={'large'}
         />
+        <Appbar style={styles.headerContainer}>
+          <Appbar.BackAction onPress={() => navigation.navigate("GroupSelector")} />
+          <Appbar.Content title="Join group" titleStyle={styles.title} />
+        </Appbar>
         <Button
           icon='home-plus'
           mode='contained'
@@ -136,6 +140,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.warmWhite,
     overflow: 'scroll',
+  },
+  headerContainer: {
+    backgroundColor: 'transparent',
+    flex: 0,
+    width: '100%',
   },
   header: {
     marginTop: 10,

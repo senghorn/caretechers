@@ -3,6 +3,7 @@ import BottomNavigation from './BottomNavigation';
 import GoogleLogin from '../../screens/google';
 import RegisterUser from '../../screens/user/register-user';
 import Groups from '../../screens/group/groups';
+import GroupSelector from '../../screens/group/group-selector';
 import CreateGroup from '../../screens/group/create-group';
 import Visit from '../../screens/visit';
 import Task from '../../screens/task';
@@ -161,6 +162,7 @@ export default function Navigation({ expoPushToken, inviteToken }) {
                           <Stack.Screen name="Metrics" component={Metrics} options={{ headerShown: false }} />
                           <Stack.Screen name="EditGraph" component={EditGraph} options={{ headerShown: false }} />
                           <Stack.Screen name="PinnedMessages" component={PinnedMessages} options={{ headerShown: false }} />
+                          <Stack.Screen name="GroupSelector" component={GroupSelector} options={{ headerShown: false }} />
                         </Stack.Navigator>
                       </InviteLinkContext.Provider>
                     </RecordVisitContext.Provider>

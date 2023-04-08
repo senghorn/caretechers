@@ -106,10 +106,10 @@ export default function GoogleLogin({ navigation }) {
         });
         if (result.curr_group) {
           setLoading(false);
-          navigation.navigate('Home');
+          navigation.navigate('GroupSelector');
         } else {
           setLoading(false);
-          navigation.navigate('Group');
+          navigation.navigate('GroupSelector');
         }
       } else {
         console.log('Fetch user data error while trying to retrieve user info.');
