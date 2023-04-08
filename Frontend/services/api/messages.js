@@ -214,7 +214,6 @@ export async function FetchUsers(user, setUsers, setThisUser, cookie) {
             })
           }
         });
-
         setUsers(users);
         return response.data;
       })
