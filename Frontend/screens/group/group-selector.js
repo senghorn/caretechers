@@ -1,10 +1,41 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
-import { SafeAreaView } from 'react-native'
+import { SafeAreaView, Text, StyleSheet, ScrollView } from 'react-native'
+import { useContext, useState, useEffect } from 'react'
 import { Appbar } from 'react-native-paper'
 import GroupCard from '../../components/group/group-card'
 import colors from '../../constants/colors'
+import UserContext from '../../services/context/UserContext'
 
 export default function GroupSelector({ navigation }) {
+    const { user } = useContext(UserContext);
+    const [groupList, setGroupList] = useState([]);
+    const [selectedGroup, setSelectedGroup] = useState(null);
+    const [groups, setGroups] = useState([]);
+    useEffect(() => {
+        if (user && user.groups) {
+            setGroups(user.groups);
+        }
+    }, [user])
+
+    useEffect(() => {
+        if (selectedGroup) {
+            // Set user data depending on which group was selected
+            console.log('group selected', selectedGroup);
+            navigation.navigate('Home');
+        }
+    }, [selectedGroup]);
+
+    useEffect(() => {
+        if (groups) {
+            setGroupList(
+                <ScrollView style={styles.groupList}>
+                    {groups.map((group) => {
+                        return <GroupCard group={group} key={group.group_id} setSelected={setSelectedGroup} />
+                    })}
+                </ScrollView>
+            );
+        }
+    }, [groups])
+
     return (
         <SafeAreaView style={styles.container} >
             <Appbar style={styles.headerContainer}>
@@ -12,9 +43,7 @@ export default function GroupSelector({ navigation }) {
                 <Appbar.Action icon="plus" onPress={() => navigation.navigate("Group")} style={styles.joinGroupButton} />
             </Appbar>
             <Text style={styles.welcomeMessage}>Select a group or join a new one!</Text>
-            <ScrollView style={styles.groupList}>
-                <GroupCard />
-            </ScrollView>
+            {groupList}
         </SafeAreaView>
     )
 }
@@ -35,7 +64,7 @@ const styles = StyleSheet.create({
 
     },
     groupList: {
-        marginTop: 40
+        marginTop: 20
     },
     headerContainer: {
         backgroundColor: 'transparent',

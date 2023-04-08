@@ -52,7 +52,7 @@ export default function GroupSettings({ navigation }) {
           ...prevUser,
           curr_group: null
         }));
-        navigation.navigate('Group');
+        navigation.navigate('GroupSelector');
       } else {
         alert('Cannot leave group.');
       }

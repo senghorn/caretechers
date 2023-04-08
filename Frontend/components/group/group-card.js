@@ -3,15 +3,16 @@ import colors from '../../constants/colors';
 import { Avatar } from 'react-native-paper';
 
 /**
+ * A reusable component that displays a card representing a group.
+ *
+ * @param {Function} setSelected - A function that is called when the user presses the card. The selected group is passed as an argument.
+ * @param {Object} group - An object that contains information about the group. Must have 'group_id', 'name', and 'password' fields.
  * 
- * @param { group_logo, name, role} 
- * @returns 
+ * @returns A TouchableOpacity component that displays the group's name and logo.
  */
 export default function GroupCard({ setSelected, group }) {
-
     const onTouch = () => {
-        // setSelected(group);
-        console.log('on pressed');
+        setSelected(group);
     }
 
     return (
@@ -21,7 +22,7 @@ export default function GroupCard({ setSelected, group }) {
                     <Avatar.Image size={34} source={require('../../assets/house.jpg')} />
                 </View>
                 <View style={styles.name}>
-                    <Text>Jackson's Fam</Text>
+                    <Text>{group.name}</Text>
                 </View>
                 <View style={styles.role}>
 
