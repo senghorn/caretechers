@@ -106,6 +106,7 @@ export default function GoogleLogin({ navigation }) {
         });
         if (result.curr_group) {
           setLoading(false);
+          // Instead, go Home
           navigation.navigate('GroupSelector');
         } else {
           setLoading(false);

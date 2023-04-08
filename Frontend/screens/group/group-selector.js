@@ -3,10 +3,13 @@ import { useContext, useState, useEffect } from 'react'
 import { Appbar } from 'react-native-paper'
 import GroupCard from '../../components/group/group-card'
 import colors from '../../constants/colors'
+import { changeUserCurrGroup, fetchUserByCookie } from '../../services/api/user'
 import UserContext from '../../services/context/UserContext'
+import SocketContext from '../../services/context/SocketContext'
 
 export default function GroupSelector({ navigation }) {
-    const { user } = useContext(UserContext);
+    const { setUser, user } = useContext(UserContext);
+    const [socket, setSocket] = useContext(SocketContext);
     const [groupList, setGroupList] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [groups, setGroups] = useState([]);
@@ -18,9 +21,21 @@ export default function GroupSelector({ navigation }) {
 
     useEffect(() => {
         if (selectedGroup) {
-            // Set user data depending on which group was selected
-            console.log('group selected', selectedGroup);
-            navigation.navigate('Home');
+            const handleSelected = async () => {
+                await changeUserCurrGroup(user.access_token, user.id, selectedGroup.group_id);
+                socket.disconnect();
+                setSocket(null);
+                const result = await fetchUserByCookie(user.access_token);
+                if (result) {
+                    setUser({
+                        "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
+                        "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+                        "phone_num": result.phone_num, "groups": result.groups
+                    });
+                    navigation.navigate('Home');
+                }
+            }
+            handleSelected();
         }
     }, [selectedGroup]);
 
