@@ -101,7 +101,7 @@ export default function Groups({ navigation }) {
                 setUser({
                   "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
                   "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-                  "phone_num": result.phone_num
+                  "phone_num": result.phone_num, "groups": result.groups
                 });
                 socket.disconnect();
                 setSocket(null);
