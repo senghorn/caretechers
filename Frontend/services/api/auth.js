@@ -2,10 +2,10 @@ import config from '../../constants/config';
 import axios from 'axios';
 
 /**
- * Given a google access token, it sends a login request and returns back cookies.
- * If login fails, it returns null.
- * @param {String} token | Google access token
- * @returns 
+ * Sends a login request with the given google access token and returns back cookies.
+ * If login fails, returns null.
+ * @param {string} token - Google access token
+ * @returns {Promise} - A promise that resolves with the cookies or null if login fails.
  */
 export async function getAccessToken(token) {
     try {
@@ -30,8 +30,9 @@ export async function getAccessToken(token) {
 }
 
 /**
- * Given a reset token, returns back an access token.
- * @param {string} token 
+ * Given a reset token, returns an access token.
+ * @param {string} token - Reset token
+ * @returns {Promise} - A promise that resolves with the access token or null if the request fails.
  */
 export async function regenerateAccessToken(token) {
     try {
