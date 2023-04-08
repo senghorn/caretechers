@@ -107,13 +107,11 @@ export default function Messages({ navigation }) {
     const result = isCamera
       ? await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
         quality: 0.5,
         base64: true,
       })
       : await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
         quality: 0.5,
         base64: true,
       });
@@ -133,14 +131,24 @@ export default function Messages({ navigation }) {
     } else setImageUploading(false);
   };
 
-  // Getting user permission to access photo gallery
-  const [hasGalPermission, setGalPermission] = useState(null);
-  useEffect(() => {
-    (async () => {
-      const galleryStatus = await ImagePicker.requestCameraPermissionsAsync();
-      setGalPermission(galleryStatus.status === "granted");
-    })();
-  }, []);
+  const imageButtonPressHandler = () => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Camera', 'Photo Gallery'],
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'dark',
+      },
+      buttonIndex => {
+        if (buttonIndex === 0) {
+
+        } else if (buttonIndex === 1) {
+          addImage(true);
+        } else if (buttonIndex === 2) {
+          addImage(false);
+        }
+      },
+    );
+  }
 
 
   useEffect(() => {
@@ -236,7 +244,7 @@ export default function Messages({ navigation }) {
       <IconButton
         icon="image-plus"
         size={25}
-        onPress={() => addImage(true)}
+        onPress={imageButtonPressHandler}
       />
     )
   }
