@@ -77,15 +77,72 @@ module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res
     return next(newError('Group does not exist or password is wrong!', 404));
   }
 
-  query = sql`DELETE FROM GroupMembers WHERE member_id=${req.params.userId} AND group_id=${group.id};
+  if(req.body.adminStatus) {
+    if(req.body.adminStatus == 2){
+      query = sql`SELECT * FROM GroupMembers WHERE admin_status = 2 AND group_id=${group.id} AND active = TRUE;`;
+
+      let [rootAdmin] = await db.query(query);
+      if (rootAdmin) {
+        return next(newError('Only one root administrator allowed.', 400));
+      }
+    } else if(!(req.body.adminStatus == 0 || req.body.adminStatus == 1 || req.body.adminStatus == 2)) {
+      return next(newError('Value of adminStatus must be 0, 1, or 2.', 400));
+    }
+
+    query = sql`DELETE FROM GroupMembers WHERE member_id=${req.params.userId} AND group_id=${group.id};
+    INSERT INTO GroupMembers(group_id, member_id, active, admin_status)
+    VALUES (${group.id}, ${req.params.userId}, TRUE, ${req.body.adminStatus});UPDATE Users SET curr_group=${group.id}
+    WHERE email=${req.params.userId};
+  `;
+  } else {
+    query = sql`DELETE FROM GroupMembers WHERE member_id=${req.params.userId} AND group_id=${group.id};
     INSERT INTO GroupMembers(group_id, member_id, active)
     VALUES (${group.id}, ${req.params.userId}, TRUE);UPDATE Users SET curr_group=${group.id}
     WHERE email=${req.params.userId};
   `;
+  }
+  
   result = await db.query(query);
   if (result.affectedRows == 0) {
     return next(newError('Cannot join the group!', 400));
   }
+  next();
+});
+
+module.exports.changeUserAdminStatus = asyncHandler(async (req, _res, next) => {
+  if (!req.body.groupId || !req.body.adminStatus) {
+    return next(newError('Request body is incorrect.', 400));
+  }
+
+  let query;
+
+  if(req.body.adminStatus == 2){ 
+    query = sql`SELECT * FROM GroupMembers WHERE admin_status = 2 AND group_id=${group.id} AND active = TRUE;`;
+
+    let [rootAdmin] = await db.query(query);
+    if (rootAdmin) {
+      return next(newError('Only one root administrator allowed.', 400));
+    }
+  } else if(!(req.body.adminStatus == 0 || req.body.adminStatus == 1 || req.body.adminStatus == 2)) {
+    return next(newError('Value of adminStatus must be 0, 1, or 2.', 400));
+  }
+
+  query = sql`UPDATE GroupMembers SET GroupMembers.admin_status = ${req.body.adminStatus} WHERE member_id=${req.params.userId} AND group_id=${!req.body.groupId};
+  `;
+
+  await db.query(query);
+  next();
+});
+
+module.exports.getUserAdminStatus = asyncHandler(async (req, _res, next) => {
+  if (!req.body.groupId) {
+    return next(newError('Request body is incorrect.', 400));
+  }
+
+  let query = sql`SELECT admin_status FROM GroupMembers WHERE member_id = ${req.params.userId} AND group_id=${group.id} AND active = TRUE;`;
+
+  const [result] = await db.query(query);
+  req.result = result;
   next();
 });
 

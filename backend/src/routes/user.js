@@ -27,6 +27,10 @@ router.put('/:userId/identifier', [userMiddleware.setUserNotificationIdentifier,
 
 router.post('/:userId/group/join', [userMiddleware.verifyUserExists, userMiddleware.addUserToGroupWithNameAndPassword, sharedMiddleware.sendNoResult]);
 
+router.patch('/adminStatus/:userId', [userMiddleware.verifyUserExists, userMiddleware.changeUserAdminStatus, sharedMiddleware.sendNoResult]);
+
+router.get('/adminStatus/:userId', [userMiddleware.verifyUserExists, userMiddleware.getUserAdminStatus, sharedMiddleware.sendResult]);
+
 module.exports = router;
 
 // SCHEMA DEFINITION
