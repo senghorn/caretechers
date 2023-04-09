@@ -11,11 +11,12 @@ import useSWR from 'swr';
 import SocketContext from '../../services/context/SocketContext';
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { setUserDataInfo } from '../../utils/userController';
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 export default function GroupSettings({ navigation }) {
   const { setUser, user } = useContext(UserContext);
-  const { data, isLoading, error, mutate } = useSWR([config.backend_server + '/groups/info/' + user.curr_group,
+  const { data, isLoading, error, mutate } = useSWR([config.backend_server + '/groups/info/active/' + user.curr_group,
   {
     headers: { 'Authorization': 'Bearer ' + user.access_token }
   }],
@@ -46,15 +47,11 @@ export default function GroupSettings({ navigation }) {
     if (user && user.id && user.curr_group) {
       const removed = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
       if (removed == true) {
-        const result = await fetchUserByCookie(user.access_token);
+        // const result = await fetchUserByCookie(user.access_token);
+        const result = await setUserDataInfo(setUser, user.access_token);
         if (result) {
           socket.disconnect();
           setSocket(null);
-          setUser({
-            "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
-            "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-            "phone_num": result.phone_num, "groups": result.groups
-          });
         } else {
           console.log('Fetch user data after removed group from failed');
         }

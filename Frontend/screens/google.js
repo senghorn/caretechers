@@ -10,10 +10,12 @@ import { fetchUserByCookie } from '../services/api/user';
 import { setAPIAccessToken, setAPIResetToken, getAPIAccessToken, clearAsyncStorage } from '../services/storage/asyncStorage';
 import { validateTokens } from '../utils/accessController';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { setUserDataInfo } from '../utils/userController';
+
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleLogin({ navigation }) {
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [accessToken, setAccessToken] = useState(null);
   const [cookies, setCookies] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -97,14 +99,10 @@ export default function GoogleLogin({ navigation }) {
   async function AuthenticatedUserHandler() {
     try {
       const access_token = await getAPIAccessToken();
-      const result = await fetchUserByCookie(access_token);
+      // const result = await fetchUserByCookie(access_token);
+      const result = await setUserDataInfo(setUser, access_token);
       if (result) {
-        setUser({
-          "access_token": access_token, "curr_group": result.curr_group, "id": result.id,
-          "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-          "phone_num": result.phone_num, "groups": result.groups
-        });
-        if (result.curr_group) {
+        if (user.curr_group) {
           setLoading(false);
           // Instead, go Home
           navigation.navigate('GroupSelector');

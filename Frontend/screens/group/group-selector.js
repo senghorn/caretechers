@@ -7,6 +7,7 @@ import { changeUserCurrGroup, fetchUserByCookie } from '../../services/api/user'
 import UserContext from '../../services/context/UserContext'
 import SocketContext from '../../services/context/SocketContext'
 import Spinner from 'react-native-loading-spinner-overlay';
+import { setUserDataInfo } from '../../utils/userController'
 export default function GroupSelector({ navigation }) {
     const { setUser, user } = useContext(UserContext);
     const [loading, setLoading] = useState(false);
@@ -30,13 +31,9 @@ export default function GroupSelector({ navigation }) {
                     await changeUserCurrGroup(user.access_token, user.id, selectedGroup.group_id);
                     socket.disconnect();
                     setSocket(null);
-                    const result = await fetchUserByCookie(user.access_token);
+                    const result = await setUserDataInfo(setUser, user.access_token);
+                    // const result = await fetchUserByCookie(user.access_token);
                     if (result) {
-                        setUser({
-                            "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
-                            "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-                            "phone_num": result.phone_num, "groups": result.groups
-                        });
                         setNavigatedToHome(true);
                         navigation.navigate('Home');
                     }

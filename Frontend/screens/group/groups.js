@@ -9,6 +9,7 @@ import axios from 'axios';
 import config from '../../constants/config'
 import SocketContext from '../../services/context/SocketContext';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { setUserDataInfo } from '../../utils/userController';
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
   const inviteLinkContext = useContext(InviteLinkContext);
@@ -96,13 +97,9 @@ export default function Groups({ navigation }) {
             setLoading(true);
             const joined = await joinGroupHandler(user, groupName, password);
             if (joined == true && user.id) {
-              const result = await fetchUserByCookie(user.access_token);
-              if (result && result.curr_group) {
-                setUser({
-                  "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
-                  "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-                  "phone_num": result.phone_num, "groups": result.groups
-                });
+              // const result = await fetchUserByCookie(user.access_token);
+              const result = setUserDataInfo(setUser, user.access_token);
+              if (result && user && user.curr_group) {
                 socket.disconnect();
                 setSocket(null);
                 navigation.navigate('Home');

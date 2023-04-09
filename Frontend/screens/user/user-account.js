@@ -42,7 +42,8 @@ export default function UserAccount({ navigation, route, newUser }) {
             profile_pic: user.profile_pic,
             phone_num: phone,
             access_token: user.access_token,
-            groups: user.groups
+            groups: user.groups,
+            admin_status: user.admin_status
           });
         }
       })();
