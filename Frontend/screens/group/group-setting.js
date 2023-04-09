@@ -5,7 +5,7 @@ import { Bullets } from "react-native-easy-content-loader";
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
 import { resetGroupPassword } from '../../services/api/groups';
-import { RemoveUserFromGroup } from '../../services/api/user';
+import { RemoveUserFromGroup, fetchUserByCookie } from '../../services/api/user';
 import config from '../../constants/config';
 import useSWR from 'swr';
 import SocketContext from '../../services/context/SocketContext';
@@ -44,15 +44,21 @@ export default function GroupSettings({ navigation }) {
 
   const LeaveGroup = async () => {
     if (user && user.id && user.curr_group) {
-      const result = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
-      if (result == true) {
-        socket.disconnect();
-        setSocket(null);
-        setUser(prevUser => ({
-          ...prevUser,
-          curr_group: null
-        }));
-        navigation.navigate('Group');
+      const removed = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
+      if (removed == true) {
+        const result = await fetchUserByCookie(user.access_token);
+        if (result) {
+          socket.disconnect();
+          setSocket(null);
+          setUser({
+            "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
+            "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+            "phone_num": result.phone_num, "groups": result.groups
+          });
+        } else {
+          console.log('Fetch user data after removed group from failed');
+        }
+        navigation.navigate('GroupSelector');
       } else {
         alert('Cannot leave group.');
       }
@@ -130,6 +136,7 @@ export default function GroupSettings({ navigation }) {
           }}
         />
         <Appbar.Content title={'Group'} titleStyle={styles.title} />
+        <Appbar.Action icon="dots-horizontal" onPress={() => { navigation.navigate('GroupSelector') }} />
       </Appbar.Header>
       <View style={styles.bodyContainer}>
         <ImageBackground

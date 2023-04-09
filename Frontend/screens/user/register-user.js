@@ -93,7 +93,7 @@ export default function Inputs({ route, navigation }) {
           setUser({
             "access_token": accessToken.accessToken, "curr_group": result.curr_group, "id": result.id,
             "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-            "phone_num": result.phone_num
+            "phone_num": result.phone_num, "groups": result.groups
           });
           setLoading(false);
           navigation.navigate('Group');

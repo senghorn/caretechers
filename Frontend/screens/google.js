@@ -102,14 +102,15 @@ export default function GoogleLogin({ navigation }) {
         setUser({
           "access_token": access_token, "curr_group": result.curr_group, "id": result.id,
           "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-          "phone_num": result.phone_num
+          "phone_num": result.phone_num, "groups": result.groups
         });
         if (result.curr_group) {
           setLoading(false);
-          navigation.navigate('Home');
+          // Instead, go Home
+          navigation.navigate('GroupSelector');
         } else {
           setLoading(false);
-          navigation.navigate('Group');
+          navigation.navigate('GroupSelector');
         }
       } else {
         console.log('Fetch user data error while trying to retrieve user info.');

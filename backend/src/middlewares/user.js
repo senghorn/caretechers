@@ -130,6 +130,20 @@ module.exports.getUserByToken = asyncHandler(async (req, _res, next) => {
   if (!result) {
     return next(newError('This user does not exist', 404));
   }
+
+  const activeGroupQuery = sql`SELECT * FROM GroupMembers gm
+  JOIN \`Groups\` g ON g.id = gm.group_id
+  WHERE gm.member_id = ${req.user.id} AND gm.active = 1;`;
+  const groups = await db.query(activeGroupQuery);
+  let allGroups = [];
+  groups.forEach(g => {
+    allGroups.push({
+      group_id: g.group_id,
+      name: g.name,
+      password: g.password,
+      timezone: g.timezone
+    })
+  })
   req.result = {
     curr_group: result.curr_group,
     id: result.email,
@@ -138,6 +152,7 @@ module.exports.getUserByToken = asyncHandler(async (req, _res, next) => {
     profile_pic: result.profile_pic,
     phone_num: result.phone_num,
     notification_identifier: result.notification_identifier,
+    groups: allGroups
   };
   next();
 });

@@ -67,7 +67,7 @@ export default function CreateGroup({ navigation, route }) {
             setUser({
               "access_token": user.access_token, "curr_group": fetchedUser.curr_group, "id": fetchedUser.id,
               "first_name": fetchedUser.first_name, "last_name": fetchedUser.last_name, "profile_pic": fetchedUser.profile_pic,
-              "phone_num": fetchedUser.phone_num
+              "phone_num": fetchedUser.phone_num, "groups": fetchedUser.groups
             })
             socket.disconnect();
             setSocket(null);

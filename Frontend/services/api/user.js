@@ -202,3 +202,25 @@ export async function setUserNotificationIdentifier(userId, identifier) {
   }
 }
 
+/**
+ * Sends a request to backend to change the user's current group.
+ * @param {string} token 
+ * @param {string} userId 
+ * @param {number} groupId 
+ */
+export async function changeUserCurrGroup(token, userId, groupId) {
+  let endpoint = `${config.backend_server}/user/currentGroup/${userId}`;
+  const data = {
+    currGroup: groupId,
+  };
+
+  try {
+    await axios.patch(endpoint, data, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+  } catch (error) {
+    console.log('Change user current group error', error);
+  }
+}
