@@ -136,6 +136,7 @@ export default function GroupSettings({ navigation }) {
           }}
         />
         <Appbar.Content title={'Group'} titleStyle={styles.title} />
+        <Appbar.Action icon="dots-horizontal" onPress={() => { navigation.navigate('GroupSelector') }} />
       </Appbar.Header>
       <View style={styles.bodyContainer}>
         <ImageBackground

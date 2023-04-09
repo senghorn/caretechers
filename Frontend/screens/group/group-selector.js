@@ -11,7 +11,6 @@ export default function GroupSelector({ navigation }) {
     const { setUser, user } = useContext(UserContext);
     const [socket, setSocket] = useContext(SocketContext);
     const [groupList, setGroupList] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState(null);
     const [groups, setGroups] = useState([]);
     useEffect(() => {
         if (user && user.groups) {
@@ -19,25 +18,42 @@ export default function GroupSelector({ navigation }) {
         }
     }, [user])
 
+    const [selectedGroup, setSelectedGroup] = useState(null);
+    const [navigatedToHome, setNavigatedToHome] = useState(false);
+
     useEffect(() => {
         if (selectedGroup) {
             const handleSelected = async () => {
-                await changeUserCurrGroup(user.access_token, user.id, selectedGroup.group_id);
-                socket.disconnect();
-                setSocket(null);
-                const result = await fetchUserByCookie(user.access_token);
-                if (result) {
-                    setUser({
-                        "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
-                        "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-                        "phone_num": result.phone_num, "groups": result.groups
-                    });
+                if (selectedGroup.group_id !== user.curr_group) {
+                    await changeUserCurrGroup(user.access_token, user.id, selectedGroup.group_id);
+                    socket.disconnect();
+                    setSocket(null);
+                    const result = await fetchUserByCookie(user.access_token);
+                    if (result) {
+                        setUser({
+                            "access_token": user.access_token, "curr_group": result.curr_group, "id": result.id,
+                            "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
+                            "phone_num": result.phone_num, "groups": result.groups
+                        });
+                        setNavigatedToHome(true);
+                        navigation.navigate('Home');
+                    }
+                } else {
+                    setNavigatedToHome(true);
                     navigation.navigate('Home');
                 }
             }
             handleSelected();
         }
-    }, [selectedGroup]);
+    }, [selectedGroup, navigatedToHome]); // add navigatedToHome as a dependency
+
+    // add another useEffect hook to reset selectedGroup to null when navigatedToHome is true
+    useEffect(() => {
+        if (navigatedToHome) {
+            setSelectedGroup(null);
+            setNavigatedToHome(false);
+        }
+    }, [navigatedToHome]);
 
     useEffect(() => {
         if (groups) {
