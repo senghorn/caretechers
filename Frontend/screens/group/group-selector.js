@@ -6,9 +6,10 @@ import colors from '../../constants/colors'
 import { changeUserCurrGroup, fetchUserByCookie } from '../../services/api/user'
 import UserContext from '../../services/context/UserContext'
 import SocketContext from '../../services/context/SocketContext'
-
+import Spinner from 'react-native-loading-spinner-overlay';
 export default function GroupSelector({ navigation }) {
     const { setUser, user } = useContext(UserContext);
+    const [loading, setLoading] = useState(false);
     const [socket, setSocket] = useContext(SocketContext);
     const [groupList, setGroupList] = useState([]);
     const [groups, setGroups] = useState([]);
@@ -24,6 +25,7 @@ export default function GroupSelector({ navigation }) {
     useEffect(() => {
         if (selectedGroup) {
             const handleSelected = async () => {
+                setLoading(true);
                 if (selectedGroup.group_id !== user.curr_group) {
                     await changeUserCurrGroup(user.access_token, user.id, selectedGroup.group_id);
                     socket.disconnect();
@@ -51,6 +53,7 @@ export default function GroupSelector({ navigation }) {
     useEffect(() => {
         if (navigatedToHome) {
             setSelectedGroup(null);
+            setLoading(false);
             setNavigatedToHome(false);
         }
     }, [navigatedToHome]);
@@ -69,6 +72,12 @@ export default function GroupSelector({ navigation }) {
 
     return (
         <SafeAreaView style={styles.container} >
+            <Spinner
+                color='#add8e6'
+                visible={loading}
+                textStyle={styles.spinnerTextStyle}
+                size={'large'}
+            />
             <Appbar style={styles.headerContainer}>
                 <Appbar.Content title="Care Groups" titleStyle={styles.title} />
                 <Appbar.Action icon="plus" onPress={() => navigation.navigate("Group")} style={styles.joinGroupButton} />
