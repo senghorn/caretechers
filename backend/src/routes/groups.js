@@ -41,6 +41,12 @@ router.get('/info/:groupId',[
 	sharedMiddleware.sendResult
 ]);
 
+router.get('/info/active/:groupId', [
+	groupMiddleware.checkIfGroupExists,
+	groupMiddleware.getActiveGroupInfo,
+	sharedMiddleware.sendResult
+]);
+
 module.exports = router;
 
 // SCHEMA DEFINITION

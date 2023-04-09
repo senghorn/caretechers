@@ -89,6 +89,12 @@ module.exports.getGroupInfo = asyncHandler(async (req, _res, next) => {
   next();
 });
 
+module.exports.getActiveGroupInfo = asyncHandler(async (req, _res, next) => {
+  let query = sql`SELECT name, first_name, last_name, profile_pic, password from GroupMembers m join Users u join \`Groups\` g where u.email = m.member_id and m.group_id = g.id and g.id = ${req.params.groupId} and m.active = 1; `;
+  req.result = await db.query(query);
+  next();
+});
+
 module.exports.generateToken = (req, _res, next) => {
   const token = jwt.sign({
     groupName: req.groupInfo.name,
