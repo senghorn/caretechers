@@ -1,56 +1,47 @@
-const express = require('express')
+const express = require('express');
 
 const groupMiddleware = require('../middlewares/groups');
 const sharedMiddleware = require('../middlewares/shared');
 
 const router = express.Router();
 
-router.post('/', [
-	groupMiddleware.verifyGroupBody,
-	groupMiddleware.createNewGroup,
-	sharedMiddleware.sendResult
+router.post('/', [groupMiddleware.verifyGroupBody, groupMiddleware.createNewGroup, sharedMiddleware.sendResult]);
+
+router.get('/token', [groupMiddleware.getGroupNameAndPassword, groupMiddleware.generateToken, sharedMiddleware.sendResult]);
+
+router.get('/info/token/:token', [groupMiddleware.verifyToken, sharedMiddleware.sendResult]);
+
+router.get('/password/:groupId', [
+  groupMiddleware.checkIfGroupExists,
+  groupMiddleware.getGroupPassword,
+  sharedMiddleware.sendResult,
 ]);
 
-router.get('/token', [
-	groupMiddleware.getGroupNameAndPassword,
-	groupMiddleware.generateToken,
-	sharedMiddleware.sendResult
-])
-
-router.get('/info/token/:token', [
-	groupMiddleware.verifyToken,
-	sharedMiddleware.sendResult
+router.patch('/passreset/:groupId', [
+  groupMiddleware.checkIfGroupExists,
+  groupMiddleware.resetPassword,
+  groupMiddleware.getGroupPassword,
+  sharedMiddleware.sendResult,
 ]);
 
-router.get('/password/:groupId',[
-	groupMiddleware.checkIfGroupExists,
-	groupMiddleware.getGroupPassword,
-	sharedMiddleware.sendResult
+router.get('/comparison/:groupId', [
+  groupMiddleware.checkIfGroupExists,
+  groupMiddleware.compareMembers,
+  sharedMiddleware.sendResult,
 ]);
 
-router.patch('/passreset/:groupId',[
-	groupMiddleware.checkIfGroupExists,
-	groupMiddleware.resetPassword,
-	groupMiddleware.getGroupPassword,
-	sharedMiddleware.sendResult
-]);
-
-router.get('/info/:groupId',[
-	groupMiddleware.checkIfGroupExists,
-	groupMiddleware.getGroupInfo,
-	sharedMiddleware.sendResult
-]);
+router.get('/info/:groupId', [groupMiddleware.checkIfGroupExists, groupMiddleware.getGroupInfo, sharedMiddleware.sendResult]);
 
 router.get('/info/active/:groupId', [
-	groupMiddleware.checkIfGroupExists,
-	groupMiddleware.getActiveGroupInfo,
-	sharedMiddleware.sendResult
+  groupMiddleware.checkIfGroupExists,
+  groupMiddleware.getActiveGroupInfo,
+  sharedMiddleware.sendResult,
 ]);
 
 module.exports = router;
 
 // SCHEMA DEFINITION
-  /**
+/**
  * @swagger
  * components:
  *   schemas:
@@ -81,7 +72,7 @@ module.exports = router;
 
 // Route Definitions
 
-  /**
+/**
  * @swagger
  * tags:
  *   name: Groups
@@ -105,7 +96,7 @@ module.exports = router;
  *   get:
  *     summary: Gets the group password
  *     tags: [Groups]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: groupId
  *         schema:
@@ -124,7 +115,7 @@ module.exports = router;
  *   patch:
  *     summary: Updates the group password
  *     tags: [Groups]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: groupId
  *         schema:
@@ -140,10 +131,10 @@ module.exports = router;
  *                 password:
  *                   type: string
  * /groups/info/{groupId}:
- *   get: 
+ *   get:
  *     summary: Gets a list of user/group info for this group
  *     tags: [Groups]
- *     parameters: 
+ *     parameters:
  *       - in: path
  *         name: groupId
  *         schema:
@@ -167,5 +158,5 @@ module.exports = router;
  *                   phone_num:
  *                     type: string
  *                   group_password:
- *                     type: string  
+ *                     type: string
  */

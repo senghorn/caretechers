@@ -1,11 +1,12 @@
 import { isBefore, isEqual, startOfDay } from 'date-fns';
-import { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { Text, View, StyleSheet, TouchableHighlight, Image } from 'react-native';
 import colors from '../../constants/colors';
 import { DateToVisitsContext } from '../../screens/calendar';
 import { getDateString } from '../../utils/date';
 import { FadeInView } from '../generic/FadeInView';
 import VolunteerButton from '../visit/volunteerButton';
+import ViewTasksButton from '../visit/viewTasksButton';
 
 export default function DaySummary({
   date,
@@ -73,8 +74,15 @@ export default function DaySummary({
   const isCurrentDay = isEqual(date, startOfDay(new Date()));
   const inThePast = isBefore(date, new Date());
 
+  const dateString = getDateString(date);
+
   if (!visitInfo.visitor && (!inThePast || isCurrentDay)) {
-    return <VolunteerButton visitFirst={visitFirst} date={key} />;
+    return (
+      <Fragment>
+        <VolunteerButton visitFirst={visitFirst} date={key} />
+        <ViewTasksButton visitInfo={visitInfo} navigation={navigation} dateString={dateString} />
+      </Fragment>
+    );
   }
 
   let colorStyle = styles.futureDayColor;
@@ -92,7 +100,6 @@ export default function DaySummary({
       : `${visitInfo.taskCount} Tasks`
     : 'No Tasks';
 
-  const dateString = getDateString(date);
   return (
     <TouchableHighlight
       onPress={() => navigation.navigate('Visit', { dateString })}
