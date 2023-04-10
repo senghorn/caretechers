@@ -24,6 +24,7 @@ module.exports.verifyGroupBody = asyncHandler(async (req, _res, next) => {
       name: { type: 'string' },
       visitFrequency: { type: 'number' },
       timeZone: { type: 'string' },
+      userId: { type: 'string' }
     },
     required: ['name', 'visitFrequency'],
   };
@@ -66,14 +67,32 @@ module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
 			${req.body.visitFrequency}, SUBSTR(MD5(RAND()), 1, 15));`;
   }
 
-  let result = await db.query(query);
-  query = sql`SELECT * FROM \`Groups\` WHERE id = ${result.insertId}`;
-  result = await db.query(query);
-  req.result = {
-    groupName: result[0].name,
-    groupPassword: result[0].password,
-  };
-  next();
+  let createGroupResult = await db.query(query);
+
+  if (createGroupResult) {
+    const group_id = createGroupResult.insertId;
+    const email = req.body.userId;
+
+    const insertUserToAsGroupAdmin = sql`INSERT INTO GroupMembers (member_id, group_id, active, admin_status) 
+    VALUES (${email}, 1, 1, 2) 
+    ON DUPLICATE KEY UPDATE group_id = ${group_id}, active = 1, admin_status = 2;
+    `;
+    const insertUserResult = await db.query(insertUserToAsGroupAdmin);
+    console.log(insertUserResult);
+    if (insertUserResult.affectedRows) {
+      req.result = {
+        status: "succeed"
+      }
+      next();
+    } else {
+      console.log(insertUserResult);
+      return next(new Error("Failed to join group."));
+    }
+
+  } else {
+    return next(new Error("Failed to create new group."));
+  }
+
 });
 
 module.exports.getGroupsDeprecated = asyncHandler(async (req, res, next) => {

@@ -1,8 +1,6 @@
-import { Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { ActivityIndicator, FAB, Provider } from 'react-native-paper';
-import { Button } from 'react-native-paper';
-import HeaderDep from '../components/tasks/headerdep';
 import Task from '../components/tasks/task';
 import config from '../constants/config';
 import useSWR from 'swr';
