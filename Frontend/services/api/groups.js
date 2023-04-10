@@ -7,11 +7,12 @@ const axios = require('axios').default;
  * @param {int} visit_frequency
  * @returns
  */
-export async function createNewGroup(groupName, timezone, visit_frequency, token) {
+export async function createNewGroup(groupName, timezone, visit_frequency, userId, token) {
   const data = {
     name: groupName,
     visitFrequency: visit_frequency,
     timeZone: timezone,
+    userId: userId
   };
   try {
     let connection_string = config.backend_server + '/groups/';

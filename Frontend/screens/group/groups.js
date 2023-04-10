@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button, Appbar } from 'react-native-paper';
 import { useState, useContext, useEffect } from 'react';
 import colors from '../../constants/colors';
-import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
+import { addUserToGroup } from '../../services/api/user';
 import UserContext from '../../services/context/UserContext';
 import InviteLinkContext from '../../services/context/InviteLinkContext';
 import axios from 'axios';
@@ -97,7 +97,6 @@ export default function Groups({ navigation }) {
             setLoading(true);
             const joined = await joinGroupHandler(user, groupName, password);
             if (joined == true && user.id) {
-              // const result = await fetchUserByCookie(user.access_token);
               const result = setUserDataInfo(setUser, user.access_token);
               if (result && user && user.curr_group) {
                 socket.disconnect();
