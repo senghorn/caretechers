@@ -4,15 +4,32 @@ import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
 import { useState, useContext, useEffect } from 'react';
 import { UpdateUserData } from '../../services/api/user';
+import * as ImagePicker from 'expo-image-picker';
+import uploadImage from '../../services/s3/uploadImage';
 
 export default function UserAccount({ navigation, route, newUser }) {
   const { user, setUser } = useContext(UserContext);
-  const [profile, setProfile] = useState(require('../../assets/favicon.png'));
+  const [profile, setProfile] = useState(null);
   const [firstName, setFirstName] = useState('John');
   const [lastName, setLastName] = useState('Doe');
   const [phone, setPhone] = useState('123-321-3211');
   const [email, setEmail] = useState('johndoe@user.com');
   const [saving, setSaving] = useState(false);
+  const [newProfile, setNewProfile] = useState(null);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [3, 3],
+      quality: 1,
+      base64: true
+    });
+
+    if (!result.canceled) {
+      setNewProfile(result.assets[0].base64);
+    }
+  };
 
   useEffect(() => {
     initData();
@@ -24,7 +41,7 @@ export default function UserAccount({ navigation, route, newUser }) {
       setLastName(user.last_name);
       setPhone(user.phone_num);
       setEmail(user.id);
-      setProfile({ uri: user.profile_pic });
+      setProfile(user.profile_pic);
     }
   };
 
@@ -32,14 +49,19 @@ export default function UserAccount({ navigation, route, newUser }) {
     setSaving(true);
     if (user && phone.length == 12 && firstName.length > 0 && lastName.length > 0) {
       await (async () => {
-        const update = await UpdateUserData(email, firstName, lastName, phone, user.curr_group, user.profile_pic, user.access_token);
+        let profileURL;
+        if (newProfile) {
+          profileURL = await uploadImage(newProfile)
+          setNewProfile(null);
+        }
+        const update = await UpdateUserData(email, firstName, lastName, phone, user.curr_group, profileURL || user.profile_pic, user.access_token);
         if (update) {
           setUser({
             id: user.id,
             first_name: firstName,
             last_name: lastName,
             curr_group: user.curr_group,
-            profile_pic: user.profile_pic,
+            profile_pic: profileURL || user.profile_pic,
             phone_num: phone,
             access_token: user.access_token,
             groups: user.groups
@@ -75,6 +97,7 @@ export default function UserAccount({ navigation, route, newUser }) {
         <Appbar.Action
           icon={'arrow-left'}
           onPress={() => {
+            setNewProfile(null);
             navigation.goBack();
           }}
         />
@@ -86,8 +109,8 @@ export default function UserAccount({ navigation, route, newUser }) {
         source={require('../../assets/blue-background.jpg')}
       >
         <View style={styles.profileContainer}>
-          <TouchableOpacity>
-            <Avatar.Image size={90} source={profile} />
+          <TouchableOpacity onPress={pickImage}>
+            <Avatar.Image size={90} source={{uri: newProfile ? 'data:image/jpeg;base64,' + newProfile : profile}} />
             <Text style={styles.uploadPhotoText}>Change</Text>
           </TouchableOpacity>
         </View>
