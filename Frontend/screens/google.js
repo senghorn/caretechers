@@ -6,7 +6,6 @@ import COLORS from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { getAccessToken } from '../services/api/auth';
 import UserContext from '../services/context/UserContext';
-import { fetchUserByCookie } from '../services/api/user';
 import { setAPIAccessToken, setAPIResetToken, getAPIAccessToken, clearAsyncStorage } from '../services/storage/asyncStorage';
 import { validateTokens } from '../utils/accessController';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -111,7 +110,6 @@ export default function GoogleLogin({ navigation }) {
   async function AuthenticatedUserHandler() {
     try {
       const access_token = await getAPIAccessToken();
-      // const result = await fetchUserByCookie(access_token);
       const result = await setUserDataInfo(setUser, access_token);
       if (result) {
         setUserDataReceived(true);

@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { TextInput, Text, Button, Appbar } from 'react-native-paper';
 import colors from '../../constants/colors';
 import { createNewGroup } from '../../services/api/groups';
-import { addUserToGroup, fetchUserByCookie } from '../../services/api/user';
+import { addUserToGroup } from '../../services/api/user';
 import { setUserDataInfo } from '../../utils/userController';
 import UserContext from '../../services/context/UserContext';
 import SocketContext from '../../services/context/SocketContext';
@@ -64,12 +64,6 @@ export default function CreateGroup({ navigation, route }) {
           const create = await createGroup(groupName, user);
           if (create) {
             await setUserDataInfo(setUser, user.access_token);
-            // const fetchedUser = await fetchUserByCookie(user.access_token);
-            // setUser({
-            //   "access_token": user.access_token, "curr_group": fetchedUser.curr_group, "id": fetchedUser.id,
-            //   "first_name": fetchedUser.first_name, "last_name": fetchedUser.last_name, "profile_pic": fetchedUser.profile_pic,
-            //   "phone_num": fetchedUser.phone_num, "groups": fetchedUser.groups
-            // })
             socket.disconnect();
             setSocket(null);
             setLoading(false);

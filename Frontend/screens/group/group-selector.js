@@ -3,7 +3,7 @@ import { useContext, useState, useEffect } from 'react'
 import { Appbar } from 'react-native-paper'
 import GroupCard from '../../components/group/group-card'
 import colors from '../../constants/colors'
-import { changeUserCurrGroup, fetchUserByCookie } from '../../services/api/user'
+import { changeUserCurrGroup } from '../../services/api/user'
 import UserContext from '../../services/context/UserContext'
 import SocketContext from '../../services/context/SocketContext'
 import Spinner from 'react-native-loading-spinner-overlay';
