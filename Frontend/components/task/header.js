@@ -64,7 +64,15 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
                     {
                       text: 'Confirm',
                       onPress: async () => {
-                        await deleteTask(id, refreshTasks, refreshVisit, refreshVisitTasks, refreshCalendar, user.access_token);
+                        await deleteTask(
+                          id,
+                          refreshTasks,
+                          refreshVisit,
+                          refreshVisitTasks,
+                          refreshCalendar,
+                          user.access_token,
+                          socket
+                        );
                         navigation.goBack();
                       },
                       style: 'destructive',
@@ -87,7 +95,7 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refreshCalendar, token) => {
+const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refreshCalendar, token, socket) => {
   const currDate = getCurrentDateString();
   const url = `${config.backend_server}/tasks/${id}?end_date=${currDate}`;
   const method = 'DELETE';
