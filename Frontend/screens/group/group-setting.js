@@ -308,7 +308,11 @@ const ManageUserModal = ({ selectedUser, setSelectedUser }) => {
           </TouchableOpacity>
           <View style={styles.infoRow}>
             <RoleBadge group={selectedUser} />
-
+            <Text style={styles.role}>{selectedUser?.admin_status === 2
+              ? "Admin"
+              : selectedUser?.admin_status === 1
+                ? "Co-Admin"
+                : "Non-Admin"}</Text>
           </View>
         </View>
       </View>
@@ -461,4 +465,9 @@ const styles = StyleSheet.create({
   removeButton: {
     backgroundColor: colors.lightYellow
   },
+  role: {
+    marginLeft: 15,
+    fontSize: 14,
+    color: 'gray',
+  }
 });
