@@ -88,41 +88,9 @@ export default function CreateGroup({ navigation, route }) {
  */
 const createGroup = async (groupName, user) => {
   const timezone = 'America/Denver';
-  const result = await createNewGroup(groupName, timezone, 4, user.access_token);
-  if (result && result.groupName && result.groupPassword) {
-    const joinGroupWithRetry = async (
-      userEmail,
-      groupName,
-      groupPassword,
-      maxAttempts = 3,
-      attempt = 1
-    ) => {
-
-      const joined = await addUserToGroup(userEmail, groupName, groupPassword, user.access_token);
-      if (joined) {
-        return true;
-      } else {
-        console.log(`Join group failed on attempt ${attempt}`);
-        if (attempt < maxAttempts) {
-          setTimeout(async () => {
-            await joinGroupWithRetry(
-              userEmail,
-              groupName,
-              groupPassword,
-              maxAttempts,
-              attempt + 1
-            );
-          }, 2000);
-        } else {
-          console.log(
-            `Maximum attempts (${maxAttempts}) reached. Join group failed.`
-          );
-          return false;
-        }
-      }
-    };
-
-    return joinGroupWithRetry(user.id, result.groupName, result.groupPassword, 3, 1);
+  const result = await createNewGroup(groupName, timezone, 4, user.id, user.access_token);
+  if (result) {
+    return true;
   }
 
   return false;
