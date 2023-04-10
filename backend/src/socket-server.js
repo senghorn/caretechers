@@ -115,7 +115,7 @@ function decodeToken(token) {
     if (err) {
       console.log('given token', token);
       console.log('token decoded error', err);
-      return res.sendStatus(403);
+      return null;
     }
     decodedUser = user;
     return user;
