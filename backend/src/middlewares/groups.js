@@ -56,7 +56,11 @@ module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
     ON DUPLICATE KEY UPDATE group_id = ${group_id}, active = 1, admin_status = 2;
     `;
     const insertUserResult = await db.query(insertUserToAsGroupAdmin);
-    if (insertUserResult.insertId) {
+    console.log(insertUserResult);
+    if (insertUserResult.affectedRows) {
+      req.result = {
+        status: "succeed"
+      }
       next();
     } else {
       console.log(insertUserResult);
