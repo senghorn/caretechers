@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 0,
     borderRadius: 8,
+    marginRight: 8,
   },
   volunteerButton: {
     width: '100%',
@@ -78,8 +79,8 @@ const styles = StyleSheet.create({
   },
   volunteerButtonText: {
     color: '#2196f3',
-    fontWeight: '500',
-    fontSize: 16,
+    fontWeight: '400',
+    fontSize: 15,
     marginLeft: 8,
   },
 });

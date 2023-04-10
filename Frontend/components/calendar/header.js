@@ -1,13 +1,15 @@
-import axios from 'axios';
 import { format, startOfDay } from 'date-fns';
 import { useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import UserContext from '../../services/context/UserContext';
-import config from '../../constants/config';
+import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
+import VisitRefreshContext from '../../services/context/VisitRefreshContext';
 
 export default function Header({ date, setInitDate, navigation }) {
   const { user } = useContext(UserContext);
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
+  const [refreshVisit] = useContext(VisitRefreshContext);
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
@@ -26,15 +28,9 @@ export default function Header({ date, setInitDate, navigation }) {
         />
         <Appbar.Action
           icon="refresh"
-          onPress={async () => {
-            const result = await axios.get(`${config.backend_server}/groups/comparison/${user.curr_group}`, {
-              headers: {
-                authorization: `Bearer ${user.access_token}`,
-              },
-            });
-
-            console.log(result.data);
-            console.log('Filter Dialog Open');
+          onPress={() => {
+            refreshCalendar();
+            refreshVisit();
           }}
         />
       </Appbar.Header>
