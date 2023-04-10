@@ -34,6 +34,28 @@ module.exports.verifyGroupBody = asyncHandler(async (req, _res, next) => {
   next();
 });
 
+module.exports.compareMembers = asyncHandler(async (req, _res, next) => {
+  let query = sql`SELECT m.member_id, m.active, u.first_name, u.last_name, COUNT(cv.id) as completed_visits, 
+                (SELECT COUNT(*) FROM Visits v WHERE v.visitor = u.email AND v.group_id = m.group_id AND v.date < CURRENT_DATE()) AS total_visits
+                FROM GroupMembers m JOIN Users u ON u.email = m.member_id 
+                LEFT JOIN Visits cv ON cv.visitor = u.email AND cv.group_id = m.group_id AND cv.completed = 1 AND cv.date < CURRENT_DATE()
+                WHERE m.group_id = 1 GROUP BY u.email;`;
+
+  if (req.query.after) {
+    query = sql`SELECT m.member_id, m.active, u.first_name, u.last_name, COUNT(cv.id) as completed_visits, 
+                (SELECT COUNT(*) FROM Visits v WHERE v.visitor = u.email AND v.group_id = m.group_id AND v.date < CURRENT_DATE() AND v.date > ${req.query.after}) AS total_visits
+                FROM GroupMembers m JOIN Users u ON u.email = m.member_id 
+                LEFT JOIN Visits cv ON cv.visitor = u.email AND cv.group_id = m.group_id AND cv.completed = 1 AND cv.date < CURRENT_DATE() AND cv.date > ${req.query.after}
+                WHERE m.group_id = 1 GROUP BY u.email;`;
+  }
+
+  const result = await db.query(query);
+
+  req.result = result;
+
+  next();
+});
+
 module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
   let query;
   if (req.body.timeZone) {
@@ -45,12 +67,12 @@ module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
   }
 
   let result = await db.query(query);
-  query = sql`SELECT * FROM \`Groups\` WHERE id = ${result.insertId}`
+  query = sql`SELECT * FROM \`Groups\` WHERE id = ${result.insertId}`;
   result = await db.query(query);
   req.result = {
     groupName: result[0].name,
-    groupPassword: result[0].password
-  }
+    groupPassword: result[0].password,
+  };
   next();
 });
 
@@ -66,7 +88,7 @@ module.exports.getGroupNameAndPassword = asyncHandler(async (req, res, next) => 
   const [result] = await db.query(query);
   req.groupInfo = result;
   next();
-})
+});
 
 module.exports.getGroupPassword = asyncHandler(async (req, res, next) => {
   const query = sql`SELECT password FROM \`Groups\` G
@@ -96,10 +118,14 @@ module.exports.getActiveGroupInfo = asyncHandler(async (req, _res, next) => {
 });
 
 module.exports.generateToken = (req, _res, next) => {
-  const token = jwt.sign({
-    groupName: req.groupInfo.name,
-    groupPassword: req.groupInfo.password
-  }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m' });
+  const token = jwt.sign(
+    {
+      groupName: req.groupInfo.name,
+      groupPassword: req.groupInfo.password,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: '5m' }
+  );
 
   req.result = token;
   next();
