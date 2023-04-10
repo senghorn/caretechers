@@ -77,15 +77,15 @@ module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res
     return next(newError('Group does not exist or password is wrong!', 404));
   }
 
-  if(req.body.adminStatus) {
-    if(req.body.adminStatus == 2){
+  if (req.body.adminStatus) {
+    if (req.body.adminStatus == 2) {
       query = sql`SELECT * FROM GroupMembers WHERE admin_status = 2 AND group_id=${group.id} AND active = TRUE;`;
 
       let [rootAdmin] = await db.query(query);
       if (rootAdmin) {
         return next(newError('Only one root administrator allowed.', 400));
       }
-    } else if(!(req.body.adminStatus == 0 || req.body.adminStatus == 1 || req.body.adminStatus == 2)) {
+    } else if (!(req.body.adminStatus == 0 || req.body.adminStatus == 1 || req.body.adminStatus == 2)) {
       return next(newError('Value of adminStatus must be 0, 1, or 2.', 400));
     }
 
@@ -101,7 +101,7 @@ module.exports.addUserToGroupWithNameAndPassword = asyncHandler(async (req, _res
     WHERE email=${req.params.userId};
   `;
   }
-  
+
   result = await db.query(query);
   if (result.affectedRows == 0) {
     return next(newError('Cannot join the group!', 400));
@@ -116,14 +116,14 @@ module.exports.changeUserAdminStatus = asyncHandler(async (req, _res, next) => {
 
   let query;
 
-  if(req.body.adminStatus == 2){ 
+  if (req.body.adminStatus == 2) {
     query = sql`SELECT * FROM GroupMembers WHERE admin_status = 2 AND group_id=${group.id} AND active = TRUE;`;
 
     let [rootAdmin] = await db.query(query);
     if (rootAdmin) {
       return next(newError('Only one root administrator allowed.', 400));
     }
-  } else if(!(req.body.adminStatus == 0 || req.body.adminStatus == 1 || req.body.adminStatus == 2)) {
+  } else if (!(req.body.adminStatus == 0 || req.body.adminStatus == 1 || req.body.adminStatus == 2)) {
     return next(newError('Value of adminStatus must be 0, 1, or 2.', 400));
   }
 
@@ -198,7 +198,8 @@ module.exports.getUserByToken = asyncHandler(async (req, _res, next) => {
       group_id: g.group_id,
       name: g.name,
       password: g.password,
-      timezone: g.timezone
+      timezone: g.timezone,
+      admin_status: g.admin_status
     })
   })
   req.result = {

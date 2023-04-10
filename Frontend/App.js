@@ -52,6 +52,10 @@ export default function App() {
     require('./assets/abstract_background.jpg'),
     require('./assets/caretaker.png'),
     require('./assets/blue-background.jpg'),
+    require('./assets/badge.png'),
+    require('./assets/crown.png'),
+    require('./assets/circle.png'),
+    require('./assets/house.jpg')
   ]);
 
   Notifications.setNotificationHandler({
@@ -65,8 +69,8 @@ export default function App() {
   const url = Linking.useURL();
   useEffect(() => {
     var regex = /[?&]([^=#]+)=([^&#]*)/g,
-    params = {},
-    match;
+      params = {},
+      match;
     while (match = regex.exec(url)) {
       params[match[1]] = match[2];
     }
@@ -95,7 +99,7 @@ export default function App() {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      <Navigation expoPushToken={expoPushToken} inviteToken={inviteToken}/>
+      <Navigation expoPushToken={expoPushToken} inviteToken={inviteToken} />
       <StatusBar style="auto" />
     </NavigationContainer>
   );
