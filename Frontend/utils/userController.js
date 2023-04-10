@@ -10,7 +10,7 @@ export async function setUserDataInfo(setUser, token) {
         setUser({
             "access_token": token, "curr_group": result.curr_group, "id": result.id,
             "first_name": result.first_name, "last_name": result.last_name, "profile_pic": result.profile_pic,
-            "phone_num": result.phone_num, "groups": result.groups, "admin_status": result.admin_status
+            "phone_num": result.phone_num, "groups": result.groups
         });
         return true;
     }

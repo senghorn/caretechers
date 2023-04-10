@@ -15,6 +15,18 @@ export default function GroupCard({ setSelected, group }) {
         setSelected(group);
     }
 
+    const RoleBadge = () => {
+        if (group.admin_status === 2) {
+            return (
+                <Avatar.Image size={34} source={require('../../assets/crown.png')} style={styles.roleBadge} />
+            );
+        } else if (group.admin_status === 1) {
+            return (<Avatar.Image size={34} source={require('../../assets/badge.png')} style={styles.roleBadge} />);
+        } else {
+            return (<Avatar.Image size={34} source={require('../../assets/circle.png')} style={styles.roleBadge} />)
+        }
+    }
+
     return (
         <TouchableOpacity style={styles.container} onPress={onTouch}>
             <View style={styles.content}>
@@ -25,7 +37,7 @@ export default function GroupCard({ setSelected, group }) {
                     <Text>{group.name}</Text>
                 </View>
                 <View style={styles.role}>
-
+                    <RoleBadge />
                 </View>
             </View>
         </TouchableOpacity>
@@ -48,15 +60,18 @@ const styles = StyleSheet.create({
     content: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between'
     },
     logo: {
         marginRight: 15
     },
     name: {
-
         alignSelf: 'center'
     },
     role: {
 
+    },
+    roleBadge: {
+        backgroundColor: 'transparent'
     },
 })

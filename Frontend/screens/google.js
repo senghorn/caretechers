@@ -19,6 +19,7 @@ export default function GoogleLogin({ navigation }) {
   const [accessToken, setAccessToken] = useState(null);
   const [cookies, setCookies] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [userDataReceived, setUserDataReceived] = useState(false);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
       '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
@@ -96,21 +97,26 @@ export default function GoogleLogin({ navigation }) {
     }
   }, [cookies]);
 
+  useEffect(() => {
+    if (userDataReceived) {
+      setLoading(false);
+      if (user.curr_group) {
+        navigation.navigate('Home');
+      } else {
+        navigation.navigate('GroupSelector');
+      }
+    }
+  }, [userDataReceived]);
+
   async function AuthenticatedUserHandler() {
     try {
       const access_token = await getAPIAccessToken();
       // const result = await fetchUserByCookie(access_token);
       const result = await setUserDataInfo(setUser, access_token);
       if (result) {
-        if (user.curr_group) {
-          setLoading(false);
-          // Instead, go Home
-          navigation.navigate('GroupSelector');
-        } else {
-          setLoading(false);
-          navigation.navigate('GroupSelector');
-        }
+        setUserDataReceived(true);
       } else {
+        setLoading(false);
         console.log('Fetch user data error while trying to retrieve user info.');
       }
     } catch (error) {

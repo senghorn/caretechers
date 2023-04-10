@@ -32,7 +32,6 @@ export default function GroupSelector({ navigation }) {
                     socket.disconnect();
                     setSocket(null);
                     const result = await setUserDataInfo(setUser, user.access_token);
-                    // const result = await fetchUserByCookie(user.access_token);
                     if (result) {
                         setNavigatedToHome(true);
                         navigation.navigate('Home');
