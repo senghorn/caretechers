@@ -89,7 +89,7 @@ export default function GroupSettings({ navigation }) {
   const LeaveGroup = async () => {
     if (user && user.id && user.curr_group) {
       const removed = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
-      if (removed == true) {
+      if (removed === true) {
         const result = await setUserDataInfo(setUser, user.access_token);
         if (result) {
           socket.disconnect();
