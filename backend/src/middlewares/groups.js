@@ -74,12 +74,13 @@ module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
     const email = req.body.userId;
 
     const insertUserToAsGroupAdmin = sql`INSERT INTO GroupMembers (member_id, group_id, active, admin_status) 
-    VALUES (${email}, 1, 1, 2) 
+    VALUES (${email}, ${group_id}, 1, 2) 
     ON DUPLICATE KEY UPDATE group_id = ${group_id}, active = 1, admin_status = 2;
+    UPDATE Users SET curr_group = ${group_id} WHERE email = ${email};
     `;
     const insertUserResult = await db.query(insertUserToAsGroupAdmin);
-    console.log(insertUserResult);
-    if (insertUserResult.affectedRows) {
+    console.log('Update and insert result', insertUserResult);
+    if (insertUserResult[0].affectedRows && insertUserResult[1].affectedRows) {
       req.result = {
         status: "succeed"
       }
