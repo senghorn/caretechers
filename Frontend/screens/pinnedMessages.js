@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, Image } from 'react-native';
 import { useContext, useState, useEffect } from 'react';
 import { Appbar, Avatar, Divider, IconButton } from 'react-native-paper';
 import { FetchUsers, UnpinMessage } from '../services/api/messages';
@@ -9,6 +9,7 @@ import { getMonthDate } from '../utils/date';
 import config from '../constants/config';
 import UserContext from '../services/context/UserContext';
 import { ActivityIndicator } from 'react-native-paper';
+
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
@@ -84,6 +85,82 @@ export default function PinnedMessages({ navigation }) {
 
 }
 
+
+const MessageBox = ({ message, sender, setMessageToUnpin }) => {
+    const handleUnpinPressed = () => {
+        Alert.alert(
+            'Do you want to unpin this message?',
+            'Old messages are sometimes hard to find!', // <- this part is optional, you can pass an empty string
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Confirm',
+                    onPress: async () => {
+                        setMessageToUnpin(message);
+                    },
+                    style: 'destructive',
+                },
+            ],
+            {
+                cancelable: true,
+            }
+        );
+    }
+
+    if (sender == null) {
+        return;
+    }
+    return (
+        <View>
+            <View style={styles.messageBox}>
+                <View style={styles.topRow}>
+                    {sender.avatar != '' ?
+                        <Avatar.Image size={32} style={styles.avatar} source={{ uri: sender.avatar }} /> :
+                        <Avatar.Image size={32} style={styles.avatar} />}
+                    <Text style={styles.senderName}>{sender.name}</Text>
+                    <Text style={styles.dateTime}>{getMonthDate(message.date_time)}</Text>
+                </View>
+                <Divider style={{ marginTop: 5 }} />
+                <View style={styles.bottomRow}>
+                    <MessageContent message={message} />
+                </View>
+            </View>
+            <Badge
+                color={colors.black}
+                status={'error'}
+                value={<IconButton
+                    icon="pin"
+                    size={15}
+                    color={colors.white}
+                    onPress={handleUnpinPressed}
+                />}
+                containerStyle={{ position: 'absolute', top: 10, right: 0 }}
+            />
+        </View>
+    );
+}
+
+const MessageContent = ({ message }) => {
+    return message ? (
+        <View>
+            {message?.messageType === "I" ? (
+                <View style={styles.pictureContainer}>
+                    <Image
+                        style={[styles.pictureStyle, { resizeMode: 'contain' }]}
+                        source={{ uri: message.content }}
+                    />
+                </View>
+
+            ) : (
+                <Text style={styles.messageContent}>{message.content}</Text>
+            )}
+        </View>
+    ) : null;
+}
+
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
@@ -140,61 +217,14 @@ const styles = StyleSheet.create({
         height: '100%',
         transform: [{ translateY: -16 }],
     },
+    pictureContainer: {
+        alignContent: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: "flex"
+    },
+    pictureStyle: {
+        width: 400,
+        height: 400,
+    },
 });
-
-const MessageBox = ({ message, sender, setMessageToUnpin }) => {
-    const handleUnpinPressed = () => {
-        Alert.alert(
-            'Do you want to unpin this message?',
-            'Old messages are sometimes hard to find!', // <- this part is optional, you can pass an empty string
-            [
-                {
-                    text: 'Cancel',
-                    style: 'cancel',
-                },
-                {
-                    text: 'Confirm',
-                    onPress: async () => {
-                        setMessageToUnpin(message);
-                    },
-                    style: 'destructive',
-                },
-            ],
-            {
-                cancelable: true,
-            }
-        );
-    }
-
-    if (sender == null) {
-        return;
-    }
-    return (
-        <View>
-            <View style={styles.messageBox}>
-                <View style={styles.topRow}>
-                    {sender.avatar != '' ?
-                        <Avatar.Image size={32} style={styles.avatar} source={{ uri: sender.avatar }} /> :
-                        <Avatar.Image size={32} style={styles.avatar} />}
-                    <Text style={styles.senderName}>{sender.name}</Text>
-                    <Text style={styles.dateTime}>{getMonthDate(message.date_time)}</Text>
-                </View>
-                <Divider style={{ marginTop: 5 }} />
-                <View style={styles.bottomRow}>
-                    <Text style={styles.messageContent}>{message.content}</Text>
-                </View>
-            </View>
-            <Badge
-                color={colors.black}
-                status={'error'}
-                value={<IconButton
-                    icon="pin"
-                    size={15}
-                    color={colors.white}
-                    onPress={handleUnpinPressed}
-                />}
-                containerStyle={{ position: 'absolute', top: 10, right: 0 }}
-            />
-        </View>
-    );
-}
