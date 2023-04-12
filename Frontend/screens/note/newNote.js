@@ -24,7 +24,6 @@ const { height } = Dimensions.get('window');
 
 export default function NewNote({ navigation, route }) {
   const { note } = route.params;
-
   const [editMode, setEditMode] = useState(true);
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
