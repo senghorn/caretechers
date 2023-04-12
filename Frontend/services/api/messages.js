@@ -71,7 +71,6 @@ export async function fetchMoreMessages(group_id, last_id, users, cookie) {
           user: users[message.sender] ? users[message.sender] : { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
         });
       });
-      console.log(messages);
       return messages;
     }
     else {
