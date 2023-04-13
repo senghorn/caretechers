@@ -1,4 +1,5 @@
-require('dotenv').config()
+require('dotenv').config({ path: '../.env' })
+
 const jwt = require('jsonwebtoken')
 
 /**
@@ -6,7 +7,9 @@ const jwt = require('jsonwebtoken')
  * @param {*} user's email to sign
  * @returns 
  */
-export default function getToken(email) {
+function getToken(email) {
     const user = { id: email };
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
 }
+
+module.exports = { getToken };
