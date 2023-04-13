@@ -142,7 +142,7 @@ module.exports.generateToken = (req, _res, next) => {
       groupPassword: req.groupInfo.password,
     },
     process.env.ACCESS_TOKEN_SECRET
-    // { expiresIn: '5m' }
+    { expiresIn: '5m' }
   );
 
   req.result = token;
