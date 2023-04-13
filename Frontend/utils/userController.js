@@ -17,3 +17,19 @@ export async function setUserDataInfo(setUser, token) {
     return false;
 
 }
+/**
+ * Returns the admin status
+ * @param {User Object} user : contains the information of groups they belong to and their roles
+ * @returns 
+ */
+export function getUserRole(user) {
+    const groups = user.groups;
+    if (groups) {
+        groups.forEach(group => {
+            if (group.group_id === user.curr_group) {
+                return group.admin_status;
+            }
+        });
+    }
+    return 0;
+}
