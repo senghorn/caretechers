@@ -23,13 +23,15 @@ export async function setUserDataInfo(setUser, token) {
  * @returns 
  */
 export function getUserRole(user) {
+    let status = 0;
     const groups = user.groups;
     if (groups) {
         groups.forEach(group => {
             if (group.group_id === user.curr_group) {
-                return group.admin_status;
+                status = group.admin_status;
+                return;
             }
         });
     }
-    return 0;
+    return status;
 }
