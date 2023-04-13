@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/', [groupMiddleware.verifyGroupBody, groupMiddleware.createNewGroup, sharedMiddleware.sendResult]);
 
-router.get('/token', [groupMiddleware.getGroupNameAndPassword, groupMiddleware.generateToken, sharedMiddleware.sendResult]);
+router.get('/token/:groupId', [groupMiddleware.getGroupNameAndPassword, groupMiddleware.generateToken, sharedMiddleware.sendResult]);
 
 router.get('/info/token/:token', [groupMiddleware.verifyToken, sharedMiddleware.sendResult]);
 

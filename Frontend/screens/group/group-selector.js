@@ -8,12 +8,22 @@ import UserContext from '../../services/context/UserContext'
 import SocketContext from '../../services/context/SocketContext'
 import Spinner from 'react-native-loading-spinner-overlay';
 import { setUserDataInfo } from '../../utils/userController'
+import InviteLinkContext from '../../services/context/InviteLinkContext';
+
 export default function GroupSelector({ navigation }) {
     const { setUser, user } = useContext(UserContext);
     const [loading, setLoading] = useState(false);
     const [socket, setSocket] = useContext(SocketContext);
     const [groupList, setGroupList] = useState([]);
     const [groups, setGroups] = useState([]);
+    const inviteLink = useContext(InviteLinkContext);
+
+    useEffect(() => {
+        if (inviteLink) {
+            navigation.navigate("Group");
+        }
+    }, []);
+
     useEffect(() => {
         if (user && user.groups) {
             setGroups(user.groups);
