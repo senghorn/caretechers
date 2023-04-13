@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const assert = require('assert');
 const rest_app = require('../src/rest-server');
-
+const token = require('./token');
 const app = rest_app.CreateRESTServer();
 
 
