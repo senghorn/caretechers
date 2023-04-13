@@ -394,11 +394,14 @@ const RoleBadge = ({ group }) => {
 const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
   const [userRole, setUserRole] = useState(0);
   useEffect(() => {
-    if (user) {
-      const role = getUserRole(user);
-      setUserRole(role);
+    if (user && selectedUser) {
+      // If user see their info, hide remove user button
+      if (user.id !== selectedUser?.email) {
+        const role = getUserRole(user);
+        setUserRole(role);
+      }
     }
-  }, [user])
+  }, [selectedUser, user])
 
   const handleRemoveUser = () => {
     console.log('removeing user ', selectedUser);
