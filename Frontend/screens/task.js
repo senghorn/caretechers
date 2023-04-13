@@ -15,6 +15,8 @@ import { getCurrentDateString, getDateFromDateString, getDateString } from '../u
 import VisitRefreshContext from '../services/context/VisitRefreshContext';
 import { getLabel, REPEAT_CODES } from '../utils/tasks';
 import RecordVisitContext from '../services/context/RecordVisitContext';
+import SocketContext from '../services/context/SocketContext';
+import axios from 'axios';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
@@ -50,6 +52,8 @@ export default function Task({ route, navigation }) {
 
   const { visitTasks, setVisitTasks } = useContext(RecordVisitContext);
 
+  const [socket] = useContext(SocketContext);
+
   useEffect(() => {
     if (!editMode) {
       setEditRepeat(null);
@@ -61,9 +65,17 @@ export default function Task({ route, navigation }) {
     data: taskData,
     isLoading: isTaskLoading,
     error: taskError,
-  } = id ? useSWR([`${config.backend_server}/tasks/group/${user.curr_group}/task/${id}`, {
-    headers: { 'Authorization': 'Bearer ' + user.access_token }
-  }], ([url, token]) => fetcher(url, token)) : undefined;
+  } = id
+    ? useSWR(
+        [
+          `${config.backend_server}/tasks/group/${user.curr_group}/task/${id}`,
+          {
+            headers: { Authorization: 'Bearer ' + user.access_token },
+          },
+        ],
+        ([url, token]) => fetcher(url, token)
+      )
+    : undefined;
 
   useEffect(() => {
     if (id !== 'new') {
@@ -79,10 +91,17 @@ export default function Task({ route, navigation }) {
     data: repeatsData,
     isLoading: isRepeatsLoading,
     error: repeatsError,
-  } = id ? useSWR([`${config.backend_server}/tasks/${id}/repeats`, {
-    headers: { 'Authorization': 'Bearer ' + user.access_token }
-  }],
-    ([url, token]) => fetcher(url, token)) : undefined;
+  } = id
+    ? useSWR(
+        [
+          `${config.backend_server}/tasks/${id}/repeats`,
+          {
+            headers: { Authorization: 'Bearer ' + user.access_token },
+          },
+        ],
+        ([url, token]) => fetcher(url, token)
+      )
+    : undefined;
 
   useEffect(() => {
     if (id !== 'new') {
@@ -181,7 +200,8 @@ export default function Task({ route, navigation }) {
                 refreshVisit,
                 navigation,
                 visitTasks,
-                setVisitTasks
+                setVisitTasks,
+                socket
               );
             }}
           >
@@ -206,14 +226,11 @@ const saveTask = async (
   refreshVisit,
   navigation,
   visitTasks,
-  setVisitTasks
+  setVisitTasks,
+  socket
 ) => {
   setLoading(true);
   const auth_token = user.access_token;
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${auth_token}`
-  };
   const url =
     id === 'new'
       ? `${config.backend_server}/tasks/group/${user.curr_group}`
@@ -221,18 +238,23 @@ const saveTask = async (
   const method = id === 'new' ? 'POST' : 'PUT';
   let newId = id;
   try {
-    const result = await fetch(url, {
-      method: method,
-      headers,
-      body: JSON.stringify(body),
+    const response = await axios({
+      url,
+      method,
+      data: body,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth_token}`,
+      },
     });
-    const data = await result.json();
+    const data = response.data;
     newId = data.insertId;
   } catch (error) {
     console.log(error);
   } finally {
     tasksMutate();
     refreshCalendar();
+    socket.emit('refreshCalendar');
     const newVisitTasks = { ...visitTasks };
     newVisitTasks[newId] = visitTasks[id] ? true : false;
     setVisitTasks(newVisitTasks);
