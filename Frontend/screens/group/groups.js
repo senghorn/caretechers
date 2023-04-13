@@ -17,6 +17,14 @@ export default function Groups({ navigation }) {
   const [password, setPassword] = useState('');
   const [socket, setSocket] = useContext(SocketContext);
   const [loading, setLoading] = useState(false);
+  const [navigateHome, setNavigateHome] = useState(false);
+  useEffect(() => {
+    if (user && navigateHome) {
+      socket.disconnect();
+      setSocket(null);
+      navigation.navigate('Home');
+    }
+  }, [user, navigateHome]);
 
   const processInviteLink = async () => {
     if (inviteLinkContext) {
@@ -99,11 +107,9 @@ export default function Groups({ navigation }) {
             setLoading(true);
             const joined = await joinGroupHandler(user, groupName, password);
             if (joined == true && user.id) {
-              const result = setUserDataInfo(setUser, user.access_token);
-              if (result && user && user.curr_group) {
-                socket.disconnect();
-                setSocket(null);
-                navigation.navigate('Home');
+              const result = await setUserDataInfo(setUser, user.access_token);
+              if (result) {
+                setNavigateHome(true);
               } else {
                 console.log('Fetch user data error');
               }
