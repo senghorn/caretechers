@@ -124,9 +124,9 @@ export default function Settings({ navigation }) {
           setLoading(true);
           const clear = await clearAsyncStorage();
           if (clear) {
+            setUser({});
             socket.disconnect();
             setSocket(null);
-            setUser({});
             navigation.navigate('Login');
           }
           setLoading(false);

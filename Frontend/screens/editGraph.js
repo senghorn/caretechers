@@ -1,15 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
-import { StyleSheet, View, Text, Dimensions, Alert } from 'react-native';
+import { StyleSheet, View, Text, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button } from 'react-native-paper';
 import { ActivityIndicator } from 'react-native-paper';
-import { IconButton, MD3Colors } from 'react-native-paper';
-import Dialog from "react-native-dialog";
-import DateTimePicker from '@react-native-community/datetimepicker';
 import UserContext from '../services/context/UserContext';
 const axios = require('axios').default;
 const config = require('../constants/config').default;
 import colors from '../constants/colors';
+import EditGraphHeader from '../components/healthVitals/editGraphHeader';
 
 const MeasurementRow = ({ timestamp, measurement, removeMeasurement }) => {
   const { user } = useContext(UserContext);
@@ -23,10 +21,10 @@ const MeasurementRow = ({ timestamp, measurement, removeMeasurement }) => {
         <Button
           mode="contained"
           uppercase={false}
-          color="#FF0D0E"
+          color={colors.pinkishRed}
           icon="minus-box"
           onPress={() => {
-            removeMeasurement(timestamp, user.access_token)
+            removeMeasurement(timestamp, user.access_token);
           }}
         >
           Delete
@@ -41,7 +39,6 @@ export default function EditGraph({ navigation, route }) {
   const { user } = useContext(UserContext);
   const [graphData, setGraphData] = useState({});
   const [showEditDialogBox, setShowEditDialogBox] = useState(false);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [newMeasurement, setNewMeasurement] = useState(null);
   const [newDate, setNewDate] = useState(new Date(Date.now()));
   const [dateToInsert, setDateToInsert] = useState(null);
@@ -64,8 +61,8 @@ export default function EditGraph({ navigation, route }) {
     try {
       await axios.delete(connection_string, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
     } catch (e) {
       console.log('error removing measurement', e);
@@ -74,8 +71,8 @@ export default function EditGraph({ navigation, route }) {
     const graphDataCopy = JSON.parse(JSON.stringify(graphData));
     delete graphDataCopy[timestamp];
     setGraphData(graphDataCopy);
-    await getGraphs(token)
-  }
+    await getGraphs(token);
+  };
 
   const getMeasurements = async (token) => {
     let connection_string = config.backend_server + '/measurements/' + id;
@@ -83,8 +80,8 @@ export default function EditGraph({ navigation, route }) {
       setIsLoading(true);
       const response = await axios.get(connection_string, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setGraphData(response.data);
       setIsLoading(false);
@@ -100,7 +97,9 @@ export default function EditGraph({ navigation, route }) {
 
     for (const timestamp of Object.keys(graphData)) {
       if (dateToInsert === timestamp) {
-        Alert.alert('Error', `Measurement already exists for ${dateToInsert}`, [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
+        Alert.alert('Error', `Measurement already exists for ${dateToInsert}`, [
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ]);
         return;
       }
     }
@@ -114,9 +113,9 @@ export default function EditGraph({ navigation, route }) {
       let connection_string = config.backend_server + '/measurements/' + id;
       await axios.post(connection_string, {
         measurement: newMeasurement,
-        date: newDateString
+        date: newDateString,
       });
-      await getGraphs()
+      await getGraphs();
     } catch (e) {
       console.log(e);
     }
@@ -134,90 +133,45 @@ export default function EditGraph({ navigation, route }) {
     try {
       await axios.delete(connection_string, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
     } catch (e) {
       console.log(e);
     }
     await getGraphs(token);
-    setShowDeleteConfirmation(false);
     setDeleteLoading(false);
     navigation.goBack();
   };
 
   useEffect(() => {
     getMeasurements(user.access_token);
-  }, [])
+  }, []);
 
   return (
-    <View style={{ height: Dimensions.get('window').height, alignItems: 'center' }}>
-      <View style={styles.header}>
-        <View style={styles.titleView}>
-          <Text style={styles.title}>{title}</Text>
-          <Text>{units}</Text>
-        </View>
-        <View style={styles.buttonView}>
-          <IconButton
-            icon="delete"
-            size={30}
-            onPress={() => setShowDeleteConfirmation(true)}
-          />
-        </View>
-      </View>
-      <View style={styles.tableWrapper}>
-        {isLoading ? (
-          <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
-        ) : (
-          <ScrollView contentContainerStyle={styles.table}>
-            {
-                Object.keys(graphData).map((timestamp) => <MeasurementRow
-                  key={`${timestamp}${graphData[timestamp]}`}
-                  timestamp={timestamp}
-                  measurement={graphData[timestamp]}
+    <View style={styles.outercontainer}>
+      <EditGraphHeader navigation={navigation} title={title} units={units} deleteGraph={deleteGraph} />
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
+      ) : (
+        <ScrollView style={styles.scrollcontainer}>
+          <View style={styles.table}>
+            {Object.keys(graphData).map((timestamp) => (
+              <MeasurementRow
+                key={`${timestamp}${graphData[timestamp]}`}
+                timestamp={timestamp}
+                measurement={graphData[timestamp]}
                 removeMeasurement={removeMeasurement}
-              >
-              </MeasurementRow>)
-            }
-            </ScrollView>
-          )
-        }
-
-      </View>
-
-      <View>
-        <Dialog.Container visible={showDeleteConfirmation}>
-          {
-            deleteLoading ? (
-              <ActivityIndicator size="large" color="#2196f3" style={{ marginBottom: '10%' }} />
-            ) : (
-              <>
-                <Dialog.Title>Are you sure you want to delete this graph? THIS CANNOT BE UNDONE!</Dialog.Title>
-                <View style={{ display: 'flex', flexDirection: 'row' }}>
-                  <Dialog.Button label="No" onPress={() => setShowDeleteConfirmation(false)} />
-                  <Dialog.Button label="Yes" onPress={() => deleteGraph(user.access_token)} />
-                </View>
-              </>
-            )
-          }
-        </Dialog.Container>
-      </View>
-
+              ></MeasurementRow>
+            ))}
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: '18%',
-    width: '90%',
-    justifyContent: 'space-between',
-    borderBottomColor: colors.grayLight,
-    borderBottomWidth: 2,
-  },
   row: {
     display: 'flex',
     flexDirection: 'row',
@@ -229,40 +183,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: '8%',
     marginBottom: '2%',
     borderRadius: 10,
-    backgroundColor: '#2D78E9',
+    backgroundColor: colors.lightBlue,
   },
-  tableWrapper: {
-    paddingTop: '2%',
-    paddingBottom: '10%',
+  tableWrapper: {},
+  loader: {
+    paddingTop: 64,
+  },
+  outercontainer: {
+    flex: 1,
+  },
+  scrollcontainer: {
+    flex: 0,
+    paddingTop: 16,
+    marginBottom: 20,
   },
   table: {
-    display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    width: Dimensions.get('window').width,
-    marginTop: '3%',
-    paddingBottom: '30%'
+    paddingBottom: 32,
   },
   cell: {
-    fontSize: '20%',
-    color: 'white'
+    fontSize: 16,
+    color: colors.dark,
   },
   measurement: {
     fontWeight: 'bold',
-    fontSize: '25%'
+    fontSize: 18,
   },
   title: {
     fontWeight: 'bold',
     fontSize: '30%',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   titleView: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   buttonView: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
-  }
+  },
 });

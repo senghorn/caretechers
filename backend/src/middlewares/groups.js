@@ -24,7 +24,7 @@ module.exports.verifyGroupBody = asyncHandler(async (req, _res, next) => {
       name: { type: 'string' },
       visitFrequency: { type: 'number' },
       timeZone: { type: 'string' },
-      userId: { type: 'string' }
+      userId: { type: 'string' },
     },
     required: ['name', 'visitFrequency'],
   };
@@ -40,14 +40,14 @@ module.exports.compareMembers = asyncHandler(async (req, _res, next) => {
                 (SELECT COUNT(*) FROM Visits v WHERE v.visitor = u.email AND v.group_id = m.group_id AND v.date < CURRENT_DATE()) AS total_visits
                 FROM GroupMembers m JOIN Users u ON u.email = m.member_id 
                 LEFT JOIN Visits cv ON cv.visitor = u.email AND cv.group_id = m.group_id AND cv.completed = 1 AND cv.date < CURRENT_DATE()
-                WHERE m.group_id = 1 GROUP BY u.email;`;
+                WHERE m.group_id = ${req.params.groupId} GROUP BY u.email;`;
 
   if (req.query.after) {
     query = sql`SELECT m.member_id, m.active, u.first_name, u.last_name, COUNT(cv.id) as completed_visits, 
                 (SELECT COUNT(*) FROM Visits v WHERE v.visitor = u.email AND v.group_id = m.group_id AND v.date < CURRENT_DATE() AND v.date > ${req.query.after}) AS total_visits
                 FROM GroupMembers m JOIN Users u ON u.email = m.member_id 
                 LEFT JOIN Visits cv ON cv.visitor = u.email AND cv.group_id = m.group_id AND cv.completed = 1 AND cv.date < CURRENT_DATE() AND cv.date > ${req.query.after}
-                WHERE m.group_id = 1 GROUP BY u.email;`;
+                WHERE m.group_id = ${req.params.groupId} GROUP BY u.email;`;
   }
 
   const result = await db.query(query);
@@ -74,25 +74,24 @@ module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
     const email = req.body.userId;
 
     const insertUserToAsGroupAdmin = sql`INSERT INTO GroupMembers (member_id, group_id, active, admin_status) 
-    VALUES (${email}, 1, 1, 2) 
+    VALUES (${email}, ${group_id}, 1, 2) 
     ON DUPLICATE KEY UPDATE group_id = ${group_id}, active = 1, admin_status = 2;
+    UPDATE Users SET curr_group = ${group_id} WHERE email = ${email};
     `;
     const insertUserResult = await db.query(insertUserToAsGroupAdmin);
-    console.log(insertUserResult);
-    if (insertUserResult.affectedRows) {
+    console.log('Update and insert result', insertUserResult);
+    if (insertUserResult[0].affectedRows && insertUserResult[1].affectedRows) {
       req.result = {
-        status: "succeed"
-      }
+        status: 'succeed',
+      };
       next();
     } else {
       console.log(insertUserResult);
-      return next(new Error("Failed to join group."));
+      return next(new Error('Failed to join group.'));
     }
-
   } else {
-    return next(new Error("Failed to create new group."));
+    return next(new Error('Failed to create new group.'));
   }
-
 });
 
 module.exports.getGroupsDeprecated = asyncHandler(async (req, res, next) => {

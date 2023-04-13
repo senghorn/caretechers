@@ -4,12 +4,7 @@ import { ActivityIndicator, Button, IconButton } from 'react-native-paper';
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import COLORS from '../constants/colors';
 import Header from '../components/notes/header';
-import {
-  FetchUsers,
-  searchMessage,
-  PinMessage,
-  fetchMoreMessages
-} from '../services/api/messages';
+import { FetchUsers, searchMessage, PinMessage, fetchMoreMessages } from '../services/api/messages';
 import UserContext from '../services/context/UserContext';
 import useSWR from 'swr';
 import config from '../constants/config';
@@ -35,10 +30,12 @@ export default function Messages({ navigation }) {
 
   // *****Fetch initial data*****
   const { data, isLoading, error, mutate } = useSWR(
-    [config.backend_server + '/messages/fetch/' + user.curr_group,
+    [
+      config.backend_server + '/messages/fetch/' + user.curr_group,
       {
-        headers: { 'Authorization': 'Bearer ' + user.access_token }
-      }],
+        headers: { Authorization: 'Bearer ' + user.access_token },
+      },
+    ],
     ([url, token]) => fetcher(url, token)
   );
   useEffect(() => {
@@ -46,7 +43,6 @@ export default function Messages({ navigation }) {
       FetchUsers(user, setUsers, setThisUser, user.access_token);
     }
   }, [user]);
-
 
   useEffect(() => {
     if (!isLoading && data && users) {
@@ -74,7 +70,7 @@ export default function Messages({ navigation }) {
         }
       }
     }
-  }
+  };
 
   const getSmallestMessageId = () => {
     let result = 0;
@@ -84,10 +80,10 @@ export default function Messages({ navigation }) {
         if (message._id < result) {
           result = message._id;
         }
-      })
+      });
     }
     return result;
-  }
+  };
 
   // *****Image handlers*****
   const addImage = async (isCamera = false) => {
@@ -106,22 +102,24 @@ export default function Messages({ navigation }) {
     setImageUploading(true);
     const result = isCamera
       ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.5,
-        base64: true,
-      })
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.5,
+          base64: true,
+        })
       : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.5,
-        base64: true,
-      });
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.5,
+          base64: true,
+        });
     if (!result.canceled) {
       try {
         const imageUrl = await uploadImage(result.assets[0].base64);
-        const imageData = [{
-          text: imageUrl,
-          messageType: 'I'
-        }];
+        const imageData = [
+          {
+            text: imageUrl,
+            messageType: 'I',
+          },
+        ];
         onMessageSend(imageData);
       } catch (error) {
         console.log(error);
@@ -138,27 +136,19 @@ export default function Messages({ navigation }) {
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
       },
-      buttonIndex => {
+      (buttonIndex) => {
         if (buttonIndex === 0) {
-
         } else if (buttonIndex === 1) {
           addImage(true);
         } else if (buttonIndex === 2) {
           addImage(false);
         }
-      },
+      }
     );
-  }
-
+  };
 
   useEffect(() => {
-    if (
-      searchQuery &&
-      searchQuery != '' &&
-      user &&
-      user.curr_group &&
-      searchMode
-    ) {
+    if (searchQuery && searchQuery != '' && user && user.curr_group && searchMode) {
       const search = async () => {
         const result = await searchMessage(user.curr_group, searchQuery, user.access_token);
         const formatted = FormatMessagesForChat(users, result);
@@ -185,20 +175,17 @@ export default function Messages({ navigation }) {
     if (socket && users) {
       socket.on('message', (message) => {
         const msg = {
-          text: message.messageType === "I" ? "" : message.content,
+          text: message.messageType === 'I' ? '' : message.content,
           createdAt: message.date_time,
           _id: message.id,
-          messageType: message.messageType === "I" ? "image" : "text",
-          image: message.messageType === "I" ? message.content : null,
-          user: users[message.sender] ? users[message.sender] :
-            { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
-        }
-        setMessages((previousMessages) =>
-          GiftedChat.append(previousMessages, msg)
-        );
+          messageType: message.messageType === 'I' ? 'image' : 'text',
+          image: message.messageType === 'I' ? message.content : null,
+          user: users[message.sender] ? users[message.sender] : { _id: 'Deleted user', avatar: '', name: 'Deleted User' },
+        };
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, msg));
       });
     }
-  }, [socket, users])
+  }, [socket, users]);
 
   var onMessageSend = useCallback(
     (messages = []) => {
@@ -216,7 +203,6 @@ export default function Messages({ navigation }) {
       PinMessage(pinMessage._id, user.access_token);
       setPinMessage(null);
     }
-
   }, [pinMessage]);
 
   const onLongPress = (context, message) => {
@@ -227,27 +213,20 @@ export default function Messages({ navigation }) {
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
       },
-      buttonIndex => {
+      (buttonIndex) => {
         if (buttonIndex === 0) {
           // cancel action
         } else if (buttonIndex === 1) {
           setPinMessage(message);
         } else if (buttonIndex === 2) {
         }
-      },
+      }
     );
-
   };
 
   const CameraButton = () => {
-    return (
-      <IconButton
-        icon="image-plus"
-        size={25}
-        onPress={imageButtonPressHandler}
-      />
-    )
-  }
+    return <IconButton icon="image-plus" size={25} onPress={imageButtonPressHandler} />;
+  };
 
   // Message render bubble
   const renderBubble = (props) => {
@@ -260,9 +239,11 @@ export default function Messages({ navigation }) {
           right: {
             backgroundColor: COLORS.primary,
             marginVertical: 5,
+            zIndex: 1,
           },
           left: {
             marginVertical: 5,
+            zIndex: 1,
           },
         }}
       />
@@ -271,14 +252,9 @@ export default function Messages({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Header
-        title={'Messages'}
-        navigation={navigation}
-        pin
-        setSearchQuery={setSearchQuery}
-        setSearchingMode={setSearchMode}
-      />
+      <Header title={'Messages'} navigation={navigation} pin setSearchQuery={setSearchQuery} setSearchingMode={setSearchMode} />
       {loading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
+      {/* <View style={styles.chatContainer}> */}
       <GiftedChat
         renderActions={CameraButton}
         renderBubble={renderBubble}
@@ -293,6 +269,7 @@ export default function Messages({ navigation }) {
         loadEarlier={!noEalierMessages}
         infiniteScroll
       />
+      {/* </View> */}
     </View>
   );
 }
@@ -300,9 +277,16 @@ export default function Messages({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     padding: 0,
     margin: 0,
+    backgroundColor: '#fff',
+  },
+  chatContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 0,
+    marginTop: 4,
+    zIndex: 0,
   },
   textInput: {
     height: 40,
@@ -322,12 +306,12 @@ const FormatMessagesForChat = (all_users, messages) => {
   if (all_users) {
     messages.forEach(function (message) {
       formatted_messages.push({
-        text: message.messageType === "I" ? "" : message.content,
+        text: message.messageType === 'I' ? '' : message.content,
         createdAt: message.date_time,
         _id: message.id,
-        messageType: message.messageType === "I" ? "image" : "text",
-        image: message.messageType === "I" ? message.content : null,
-        user: all_users[message.sender] ? all_users[message.sender] : { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
+        messageType: message.messageType === 'I' ? 'image' : 'text',
+        image: message.messageType === 'I' ? message.content : null,
+        user: all_users[message.sender] ? all_users[message.sender] : { _id: 'Deleted user', avatar: '', name: 'Deleted User' },
       });
     });
   }

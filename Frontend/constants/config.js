@@ -1,6 +1,6 @@
-const local_ip = '10.18.86.123';
+const local_ip = 'localhost';
 const aws_ip = 'ec2-54-177-61-20.us-west-1.compute.amazonaws.com';
-const ip = aws_ip;
+const ip = local_ip;
 
 export default {
   ip,

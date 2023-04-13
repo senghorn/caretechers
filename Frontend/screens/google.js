@@ -62,13 +62,13 @@ export default function GoogleLogin({ navigation }) {
         let serverAccessTokens = await getAccessToken(accessToken);
         if (serverAccessTokens) {
           if (serverAccessTokens.registered) {
-            setCookies(serverAccessTokens);
             if (serverAccessTokens.accessToken) {
-              setAPIAccessToken(serverAccessTokens.accessToken);
+              await setAPIAccessToken(serverAccessTokens.accessToken);
             }
             if (serverAccessTokens.refreshToken) {
-              setAPIResetToken(serverAccessTokens.refreshToken);
+              await setAPIResetToken(serverAccessTokens.refreshToken);
             }
+            setCookies(serverAccessTokens);
           } else {
             let userInfoResponse = await fetch(
               'https://www.googleapis.com/userinfo/v2/me',
@@ -105,13 +105,14 @@ export default function GoogleLogin({ navigation }) {
         navigation.navigate('GroupSelector');
       }
     }
-  }, [userDataReceived]);
+  }, [userDataReceived, user]);
 
   async function AuthenticatedUserHandler() {
     try {
       const access_token = await getAPIAccessToken();
       const result = await setUserDataInfo(setUser, access_token);
       if (result) {
+        console.log('setting user data to be received');
         setUserDataReceived(true);
       } else {
         setLoading(false);

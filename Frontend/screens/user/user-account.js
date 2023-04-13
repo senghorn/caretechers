@@ -6,6 +6,7 @@ import { useState, useContext, useEffect } from 'react';
 import { UpdateUserData } from '../../services/api/user';
 import * as ImagePicker from 'expo-image-picker';
 import uploadImage from '../../services/s3/uploadImage';
+import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
 
 export default function UserAccount({ navigation, route, newUser }) {
   const { user, setUser } = useContext(UserContext);
@@ -16,14 +17,15 @@ export default function UserAccount({ navigation, route, newUser }) {
   const [email, setEmail] = useState('johndoe@user.com');
   const [saving, setSaving] = useState(false);
   const [newProfile, setNewProfile] = useState(null);
+  const [refreshCalendar] = useContext(CalendarRefreshContext);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [3, 3],
-      quality: 1,
-      base64: true
+      quality: 5,
+      base64: true,
     });
 
     if (!result.canceled) {
@@ -51,10 +53,18 @@ export default function UserAccount({ navigation, route, newUser }) {
       await (async () => {
         let profileURL;
         if (newProfile) {
-          profileURL = await uploadImage(newProfile)
-          setNewProfile(null);
+          // setNewProfile(null);
+          profileURL = await uploadImage(newProfile);
         }
-        const update = await UpdateUserData(email, firstName, lastName, phone, user.curr_group, profileURL || user.profile_pic, user.access_token);
+        const update = await UpdateUserData(
+          email,
+          firstName,
+          lastName,
+          phone,
+          user.curr_group,
+          profileURL || user.profile_pic,
+          user.access_token
+        );
         if (update) {
           setUser({
             id: user.id,
@@ -64,14 +74,16 @@ export default function UserAccount({ navigation, route, newUser }) {
             profile_pic: profileURL || user.profile_pic,
             phone_num: phone,
             access_token: user.access_token,
-            groups: user.groups
+            groups: user.groups,
           });
         }
       })();
     } else {
       alert('Make sure your phone number, first and last name are valid.');
     }
+    refreshCalendar();
     setSaving(false);
+    navigation.navigate('Settings');
   };
 
   const formatPhoneNumber = (text) => {
@@ -110,7 +122,7 @@ export default function UserAccount({ navigation, route, newUser }) {
       >
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={pickImage}>
-            <Avatar.Image size={90} source={{uri: newProfile ? 'data:image/jpeg;base64,' + newProfile : profile}} />
+            <Avatar.Image size={90} source={{ uri: newProfile ? 'data:image/jpeg;base64,' + newProfile : profile }} />
             <Text style={styles.uploadPhotoText}>Change</Text>
           </TouchableOpacity>
         </View>
