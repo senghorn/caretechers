@@ -30,6 +30,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
         {editMode ? (
           <TextInput
             style={styles.titleInput}
+            dense
             label="Title"
             value={editTitle}
             onChangeText={(text) => {
@@ -139,7 +140,6 @@ const styles = StyleSheet.create({
   },
   titleInput: {
     flexGrow: 1,
-    height: 40,
     marginRight: 16,
     marginBottom: 4,
     fontSize: 18,

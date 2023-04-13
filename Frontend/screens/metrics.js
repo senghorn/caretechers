@@ -127,7 +127,9 @@ export default function Metrics({ navigation }) {
         {isLoading ? (
           <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />
         ) : (
-          <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+          <ScrollView
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} style={styles.scrollPadding} />}
+          >
             {Object.keys(graphs).map((key) => (
               <Graph
                 key={key}
@@ -165,21 +167,13 @@ const styles = StyleSheet.create({
   scrollContainer: {
     backgroundColor: '#fff',
     flex: 1,
+  },
+  scrollPadding: {
     paddingTop: 16,
   },
   title: {
     fontWeight: 'bold',
     fontSize: '30%',
-  },
-  titleBar: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: Dimensions.get('window').width - 40,
-    marginLeft: '10%',
-    marginRight: '10%',
-    paddingBottom: '5%',
   },
   button: {
     backgroundColor: colors.card,
