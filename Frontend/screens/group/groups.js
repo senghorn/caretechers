@@ -17,6 +17,7 @@ export default function Groups({ navigation }) {
   const [password, setPassword] = useState('');
   const [socket, setSocket] = useContext(SocketContext);
   const [loading, setLoading] = useState(false);
+
   const processInviteLink = async () => {
     if (inviteLinkContext) {
       try {
@@ -25,6 +26,7 @@ export default function Groups({ navigation }) {
             'authorization': `Bearer ${user.access_token}`
           }
         });
+        console.log(response.data)
         setGroupName(response.data.groupName);
         setPassword(response.data.groupPassword);
 

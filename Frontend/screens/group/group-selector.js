@@ -19,10 +19,10 @@ export default function GroupSelector({ navigation }) {
     const inviteLink = useContext(InviteLinkContext);
 
     useEffect(() => {
-        if (inviteLink) {
+        if (inviteLink && user) {
             navigation.navigate("Group");
         }
-    }, []);
+    }, [inviteLink, user]);
 
     useEffect(() => {
         if (user && user.groups) {
