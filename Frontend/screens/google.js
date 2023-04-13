@@ -10,6 +10,7 @@ import { setAPIAccessToken, setAPIResetToken, getAPIAccessToken, clearAsyncStora
 import { validateTokens } from '../utils/accessController';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { setUserDataInfo } from '../utils/userController';
+import InviteLinkContext from '../services/context/InviteLinkContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -19,6 +20,7 @@ export default function GoogleLogin({ navigation }) {
   const [cookies, setCookies] = useState(null);
   const [loading, setLoading] = useState(false);
   const [userDataReceived, setUserDataReceived] = useState(false);
+  const inviteLink = useContext(InviteLinkContext);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId:
       '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
@@ -101,7 +103,10 @@ export default function GoogleLogin({ navigation }) {
       setLoading(false);
       if (user.curr_group) {
         navigation.navigate('Home');
-      } else {
+      } else if (inviteLink) {
+        navigation.navigate('Group');
+      }
+      else {
         navigation.navigate('GroupSelector');
       }
     }
