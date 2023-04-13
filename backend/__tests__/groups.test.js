@@ -42,7 +42,7 @@ describe('notes', () => {
         test('POST /groups/', async () => {
             const response = await supertest(app).post(`/groups/`).set('Authorization', `Bearer ${cookie}`).send(data);
             expect(response.status).toBe(200);
-            console.log(response);
+            // console.log(response);
         });
     });
 });
