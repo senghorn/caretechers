@@ -7,14 +7,7 @@ import SortAction from '../generic/sortAction';
 import colors from '../../constants/colors';
 import UserContext from '../../services/context/UserContext';
 
-export default function Header({
-  navigation,
-  title,
-  sort,
-  pin = false,
-  setSearchQuery,
-  setSearchingMode = () => { },
-}) {
+export default function Header({ navigation, title, sort, pin = false, setSearchQuery, setSearchingMode = () => {} }) {
   const SORT_LABELS = {
     ascending: 'Ascending',
     descending: 'Descending',
@@ -42,7 +35,8 @@ export default function Header({
         {iconSearchMode ? (
           <TextInput
             style={styles.titleInput}
-            label='Search'
+            dense={true}
+            label="Search"
             value={searchQuery}
             onChangeText={(text) => {
               setQuery(text);
@@ -54,18 +48,16 @@ export default function Header({
             }}
             autoFocus
             activeOutlineColor={colors.primary}
-            mode='outlined'
+            mode="outlined"
           />
         ) : (
           <Appbar.Content title={title} titleStyle={styles.title} />
         )}
-        {!iconSearchMode && sort && (
-          <SortAction sortOptions={sortOptions} setSort={sortRefresh} />
-        )}
+        {!iconSearchMode && sort && <SortAction sortOptions={sortOptions} setSort={sortRefresh} />}
         {!iconSearchMode && pin && (
           <Appbar.Action
-            icon='pin'
-            color='#CF3232'
+            icon="pin"
+            color="#CF3232"
             onPress={() => {
               navigation.navigate('PinnedMessages');
             }}
@@ -88,11 +80,12 @@ const styles = StyleSheet.create({
   headerContainer: {
     flex: 0,
     backgroundColor: '#fff',
-  },
-  outerContainer: {
+    zIndex: 9999,
     shadowOffset: { width: 0, height: -10 },
     shadowColor: '#888',
     shadowOpacity: 0.1,
+  },
+  outerContainer: {
     zIndex: 999,
   },
   title: {
@@ -101,7 +94,6 @@ const styles = StyleSheet.create({
   },
   titleInput: {
     flexGrow: 1,
-    height: 40,
     marginRight: 16,
     marginBottom: 4,
     fontSize: 18,

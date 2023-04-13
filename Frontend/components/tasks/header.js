@@ -18,6 +18,7 @@ export default function Header({ navigation, sortOptions, setSort, query, setQue
         {searchMode ? (
           <TextInput
             style={styles.titleInput}
+            dense
             label="Search Tasks"
             value={query}
             autoFocus
@@ -71,7 +72,6 @@ const styles = StyleSheet.create({
   },
   titleInput: {
     flexGrow: 1,
-    height: 40,
     marginRight: 16,
     marginBottom: 4,
     fontSize: 18,
