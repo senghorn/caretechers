@@ -24,7 +24,7 @@ export default function UserAccount({ navigation, route, newUser }) {
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [3, 3],
-      quality: 0.5,
+      quality: 0.4,
       base64: true,
     });
 
