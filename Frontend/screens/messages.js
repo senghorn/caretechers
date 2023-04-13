@@ -103,12 +103,12 @@ export default function Messages({ navigation }) {
     const result = isCamera
       ? await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 0.5,
+          quality: 0.3,
           base64: true,
         })
       : await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 0.5,
+          quality: 0.3,
           base64: true,
         });
     if (!result.canceled) {
