@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     backgroundColor: '#fff',
     flex: 1,
-    marginTop: 16,
+    paddingTop: 16,
   },
   title: {
     fontWeight: 'bold',
