@@ -24,7 +24,7 @@ import SocketContext from '../../services/context/SocketContext';
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { setUserDataInfo } from '../../utils/userController';
+import { getUserRole, setUserDataInfo } from '../../utils/userController';
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { subMonths } from 'date-fns';
@@ -184,7 +184,7 @@ export default function GroupSettings({ navigation }) {
   return (
     <Provider>
       <Portal>
-        <ManageUserModal selectedUser={selectedUser} setSelectedUser={setSelectedUser} F />
+        <ManageUserModal selectedUser={selectedUser} setSelectedUser={setSelectedUser} user={user} />
       </Portal>
       <View style={styles.container}>
         <Spinner color="#add8e6" visible={waitingToLeave} textStyle={styles.spinnerTextStyle} size={'large'} />
@@ -376,11 +376,19 @@ const RoleBadge = ({ group }) => {
   }
 };
 
-const ManageUserModal = ({ selectedUser, setSelectedUser }) => {
+const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
+  const [userRole, setUserRole] = useState(0);
+  useEffect(() => {
+    if (user) {
+      const role = getUserRole(user);
+      setUserRole(role);
+    }
+  }, [user])
+
   const handleRemoveUser = () => {
     console.log('removeing user ', selectedUser);
   };
-  const handleCancel = () => {};
+  const handleCancel = () => { };
   const removeUserHandler = () => {
     Alert.alert(
       'Remove User',
@@ -444,9 +452,9 @@ const ManageUserModal = ({ selectedUser, setSelectedUser }) => {
         </View>
       </View>
       <View style={styles.manageButtons}>
-        <Button style={styles.removeButton} color="red" onPress={removeUserHandler}>
+        {userRole === 0 ? null : <Button style={styles.removeButton} color="red" onPress={removeUserHandler}>
           Remove User
-        </Button>
+        </Button>}
       </View>
     </Modal>
   );
