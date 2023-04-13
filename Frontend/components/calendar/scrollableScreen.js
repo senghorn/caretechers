@@ -1,7 +1,7 @@
 import { FlatList } from 'react-native-bidirectional-infinite-scroll';
 
 import { addDays, subDays } from 'date-fns';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Day from './day';
 import WeekLabel from './weekLabel';
@@ -22,6 +22,8 @@ export default function ScrollableScreen({
 
   const renderFlatListDay = ({ item }) => <RenderDayFromData date={item.date} types={item.types} navigation={navigation} />;
 
+  const [lock, setLock] = useState(false);
+
   const viewabilityConfigCallbackPairs = useRef([{ onViewableItemsChanged }]);
   const flatListRef = useRef();
   return (
@@ -36,9 +38,13 @@ export default function ScrollableScreen({
       onEndReached={() =>
         updateEndRendering(renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList)
       }
-      onStartReachedThreshold={4}
-      onStartReached={() => {
-        return updateStartRendering(renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList);
+      onStartReachedThreshold={6}
+      onStartReached={async () => {
+        if (!lock) {
+          setLock(true);
+          await updateStartRendering(renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList);
+          setLock(false);
+        }
       }}
       showsVerticalScrollIndicator={false}
       viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
@@ -59,7 +65,7 @@ function RenderDayFromData({ date, types, navigation }) {
 const updateStartRendering = (renderingDataForFlatList, setRenderingDataForFlatList, createRenderingDataForFlatList) => {
   return new Promise((resolve) => {
     const firstDate = renderingDataForFlatList[0].date;
-    const newFirstDate = subDays(firstDate, 14);
+    const newFirstDate = subDays(firstDate, 4);
     const newDays = createRenderingDataForFlatList(newFirstDate, subDays(firstDate, 1));
     const renderingData = [...newDays, ...renderingDataForFlatList];
     setRenderingDataForFlatList(renderingData);
