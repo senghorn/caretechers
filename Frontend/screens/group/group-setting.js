@@ -366,16 +366,31 @@ const MemberItem = ({ user, setSelectedUser, visitHistory, visitHistoryLoading }
   );
 };
 
+/**
+*
+* React Native functional component that displays a role badge for a user group.
+* @param {object} param0 Props object
+* @param {object} param0.group User group object
+* @returns {JSX.Element} RoleBadge component JSX.Element
+*/
 const RoleBadge = ({ group }) => {
   if (group?.admin_status === 2) {
-    return <Avatar.Image size={34} source={require('../../assets/crown.png')} style={styles.roleBadge} />;
+    return <Avatar.Image size={26} source={require('../../assets/crown.png')} style={styles.roleBadge} />;
   } else if (group?.admin_status === 1) {
-    return <Avatar.Image size={34} source={require('../../assets/badge.png')} style={styles.roleBadge} />;
+    return <Avatar.Image size={26} source={require('../../assets/badge.png')} style={styles.roleBadge} />;
   } else {
-    return <Avatar.Image size={34} source={require('../../assets/circle.png')} style={styles.roleBadge} />;
+    return <Avatar.Image size={26} source={require('../../assets/circle.png')} style={styles.roleBadge} />;
   }
 };
 
+/**
+* React Native functional component that displays a modal for managing a user.
+* @param {object} param0 Props object
+* @param {object} param0.selectedUser Currently selected user
+* @param {function} param0.setSelectedUser Function to update the currently selected user
+* @param {object} param0.user Current user
+* @returns {JSX.Element} ManageUserModal component JSX.Element
+*/
 const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
   const [userRole, setUserRole] = useState(0);
   useEffect(() => {
@@ -415,46 +430,48 @@ const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
       onDismiss={() => {
         setSelectedUser(null);
       }}
-      contentContainerStyle={styles.modalContainerStyle}
+      contentContainerStyle={styles.modal}
     >
-      <View style={styles.profileContainer}>
-        <View style={styles.leftContainer}>
-          <Avatar.Image size={65} source={{ uri: selectedUser?.profile_pic }} style={styles.photo} />
-        </View>
-        <View style={styles.rightContainer}>
-          <View style={styles.nameRow}>
-            <Text style={styles.name}>{selectedUser?.first_name + ' ' + selectedUser?.last_name}</Text>
+      <View style={styles.modalContainerStyle}>
+        <View style={styles.profileContainer}>
+          <View style={styles.leftContainer}>
+            <Avatar.Image size={100} source={{ uri: selectedUser?.profile_pic }} style={styles.photo} />
           </View>
-          <TouchableOpacity
-            style={styles.infoRow}
-            onPress={() => {
-              console.log('pressed');
-            }}
-          >
-            <Ionicons name="call-outline" size={30} color="red" style={styles.infoIcon} />
-            <Text style={styles.phone}>{selectedUser?.phone_num}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.infoRow}
-            onPress={() => {
-              console.log('pressed');
-            }}
-          >
-            <Ionicons name="mail-outline" size={30} color="green" style={styles.infoIcon} />
-            <Text style={styles.phone}>{selectedUser?.email}</Text>
-          </TouchableOpacity>
-          <View style={styles.infoRow}>
-            <RoleBadge group={selectedUser} />
-            <Text style={styles.role}>
-              {selectedUser?.admin_status === 2 ? 'Admin' : selectedUser?.admin_status === 1 ? 'Co-Admin' : 'Non-Admin'}
-            </Text>
+          <View style={styles.rightContainer}>
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>{selectedUser?.first_name + ' ' + selectedUser?.last_name}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.infoRow}
+              onPress={() => {
+                console.log('pressed');
+              }}
+            >
+              <Ionicons name="call-outline" size={26} color="red" style={styles.infoIcon} />
+              <Text style={styles.phone}>{selectedUser?.phone_num}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.infoRow}
+              onPress={() => {
+                console.log('pressed');
+              }}
+            >
+              <Ionicons name="mail-outline" size={26} color="green" style={styles.infoIcon} />
+              <Text style={styles.phone}>{selectedUser?.email}</Text>
+            </TouchableOpacity>
+            <View style={styles.infoRow}>
+              <RoleBadge group={selectedUser} />
+              <Text style={styles.role}>
+                {selectedUser?.admin_status === 2 ? 'Admin' : selectedUser?.admin_status === 1 ? 'Co-Admin' : 'Non-Admin'}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-      <View style={styles.manageButtons}>
-        {userRole === 0 ? null : <Button style={styles.removeButton} color="red" onPress={removeUserHandler}>
-          Remove User
-        </Button>}
+        <View style={styles.manageButtons}>
+          {userRole === 0 ? null : <Button style={styles.removeButton} color="red" onPress={removeUserHandler}>
+            Remove User
+          </Button>}
+        </View>
       </View>
     </Modal>
   );
@@ -545,29 +562,34 @@ const styles = StyleSheet.create({
   roleBadge: {
     backgroundColor: 'transparent',
   },
+  modal: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+  },
   modalContainerStyle: {
     backgroundColor: 'white',
     padding: 20,
     minHeight: '30%',
-    justifyContent: 'center',
-    borderRadius: 8,
+    borderRadius: '100%',
     borderWidth: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    width: '95%'
   },
-
   profileContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginTop: 20,
   },
   leftContainer: {
-    width: '40%',
     alignContent: 'center',
     justifyContent: 'center',
     alignItems: 'center',
   },
   rightContainer: {
-    flex: 1,
-    display: 'flex',
+
   },
   nameRow: {
     marginBottom: 10,
@@ -575,7 +597,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoIcon: {
-    marginRight: 15,
+    marginRight: 10,
   },
   infoRow: {
     flexDirection: 'row',
@@ -600,7 +622,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightYellow,
   },
   role: {
-    marginLeft: 15,
+    marginLeft: 8,
     fontSize: 14,
     color: 'gray',
   },
