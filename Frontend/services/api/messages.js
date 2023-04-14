@@ -65,9 +65,11 @@ export async function fetchMoreMessages(group_id, last_id, users, cookie) {
       var messages = [];
       result.data.forEach(function (message) {
         messages.push({
-          text: message.content,
+          text: message.messageType === 'I' ? '' : message.content,
           createdAt: message.date_time,
           _id: message.id,
+          messageType: message.messageType === 'I' ? 'image' : 'text',
+          image: message.messageType === 'I' ? message.content : null,
           user: users[message.sender] ? users[message.sender] : { "_id": "Deleted user", "avatar": "", "name": "Deleted User" },
         });
       });
