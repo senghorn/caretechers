@@ -4,6 +4,12 @@ import RenderHTML from 'react-native-render-html';
 import { formatDate } from '../../utils/date';
 const width = Dimensions.get('window').width;
 
+/**
+ * Component that displays notes
+ * @param {Object} navigation: React component for navigation 
+ * @param {Object} note: note to display that has content, last_edited, title
+ * @returns 
+ */
 const Note = ({ navigation, route, note }) => {
   return (
     <TouchableOpacity

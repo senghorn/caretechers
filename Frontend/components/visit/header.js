@@ -2,6 +2,12 @@ import { format, startOfDay } from 'date-fns';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
+/**
+ * Visit header component to allow sorting and searching
+ * @param {Date} visit date
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Header({ date, navigation }) {
   return (
     <View style={styles.outerContainer}>

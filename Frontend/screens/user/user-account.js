@@ -8,6 +8,11 @@ import * as ImagePicker from 'expo-image-picker';
 import uploadImage from '../../services/s3/uploadImage';
 import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
 
+/**
+ * Screen for displaying user account and allow user to edit their account.
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function UserAccount({ navigation, route, newUser }) {
   const { user, setUser } = useContext(UserContext);
   const [profile, setProfile] = useState(null);

@@ -9,6 +9,12 @@ import Header from '../components/healthVitals/header';
 const axios = require('axios').default;
 const config = require('../constants/config').default;
 
+/**
+ * Component to display metrics and allow create new graph and measurements.
+ * 
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Metrics({ navigation }) {
   const [showCreateNewGraphDialogBox, setShowCreateNewGraphDialogBox] = useState(false);
   const [graphs, setGraphs] = useState({});
@@ -23,6 +29,7 @@ export default function Metrics({ navigation }) {
     return timestamp.slice(5).replace('-', '/');
   };
 
+  // Handler for creating new graph button
   const createNewGraph = async (token) => {
     if (newTitle === null || newUnits === null) {
       Alert.alert('Error', 'Title and units required!', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
@@ -65,6 +72,7 @@ export default function Metrics({ navigation }) {
     setNewGraphLoading(false);
   };
 
+  // Fetches graphs and update graphs 
   const getGraphs = async (token) => {
     let connection_string = config.backend_server + '/graphs/' + user.curr_group + '?limit=7';
     try {

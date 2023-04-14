@@ -12,6 +12,12 @@ import { SearchNotes } from '../../services/api/notes';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
+/**
+ * Displays all notes and support sorting and searching feature.
+ * 
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Notes({ navigation, route }) {
   const { user } = useContext(UserContext);
 

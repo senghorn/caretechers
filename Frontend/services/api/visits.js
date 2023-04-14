@@ -2,6 +2,14 @@ import config from '../../constants/config';
 import { schedulePushNotification } from '../notifications/schedule';
 const axios = require('axios').default;
 
+/**
+ * Sends api post request to backend in order to record the visit.
+ * @param {string} visitId 
+ * @param {Date} date 
+ * @param {Object} completedTasks 
+ * @param {string} notes 
+ * @param {string} token 
+ */
 export const recordVisit = async (visitId, date, completedTasks, notes, token) => {
   try {
     const tasks = Object.keys(completedTasks).filter((taskId) => completedTasks[taskId]);
@@ -29,6 +37,12 @@ export const deleteVisit = async (visitId, token) => {
   }
 };
 
+/**
+ * Sends api post request to backend in order to volunteer the visit.
+ * @param {Date} date : date to volunteer
+ * @param {Object} user : user object form Context
+ * @param {string} token : auth token to attache to the request
+ */
 export const volunteerForVisit = async (date, user, token) => {
   const newVisit = {
     date,
@@ -54,6 +68,14 @@ export const volunteerForVisit = async (date, user, token) => {
     console.log('Error volunteering for visit:', error);
   }
 };
+
+/**
+ * Sends an api request to update notification identifier.
+ * 
+ * @param {string} visitId 
+ * @param {Object} identifier 
+ * @param {string} token 
+ */
 export const setVisitNotificationIdentifier = async (visitId, identifier, token) => {
   const headers = {
     'Content-Type': 'application/json',

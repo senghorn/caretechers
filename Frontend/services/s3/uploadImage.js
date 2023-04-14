@@ -5,6 +5,11 @@ import { Buffer } from 'buffer';
 import Base64Binary from 'base64-arraybuffer';
 import { v4 as uuidv4 } from 'uuid';
 
+/**
+ * Uploads content given to s3 bucket and returns the url to that uploaded content.
+ * @param {Object} content 
+ * @returns 
+ */
 const uploadImage = (content) => {
   console.log('uploading');
   const imageName = uuidv4();

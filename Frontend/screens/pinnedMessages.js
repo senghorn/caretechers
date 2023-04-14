@@ -13,6 +13,12 @@ import { ActivityIndicator } from 'react-native-paper';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
+/**
+ * Component for displaying pinned messages and allow unpinning messages.
+ * 
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function PinnedMessages({ navigation }) {
 
     const { user } = useContext(UserContext);
@@ -29,12 +35,14 @@ export default function PinnedMessages({ navigation }) {
     const [users, setUsers] = useState([]);
     const [this_user, setThisUser] = useState(null);
 
+    // handle data receiving
     useEffect(() => {
         if (data && !isLoading) {
             setMessages(data);
         }
     }, [data, isLoading]);
 
+    // Fetch users for displaying messages when user object exists
     useEffect(() => {
         if (user && user.curr_group) {
             const fetchData = async () => {
@@ -45,6 +53,7 @@ export default function PinnedMessages({ navigation }) {
         }
     }, [user])
 
+    // Handles unpin messages
     const [messageToUnpin, setMessageToUnpin] = useState(null);
     useEffect(() => {
         if (messageToUnpin != null) {
@@ -85,7 +94,13 @@ export default function PinnedMessages({ navigation }) {
 
 }
 
-
+/**
+ * Display message and handles unpinning feature
+ * @param {object} message to display
+ * @param {string} sender email
+ * @param {function} sets when unpin button is pressed on this message
+ * @returns 
+ */
 const MessageBox = ({ message, sender, setMessageToUnpin }) => {
     const handleUnpinPressed = () => {
         Alert.alert(
@@ -143,6 +158,10 @@ const MessageBox = ({ message, sender, setMessageToUnpin }) => {
     );
 }
 
+/**
+ * Component for displaying message content
+ * @returns 
+ */
 const MessageContent = ({ message }) => {
     return message ? (
         <View>

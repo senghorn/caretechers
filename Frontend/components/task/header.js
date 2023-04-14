@@ -11,6 +11,12 @@ import { getCurrentDateString } from '../../utils/date';
 import UserContext from '../../services/context/UserContext';
 import SocketContext from '../../services/context/SocketContext';
 
+/**
+ * Tasks screen header component that allow editing modes
+ * 
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
   const [refreshTasks] = useContext(TasksRefreshContext);
   const [refreshVisitTasks] = useContext(VisitTasksRefreshContext);
@@ -96,6 +102,7 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
+// Handles deleting a tasks by sending backend api request to backend
 const deleteTask = async (id, tasksMutate, refreshVisit, refreshVisitTasks, refreshCalendar, token, socket) => {
   const currDate = getCurrentDateString();
   const url = `${config.backend_server}/tasks/${id}?end_date=${currDate}`;

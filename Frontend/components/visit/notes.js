@@ -8,6 +8,11 @@ import uploadImage from '../../services/s3/uploadImage';
 
 const { height } = Dimensions.get('window').height;
 
+/**
+ * Component built for visit notes that support editing note for the visit
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function VisitNotes({ editMode, editContent, setEditContent }) {
   const richText = useRef();
 

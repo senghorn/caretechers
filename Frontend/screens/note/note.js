@@ -9,6 +9,11 @@ import UserContext from '../../services/context/UserContext';
 import colors from '../../constants/colors';
 import NewNote from './newNote';
 
+/**
+ * Display full note and allow editing the note.
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Note({ navigation, route }) {
   const { note } = route.params;
   const [noteContent, setNoteContent] = useState('');
@@ -18,6 +23,7 @@ export default function Note({ navigation, route }) {
   const [editTime, setEditTime] = useState('');
   const { user } = useContext(UserContext);
   const { toggleRefresh } = useContext(NotesRefreshContext);
+
 
   useEffect(() => {
     if (note && note.last_edited) {
@@ -138,6 +144,7 @@ export default function Note({ navigation, route }) {
   );
 }
 
+// Handler for updating note.
 const addNote = async (noteTitle, noteContent, groupId, navigation, cookie) => {
   if (noteTitle && noteContent) {
     CreateNote({ title: noteTitle, content: noteContent }, groupId, cookie)

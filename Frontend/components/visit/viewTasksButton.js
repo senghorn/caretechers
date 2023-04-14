@@ -1,5 +1,10 @@
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
+/**
+ * Customized button to view tasks
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function ViewTasksButton({ visitInfo, navigation, dateString }) {
   return (
     <TouchableHighlight

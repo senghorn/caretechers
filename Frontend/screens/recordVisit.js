@@ -19,6 +19,11 @@ import SocketContext from '../services/context/SocketContext';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
+/**
+ * Visit recording screen that support visit completing and allow user to take notes of the visit.
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function RecordVisit({ navigation }) {
   const date = new Date();
   const dateString = getDateString(date);
@@ -34,6 +39,7 @@ export default function RecordVisit({ navigation }) {
 
   const tasksURL = `${config.backend_server}/tasks/group/${user.curr_group}/range?start=${dateString}&end=${dateString}`;
 
+  // Fetcher to retrieve visits information
   const {
     data: visits,
     error: visitError,

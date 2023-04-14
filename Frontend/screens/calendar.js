@@ -29,6 +29,11 @@ import { useRoute } from '@react-navigation/native';
 
 const DateToVisitsContext = createContext();
 
+/**
+ * Main calendar screen component.
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Calendar({ navigation }) {
   const [initDate, setInitDate] = useState(startOfDay(new Date()));
   const [startDate, setStartDate] = useState(startOfYear(initDate));

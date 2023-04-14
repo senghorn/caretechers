@@ -15,6 +15,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
+/**
+ * Message screen that display group messages and support send/receive/pin messages.
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Messages({ navigation }) {
   const [this_user, setThisUser] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -38,12 +43,16 @@ export default function Messages({ navigation }) {
     ],
     ([url, token]) => fetcher(url, token)
   );
+
+  // Fetch all Users
   useEffect(() => {
     if (user) {
       FetchUsers(user, setUsers, setThisUser, user.access_token);
     }
   }, [user]);
 
+
+  // Format and set message when received
   useEffect(() => {
     if (!isLoading && data && users) {
       const formatted = FormatMessagesForChat(users, data);
@@ -56,6 +65,7 @@ export default function Messages({ navigation }) {
   }, [data, isLoading, users]);
 
   const [isLoadingData, setIsLoadingData] = useState(false);
+  // Handles loading more messages
   const loadEarlier = async () => {
     if (user && users && user.curr_group && messages) {
       if (!isLoadingData) {
@@ -72,6 +82,7 @@ export default function Messages({ navigation }) {
     }
   };
 
+  // Returns smallest Id in the message
   const getSmallestMessageId = () => {
     let result = 0;
     if (messages && messages.length > 0) {
@@ -129,6 +140,7 @@ export default function Messages({ navigation }) {
     } else setImageUploading(false);
   };
 
+  // Handler when image button is pressed
   const imageButtonPressHandler = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -171,6 +183,7 @@ export default function Messages({ navigation }) {
     setIsLoadingData(false);
   }, [displayMessages]);
 
+  // When socket is connected, sets the event to listen for messages
   useEffect(() => {
     if (socket && users) {
       socket.on('message', (message) => {
@@ -198,6 +211,7 @@ export default function Messages({ navigation }) {
 
   const [pinMessage, setPinMessage] = useState(null);
 
+  // Handles pinning messages action
   useEffect(() => {
     if (pinMessage && pinMessage._id && user && user.curr_group) {
       PinMessage(pinMessage._id, user.access_token);
@@ -205,6 +219,7 @@ export default function Messages({ navigation }) {
     }
   }, [pinMessage]);
 
+  // Allow options to pin message handler
   const onLongPress = (context, message) => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -224,6 +239,7 @@ export default function Messages({ navigation }) {
     );
   };
 
+  // Image button component for send image message
   const CameraButton = () => {
     return <IconButton icon="image-plus" size={25} onPress={imageButtonPressHandler} />;
   };
@@ -301,6 +317,12 @@ const styles = StyleSheet.create({
   },
 });
 
+/**
+ * Formats the message received form backend to GiftedChat messages prop.
+ * @param {Array} all_users : All users in the group
+ * @param {Array} messages : Messages to format
+ * @returns 
+ */
 const FormatMessagesForChat = (all_users, messages) => {
   var formatted_messages = [];
   if (all_users) {
