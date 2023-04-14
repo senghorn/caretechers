@@ -79,7 +79,6 @@ module.exports.createNewGroup = asyncHandler(async (req, _res, next) => {
     UPDATE Users SET curr_group = ${group_id} WHERE email = ${email};
     `;
     const insertUserResult = await db.query(insertUserToAsGroupAdmin);
-    console.log('Update and insert result', insertUserResult);
     if (insertUserResult[0].affectedRows && insertUserResult[1].affectedRows) {
       req.result = {
         status: 'succeed',

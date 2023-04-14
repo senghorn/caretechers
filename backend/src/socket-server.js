@@ -27,6 +27,7 @@ function CreateWebSocketServer(app) {
     socket.on('chat', async (messages) => {
       var messageData = messages[0];
       const date = new Date();
+      console.log('current date', date);
       try {
         let messageType = 'T';
         if (messageData.messageType === 'I') {
@@ -38,8 +39,7 @@ function CreateWebSocketServer(app) {
         const result = await db.query(query);
 
         const insertedMessageQuery = sql`SELECT * FROM Messages WHERE id = ${result.insertId}`;
-        const data = await db.query(insertedMessageQuery);
-
+        let data = await db.query(insertedMessageQuery);
         if (data.length > 0) {
           io.to(groupId).emit('message', data[0]);
           sendNotificationsToGroup(
