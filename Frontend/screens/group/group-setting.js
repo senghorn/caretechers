@@ -170,7 +170,7 @@ export default function GroupSettings({ navigation }) {
 
   // Handler for invite button
   const onShare = async () => {
-    const response = await axios.get(`${config.backend_server}/groups/token`, {
+    const response = await axios.get(`${config.backend_server}/groups/token/${user.curr_group}`, {
       headers: {
         authorization: `Bearer ${user.access_token}`,
       },

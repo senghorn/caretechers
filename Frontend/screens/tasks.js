@@ -48,9 +48,15 @@ export default function Tasks({ navigation }) {
 
   const [, setRefreshTasks] = useContext(TasksRefreshContext);
 
-  const { data, isLoading, error, mutate } = useSWR([tasksURL, {
-    headers: { 'Authorization': 'Bearer ' + user.access_token }
-  }], ([url, token]) => fetcher(url, token));
+  const { data, isLoading, error, mutate } = useSWR(
+    [
+      tasksURL,
+      {
+        headers: { Authorization: 'Bearer ' + user.access_token },
+      },
+    ],
+    ([url, token]) => fetcher(url, token)
+  );
 
   const [filter, setFilter] = useState(null);
 

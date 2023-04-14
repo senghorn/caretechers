@@ -102,7 +102,7 @@ module.exports.getGroupsDeprecated = asyncHandler(async (req, res, next) => {
 
 module.exports.getGroupNameAndPassword = asyncHandler(async (req, res, next) => {
   const query = sql`SELECT name, password FROM \`Groups\` G
-	WHERE id = ${req.user.curr_group}`;
+	WHERE id = ${req.params.groupId}`;
   const [result] = await db.query(query);
   req.groupInfo = result;
   next();

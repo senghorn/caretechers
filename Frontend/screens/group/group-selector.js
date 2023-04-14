@@ -20,6 +20,8 @@ export default function GroupSelector({ navigation }) {
     const [socket, setSocket] = useContext(SocketContext);
     const [groupList, setGroupList] = useState([]);
     const [groups, setGroups] = useState([]);
+
+
     useEffect(() => {
         if (user && user.groups) {
             setGroups(user.groups);

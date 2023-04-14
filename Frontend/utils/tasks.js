@@ -7,6 +7,7 @@ import {
   getDate,
   getDay,
   getMonth,
+  isSameDay,
   max,
 } from 'date-fns';
 
@@ -77,7 +78,10 @@ export const getNextDateFromRepeatBehavior = (recurringType, startDate) => {
     case REPEAT_CODES.DAY:
       return max([today, startDate]);
     case REPEAT_CODES.WEEK:
-      const diffInWeeks = differenceInCalendarWeeks(today, startDate);
+      let diffInWeeks = differenceInCalendarWeeks(today, startDate);
+      if (diffInWeeks === 0 && today > startDate && !isSameDay(today, startDate)) {
+        diffInWeeks = 1;
+      }
       return max([addWeeks(startDate, diffInWeeks), startDate]);
     case REPEAT_CODES.ANNUAL:
       const diffInYears = differenceInCalendarYears(today, startDate);
