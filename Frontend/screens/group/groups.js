@@ -115,6 +115,8 @@ export default function Groups({ navigation }) {
             if (joined == true && user.id) {
               const result = await setUserDataInfo(setUser, user.access_token);
               if (result) {
+                socket.disconnect();
+                setSocket(null);
                 setNavigateHome(true);
               } else {
                 console.log('Fetch user data error');

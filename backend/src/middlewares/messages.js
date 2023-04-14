@@ -28,7 +28,8 @@ module.exports.fetchMoreMessagesByLastMessageId = asyncHandler(async (req, res, 
 });
 
 module.exports.getUsersInGroup = asyncHandler(async (req, res, next) => {
-	const query = sql`SELECT * FROM Users WHERE curr_group = ${req.params.groupId};`;
+	const query = sql`SELECT * FROM GroupMembers gm join Users u where gm.member_id = u.email AND group_id = ${req.params.groupId};`;
+
 	let result = await db.query(query);
 	req.result = result;
 	next();
