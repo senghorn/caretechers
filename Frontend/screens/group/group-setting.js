@@ -423,6 +423,8 @@ const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
       if (user.id !== selectedUser?.email) {
         const role = getUserRole(user);
         setUserRole(role);
+      } else {
+        setUserRole(0);
       }
     }
   }, [selectedUser, user])
@@ -462,7 +464,7 @@ const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
       <View style={styles.modalContainerStyle}>
         <View style={styles.profileContainer}>
           <View style={styles.leftContainer}>
-            <Avatar.Image size={100} source={{ uri: selectedUser?.profile_pic }} style={styles.photo} />
+            <Avatar.Image size={65} source={{ uri: selectedUser?.profile_pic }} style={styles.photo} />
           </View>
           <View style={styles.rightContainer}>
             <View style={styles.nameRow}>
