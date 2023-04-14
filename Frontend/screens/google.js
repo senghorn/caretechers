@@ -14,6 +14,11 @@ import InviteLinkContext from '../services/context/InviteLinkContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
+/**
+ * Login screen component that allow users to login and navigate to home screen on successful attempt.
+ * @param {Object} navigation: react component for navigation 
+ * @returns 
+ */
 export default function GoogleLogin({ navigation }) {
   const { user, setUser } = useContext(UserContext);
   const [accessToken, setAccessToken] = useState(null);
@@ -98,6 +103,7 @@ export default function GoogleLogin({ navigation }) {
     }
   }, [cookies]);
 
+  // Handles the effect from {user} changes. Navigate to appropriate pages
   useEffect(() => {
     if (userDataReceived) {
       setLoading(false);
@@ -112,6 +118,7 @@ export default function GoogleLogin({ navigation }) {
     }
   }, [userDataReceived, user]);
 
+  // Handler that fetch and set user data after google auth
   async function AuthenticatedUserHandler() {
     try {
       const access_token = await getAPIAccessToken();
