@@ -5,7 +5,7 @@ const sql = require('sql-template-strings');
 const token = require('./token');
 const app = rest_app.CreateRESTServer();
 
-const testUserEmail = 'testUserUser@gmail.com';
+const testUserEmail = 'testUserUsers@gmail.com';
 
 describe('user', () => {
   let groupId;

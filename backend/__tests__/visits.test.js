@@ -7,7 +7,7 @@ const token = require('./token');
 const app = rest_app.CreateRESTServer();
 
 const currentDate = format(new Date(), 'yyyy-MM-dd');
-const testUserEmail = 'testuser@gmail.com';
+const testUserEmail = 'testUserVisits@gmail.com';
 
 describe('visits', () => {
   let groupId;

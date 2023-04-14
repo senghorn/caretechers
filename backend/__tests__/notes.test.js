@@ -5,7 +5,7 @@ const token = require('./token');
 const db = require('../src/database');
 const app = rest_app.CreateRESTServer();
 
-const testUserEmail = 'testuserMessages@gmail.com';
+const testUserEmail = 'testUserNotes@gmail.com';
 
 describe('notes', () => {
   let groupId;
