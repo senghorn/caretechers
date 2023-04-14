@@ -102,15 +102,15 @@ export default function Messages({ navigation }) {
     setImageUploading(true);
     const result = isCamera
       ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 0.3,
-          base64: true,
-        })
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.3,
+        base64: true,
+      })
       : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 0.3,
-          base64: true,
-        });
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.3,
+        base64: true,
+      });
     if (!result.canceled) {
       try {
         const imageUrl = await uploadImage(result.assets[0].base64);
