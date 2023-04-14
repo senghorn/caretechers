@@ -9,6 +9,14 @@ const config = require('../constants/config').default;
 import colors from '../constants/colors';
 import EditGraphHeader from '../components/healthVitals/editGraphHeader';
 
+/**
+ * Display component a measurement row
+ * 
+ * @param {Object} timestamp  
+ * @param {Object} measurement component
+ * @param {Function} removeMeasurement(timestamp, auth_token) handler when user press delete a measurement
+ * @returns 
+ */
 const MeasurementRow = ({ timestamp, measurement, removeMeasurement }) => {
   const { user } = useContext(UserContext);
   return (
@@ -34,6 +42,11 @@ const MeasurementRow = ({ timestamp, measurement, removeMeasurement }) => {
   );
 };
 
+/**
+ *  Graph editor screen that support changes in a health vitals graph.
+ * @param {*} param0 
+ * @returns 
+ */
 export default function EditGraph({ navigation, route }) {
   const { id, units, title, getGraphs } = route.params;
   const { user } = useContext(UserContext);
@@ -56,6 +69,7 @@ export default function EditGraph({ navigation, route }) {
     setNewDate(selectedDate);
   };
 
+  // Sends a remove measurement qpi request to backend given timestamp and auth token
   const removeMeasurement = async (timestamp, token) => {
     let connection_string = config.backend_server + `/measurements/${id}/${timestamp}`;
     try {
@@ -74,6 +88,7 @@ export default function EditGraph({ navigation, route }) {
     await getGraphs(token);
   };
 
+  // Fetches all the measurements in this graph
   const getMeasurements = async (token) => {
     let connection_string = config.backend_server + '/measurements/' + id;
     try {
@@ -127,6 +142,7 @@ export default function EditGraph({ navigation, route }) {
     setSaveLoading(false);
   };
 
+  // Sends a delete graph api request to completely remove graph
   const deleteGraph = async (token) => {
     setDeleteLoading(true);
     let connection_string = config.backend_server + '/graphs/' + id;
