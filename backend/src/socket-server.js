@@ -40,7 +40,6 @@ function CreateWebSocketServer(app) {
 
         const insertedMessageQuery = sql`SELECT * FROM Messages WHERE id = ${result.insertId}`;
         let data = await db.query(insertedMessageQuery);
-        data.map(row => row.date_time = new Date(`${row.date_time} UTC`).toString());
         if (data.length > 0) {
           io.to(groupId).emit('message', data[0]);
           sendNotificationsToGroup(
