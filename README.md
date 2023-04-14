@@ -101,7 +101,7 @@ the Expo Go app on your iPhone, the UI should automatically load once the QR Cod
 Note: These instructions are specifically for iPhone users, as this project is tailored for the iPhone. Instructions may
 differ for Android users. If you are an Android user, we recommend visiting [these React Native docs](https://reactnative.dev/docs/environment-setup) for more information.
 
-### Optional - Configuring backend address
+#### Optional - Configuring backend address
 
 If you want the frontend to use your locally-running backend, navigate to the `config.js` file in the `Frontend/constants/` directory.
 Then, set the value of the `local_ip` variable to be your computer's IP address. Then, change the value of `ip` to be equal to `local_ip`
