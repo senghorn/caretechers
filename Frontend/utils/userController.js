@@ -1,5 +1,11 @@
 import { fetchUserByCookie } from '../services/api/user';
 
+/**
+ * Fetches user info from server given token and setUser of the given value
+ * @param {Function} setUser 
+ * @param {String} token 
+ * @returns 
+ */
 export async function setUserDataInfo(setUser, token) {
     if (!token) {
         console.log('setUserDataInfo error: No token provided');

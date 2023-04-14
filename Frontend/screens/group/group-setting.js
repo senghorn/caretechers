@@ -30,6 +30,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { subMonths } from 'date-fns';
 import { getDateString } from '../../utils/date';
 
+/**
+ * Component for group settings screen that allow user to see group information and manage the settings.
+ * @param {Object} navigation react navigator 
+ * @returns 
+ */
 export default function GroupSettings({ navigation }) {
   const { setUser, user } = useContext(UserContext);
   const { data, isLoading, error, mutate } = useSWR(
@@ -86,6 +91,7 @@ export default function GroupSettings({ navigation }) {
     setLoading(isLoading);
   }, [user, data, isLoading]);
 
+  // Handler when user confirms to leave the group
   const LeaveGroup = async () => {
     if (user && user.id && user.curr_group) {
       const removed = await RemoveUserFromGroup(user.id, user.curr_group, user.access_token);
@@ -104,6 +110,7 @@ export default function GroupSettings({ navigation }) {
     }
   };
 
+  // Handler for when leave button is pressed
   const handleLeaveGroup = () => {
     Alert.alert(
       'Leave Group',
@@ -123,6 +130,8 @@ export default function GroupSettings({ navigation }) {
       { cancelable: false }
     );
   };
+
+  // Properly show and hide loader while leaving the group
   const handleConfirmLeaveGroup = async () => {
     setWaitToLeave(true);
     await LeaveGroup();
@@ -132,6 +141,7 @@ export default function GroupSettings({ navigation }) {
     setShowAlert(false);
   };
 
+  // Handles leave group by showing up alerts
   useEffect(() => {
     if (showAlert) {
       Alert.alert(
@@ -158,6 +168,7 @@ export default function GroupSettings({ navigation }) {
     console.log('Change Group Name Pressed');
   };
 
+  // Handler for invite button
   const onShare = async () => {
     const response = await axios.get(`${config.backend_server}/groups/token`, {
       headers: {
@@ -289,6 +300,15 @@ export default function GroupSettings({ navigation }) {
   );
 }
 
+/**
+ * Display member list and allow pressing on each user
+ * 
+ * @param {List} members information
+ * @param {Function} setSelectedUser when a user is pressed
+ * @param {visitHistory} visitHistory of all users
+ * @param {visitHistoryLoading} visitHistoryLoading
+ * @returns 
+ */
 const GroupMemberList = ({ members, setSelectedUser, visitHistory, visitHistoryLoading }) => {
   return (
     <ScrollView style={styles.listContainer}>
@@ -305,6 +325,10 @@ const GroupMemberList = ({ members, setSelectedUser, visitHistory, visitHistoryL
   );
 };
 
+/**
+ * Display for each member in MemeberList
+ * @returns 
+ */
 const MemberItem = ({ user, setSelectedUser, visitHistory, visitHistoryLoading }) => {
   const userPressedHandler = () => {
     setSelectedUser(user);
