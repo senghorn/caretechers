@@ -9,6 +9,11 @@ import SocketContext from '../../services/context/SocketContext'
 import Spinner from 'react-native-loading-spinner-overlay';
 import { setUserDataInfo } from '../../utils/userController'
 
+/**
+ * This component displays groups users are in and option to navigate to join/create group screen.
+ * @param {Object} react component for navigating between screen 
+ * @returns 
+ */
 export default function GroupSelector({ navigation }) {
     const { setUser, user } = useContext(UserContext);
     const [loading, setLoading] = useState(false);

@@ -10,6 +10,12 @@ import config from '../../constants/config'
 import SocketContext from '../../services/context/SocketContext';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { setUserDataInfo } from '../../utils/userController';
+
+/**
+ * This component displays options for joining or creating group.
+ * @param {Object} react component for navigating between screen 
+ * @returns 
+ */
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
   const inviteLinkContext = useContext(InviteLinkContext);
@@ -128,6 +134,14 @@ export default function Groups({ navigation }) {
     </View>
   );
 }
+
+/**
+ * Handles joining group given user with id, access_token, group and password
+ * @param {*} user 
+ * @param {*} group 
+ * @param {*} password 
+ * @returns 
+ */
 const joinGroupHandler = async (user, group, password) => {
   const joined = await addUserToGroup(user.id, group, password, user.access_token);
 

@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config({ path: '../.env' })
 
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
@@ -65,7 +65,7 @@ function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
   if (!token) {
-    console.log('\n No request token');
+    console.log('No request token');
     console.log('request header', req.originalUrl);
     return res.sendStatus(401)
   }
