@@ -101,12 +101,11 @@ export default function GoogleLogin({ navigation }) {
   useEffect(() => {
     if (userDataReceived) {
       setLoading(false);
-      if (user.curr_group) {
-        navigation.navigate('Home');
-      } else if (inviteLink) {
+      if (inviteLink) {
         navigation.navigate('Group');
-      }
-      else {
+      } else if (user.curr_group) {
+        navigation.navigate('Home');
+      } else {
         navigation.navigate('GroupSelector');
       }
     }
