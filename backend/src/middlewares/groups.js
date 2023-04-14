@@ -37,16 +37,16 @@ module.exports.verifyGroupBody = asyncHandler(async (req, _res, next) => {
 
 module.exports.compareMembers = asyncHandler(async (req, _res, next) => {
   let query = sql`SELECT m.member_id, m.active, u.first_name, u.last_name, COUNT(cv.id) as completed_visits, 
-                (SELECT COUNT(*) FROM Visits v WHERE v.visitor = u.email AND v.group_id = m.group_id AND v.date < CURRENT_DATE()) AS total_visits
+                (SELECT COUNT(*) FROM Visits v WHERE v.visitor = u.email AND v.group_id = m.group_id AND v.date <= CURRENT_DATE()) AS total_visits
                 FROM GroupMembers m JOIN Users u ON u.email = m.member_id 
-                LEFT JOIN Visits cv ON cv.visitor = u.email AND cv.group_id = m.group_id AND cv.completed = 1 AND cv.date < CURRENT_DATE()
+                LEFT JOIN Visits cv ON cv.visitor = u.email AND cv.group_id = m.group_id AND cv.completed = 1 AND cv.date <= CURRENT_DATE()
                 WHERE m.group_id = ${req.params.groupId} GROUP BY u.email;`;
 
   if (req.query.after) {
     query = sql`SELECT m.member_id, m.active, u.first_name, u.last_name, COUNT(cv.id) as completed_visits, 
-                (SELECT COUNT(*) FROM Visits v WHERE v.visitor = u.email AND v.group_id = m.group_id AND v.date < CURRENT_DATE() AND v.date > ${req.query.after}) AS total_visits
+                (SELECT COUNT(*) FROM Visits v WHERE v.visitor = u.email AND v.group_id = m.group_id AND v.date <= CURRENT_DATE() AND v.date > ${req.query.after}) AS total_visits
                 FROM GroupMembers m JOIN Users u ON u.email = m.member_id 
-                LEFT JOIN Visits cv ON cv.visitor = u.email AND cv.group_id = m.group_id AND cv.completed = 1 AND cv.date < CURRENT_DATE() AND cv.date > ${req.query.after}
+                LEFT JOIN Visits cv ON cv.visitor = u.email AND cv.group_id = m.group_id AND cv.completed = 1 AND cv.date <= CURRENT_DATE() AND cv.date > ${req.query.after}
                 WHERE m.group_id = ${req.params.groupId} GROUP BY u.email;`;
   }
 

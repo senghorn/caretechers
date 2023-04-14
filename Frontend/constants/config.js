@@ -7,4 +7,5 @@ export default {
   backend_server: 'http://' + ip + ':3000',
   backend_messaging: 'http://' + ip + ':3001',
   auth_server: 'http://' + ip + ':4000',
+  link_ip: local_ip,
 };

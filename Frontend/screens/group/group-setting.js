@@ -32,8 +32,8 @@ import { getDateString } from '../../utils/date';
 
 /**
  * Component for group settings screen that allow user to see group information and manage the settings.
- * @param {Object} navigation react navigator 
- * @returns 
+ * @param {Object} navigation react navigator
+ * @returns
  */
 export default function GroupSettings({ navigation }) {
   const { setUser, user } = useContext(UserContext);
@@ -178,7 +178,7 @@ export default function GroupSettings({ navigation }) {
     console.log(response.data);
     try {
       const result = await Share.share({
-        message: `Join our caretaking group!\n\nexp://${config.ip}:19000/?token=${response.data}\n\nThis link will expire in 5 minutes!`,
+        message: `Join our caretaking group!\n\nexp://${config.link_ip}:19000/?token=${response.data}\n\nThis link will expire in 5 minutes!`,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -302,12 +302,12 @@ export default function GroupSettings({ navigation }) {
 
 /**
  * Display member list and allow pressing on each user
- * 
+ *
  * @param {List} members information
  * @param {Function} setSelectedUser when a user is pressed
  * @param {visitHistory} visitHistory of all users
  * @param {visitHistoryLoading} visitHistoryLoading
- * @returns 
+ * @returns
  */
 const GroupMemberList = ({ members, setSelectedUser, visitHistory, visitHistoryLoading }) => {
   return (
@@ -327,7 +327,7 @@ const GroupMemberList = ({ members, setSelectedUser, visitHistory, visitHistoryL
 
 /**
  * Display for each member in MemeberList
- * @returns 
+ * @returns
  */
 const MemberItem = ({ user, setSelectedUser, visitHistory, visitHistoryLoading }) => {
   const userPressedHandler = () => {
@@ -391,12 +391,12 @@ const MemberItem = ({ user, setSelectedUser, visitHistory, visitHistoryLoading }
 };
 
 /**
-*
-* React Native functional component that displays a role badge for a user group.
-* @param {object} param0 Props object
-* @param {object} param0.group User group object
-* @returns {JSX.Element} RoleBadge component JSX.Element
-*/
+ *
+ * React Native functional component that displays a role badge for a user group.
+ * @param {object} param0 Props object
+ * @param {object} param0.group User group object
+ * @returns {JSX.Element} RoleBadge component JSX.Element
+ */
 const RoleBadge = ({ group }) => {
   if (group?.admin_status === 2) {
     return <Avatar.Image size={26} source={require('../../assets/crown.png')} style={styles.roleBadge} />;
@@ -408,13 +408,13 @@ const RoleBadge = ({ group }) => {
 };
 
 /**
-* React Native functional component that displays a modal for managing a user.
-* @param {object} param0 Props object
-* @param {object} param0.selectedUser Currently selected user
-* @param {function} param0.setSelectedUser Function to update the currently selected user
-* @param {object} param0.user Current user
-* @returns {JSX.Element} ManageUserModal component JSX.Element
-*/
+ * React Native functional component that displays a modal for managing a user.
+ * @param {object} param0 Props object
+ * @param {object} param0.selectedUser Currently selected user
+ * @param {function} param0.setSelectedUser Function to update the currently selected user
+ * @param {object} param0.user Current user
+ * @returns {JSX.Element} ManageUserModal component JSX.Element
+ */
 const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
   const [userRole, setUserRole] = useState(0);
   useEffect(() => {
@@ -427,12 +427,12 @@ const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
         setUserRole(0);
       }
     }
-  }, [selectedUser, user])
+  }, [selectedUser, user]);
 
   const handleRemoveUser = () => {
     console.log('removeing user ', selectedUser);
   };
-  const handleCancel = () => { };
+  const handleCancel = () => {};
   const removeUserHandler = () => {
     Alert.alert(
       'Remove User',
@@ -497,9 +497,11 @@ const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
           </View>
         </View>
         <View style={styles.manageButtons}>
-          {userRole === 0 ? null : <Button style={styles.removeButton} color="red" onPress={removeUserHandler}>
-            Remove User
-          </Button>}
+          {userRole === 0 ? null : (
+            <Button style={styles.removeButton} color="red" onPress={removeUserHandler}>
+              Remove User
+            </Button>
+          )}
         </View>
       </View>
     </Modal>
@@ -605,7 +607,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     justifyContent: 'center',
     alignContent: 'center',
-    width: '95%'
+    width: '95%',
   },
   profileContainer: {
     flexDirection: 'row',
@@ -617,9 +619,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  rightContainer: {
-
-  },
+  rightContainer: {},
   nameRow: {
     marginBottom: 10,
     flexDirection: 'row',

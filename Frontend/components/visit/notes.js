@@ -86,7 +86,6 @@ export default function VisitNotes({ editMode, editContent, setEditContent }) {
               setEditContent(newText);
             }}
             initialHeight={height}
-            initialFocus={true}
             disabled={!editMode}
             initialContentHTML={editContent}
           />
