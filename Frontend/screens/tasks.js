@@ -14,6 +14,12 @@ import colors from '../constants/colors';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
+/**
+ * Filters the tasks given using the specified filter
+ * @param {Array} tasks to filter 
+ * @param {string} filter type of filter
+ * @returns 
+ */
 const getFilteredTasks = (tasks, filter) => {
   switch (filter) {
     case REPEAT_CODES.NEVER:
@@ -39,6 +45,11 @@ const getNextDate = (task) => {
   return getNextDateFromRepeatBehavior(task.recurring_type, getDateFromDateString(task.start_date));
 };
 
+/**
+ * Displays all the tasks and allow sorting tasks for UI
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Tasks({ navigation }) {
   const [renderedTasks, setRenderedTasks] = useState(null);
 
@@ -68,6 +79,7 @@ export default function Tasks({ navigation }) {
     setRefreshTasks(() => mutate);
   }, [mutate]);
 
+  // Manage rendering tasks according to filter
   const renderTasks = (tasks) => {
     const filteredTasks = getFilteredTasks(tasks, filter).filter((task) =>
       task.title.toLowerCase().includes(query.toLowerCase())
@@ -101,6 +113,7 @@ export default function Tasks({ navigation }) {
 
   const [refreshing, setRefreshing] = useState(false);
 
+  // Handles refreshing data
   const onRefresh = useCallback(async () => {
     if (user != null && user !== {}) {
       setRefreshing(true);

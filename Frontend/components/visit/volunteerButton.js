@@ -10,6 +10,11 @@ import { volunteerForVisit } from '../../services/api/visits';
 import colors from '../../constants/colors';
 import SocketContext from '../../services/context/SocketContext';
 
+/**
+ * Customized volunteer button that support volunteering to visit
+ * @param {*} param0 
+ * @returns 
+ */
 export default function VolunteerButton({ date, visitFirst = false }) {
   const [volunteerLoading, setVolunteerLoading] = useState(false);
 

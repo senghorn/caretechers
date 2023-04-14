@@ -8,6 +8,12 @@ import { clearAsyncStorage } from '../services/storage/asyncStorage';
 import colors from '../constants/colors';
 import SocketContext from '../services/context/SocketContext';
 import Spinner from 'react-native-loading-spinner-overlay';
+
+/**
+ * Display screen for settings. Supports setting features and navigate to more specific settings
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Settings({ navigation }) {
   const [notificationOn, setNotificationOn] = useState(false);
   const [username, setUsername] = useState('John Doe');
@@ -17,6 +23,8 @@ export default function Settings({ navigation }) {
   const [socket, setSocket] = useContext(SocketContext)
   const { user, setUser } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
+
+  // Set user information for displays
   useEffect(() => {
     if (user) {
       setUsername(user.first_name + ' ' + user.last_name);

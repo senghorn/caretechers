@@ -22,6 +22,11 @@ import uploadImage from '../../services/s3/uploadImage';
 
 const { height } = Dimensions.get('window');
 
+/**
+ * Adding new note screen. 
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function NewNote({ navigation, route }) {
   const { note } = route.params;
   const [editMode, setEditMode] = useState(true);
@@ -31,6 +36,8 @@ export default function NewNote({ navigation, route }) {
   const [noteId, setNoteId] = useState(null);
   const [imageUploading, setImageUploading] = useState(false);
 
+  // Handles adding image to the note. isCamera boolean decides whether
+  // user wants to capture an image or choose for library.
   const addImage = async (isCamera = false) => {
     setImageUploading(true);
     const result = isCamera
@@ -238,6 +245,7 @@ export default function NewNote({ navigation, route }) {
   );
 }
 
+// 
 const addNote = async (noteTitle, noteContent, groupId, navigation, setEditMode, toggleRefresh, cookie) => {
   if (noteTitle && noteContent) {
     CreateNote({ title: noteTitle, content: noteContent }, groupId, cookie)

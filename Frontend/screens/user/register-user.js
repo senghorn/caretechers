@@ -8,6 +8,12 @@ import colors from '../../constants/colors';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { getAccessToken } from '../../services/api/auth';
 import { setAPIAccessToken, setAPIResetToken } from '../../services/storage/asyncStorage';
+
+/**
+ * User registration screen
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Inputs({ route, navigation }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneMissing, setPhoneMissing] = useState(false);

@@ -1,6 +1,11 @@
 import { StyleSheet, Text } from 'react-native';
 import { List } from 'react-native-paper';
 
+/**
+ * Repeat behavior item
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function RepeatItem({ title, setSelected, setExpanded, editMode, setEditRepeat, setEditRepeatTitle }) {
   return (
     <List.Item

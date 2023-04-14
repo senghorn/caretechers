@@ -14,6 +14,11 @@ import { getDateFromDateString, getHumanReadableDate } from '../../utils/date';
 import { format, isSameDay, isToday, isTomorrow, max } from 'date-fns';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+/**
+ * Component that supports repeat behavior options for a task
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function RepeatBehavior({
   id,
   data,

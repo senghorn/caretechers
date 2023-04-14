@@ -20,6 +20,11 @@ import axios from 'axios';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
+/**
+ * Task screen that display allow user to manage a specific task
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Task({ route, navigation }) {
   const { title, id, dateString } = route.params;
 
@@ -53,7 +58,7 @@ export default function Task({ route, navigation }) {
   const { visitTasks, setVisitTasks } = useContext(RecordVisitContext);
 
   const [socket] = useContext(SocketContext);
-
+  // Turns into editable mode 
   useEffect(() => {
     if (!editMode) {
       setEditRepeat(null);
@@ -77,6 +82,7 @@ export default function Task({ route, navigation }) {
       )
     : undefined;
 
+  // Mange state of the task whether to display as new or existing tasks
   useEffect(() => {
     if (id !== 'new') {
       if (!isTaskLoading && !taskError && taskData && taskData.length > 0) {

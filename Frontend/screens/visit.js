@@ -28,6 +28,12 @@ const fetcher = (url, token) =>
     .then((res) => res.json())
     .catch((err) => console.log('visit fetch error', err));
 
+/**
+ * Component that displays a specific visit and support visit management features.
+ * 
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function Visit({ route, navigation }) {
   const { dateString } = route.params;
   const date = getDateFromDateString(dateString);

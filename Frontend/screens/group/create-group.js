@@ -8,6 +8,13 @@ import { setUserDataInfo } from '../../utils/userController';
 import UserContext from '../../services/context/UserContext';
 import SocketContext from '../../services/context/SocketContext';
 import Spinner from 'react-native-loading-spinner-overlay';
+
+/**
+ * Creating a new group screen
+ * 
+ * @param {Object} navigation: React component for navigation 
+ * @returns 
+ */
 export default function CreateGroup({ navigation, route }) {
   const { user, setUser } = useContext(UserContext);
   const [groupName, setGroupName] = useState('');
