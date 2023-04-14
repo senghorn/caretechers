@@ -27,7 +27,6 @@ function CreateWebSocketServer(app) {
     socket.on('chat', async (messages) => {
       var messageData = messages[0];
       const date = new Date();
-      console.log('current date', date);
       try {
         let messageType = 'T';
         if (messageData.messageType === 'I') {
@@ -37,9 +36,12 @@ function CreateWebSocketServer(app) {
         const query = sql`INSERT INTO Messages
          VALUES(NULL, ${socket.username}, ${date}, ${messageData.text}, ${groupId}, 0, ${messageType})`;
         const result = await db.query(query);
-
         const insertedMessageQuery = sql`SELECT * FROM Messages WHERE id = ${result.insertId}`;
         let data = await db.query(insertedMessageQuery);
+        data = data.map(row => {
+          row.date_time = new Date(`${row.date_time}`).toString()
+          return row
+        });
         if (data.length > 0) {
           io.to(groupId).emit('message', data[0]);
           sendNotificationsToGroup(
