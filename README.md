@@ -76,7 +76,20 @@ Install dependencies by entering the following command in your terminal:
 
 `npm install`
 
-#### Step 3: Start the UI development server
+#### Step 3: Login to Expo
+
+In order for the Google Auth to work in CareCoord, you must log in to expo in your terminal (make sure you
+are in the Frontend directory) by entering this command:
+
+`npx expo login`
+
+Email/Username: `caretecher`
+
+Password: `4$CareTechers`
+
+Once you have logged in, Google Auth should work.
+
+#### Step 4: Start the UI development server
 
 To start the development server, just type the singular command in your terminal below
 
@@ -87,6 +100,30 @@ the Expo Go app on your iPhone, the UI should automatically load once the QR Cod
 
 Note: These instructions are specifically for iPhone users, as this project is tailored for the iPhone. Instructions may
 differ for Android users. If you are an Android user, we recommend visiting [these React Native docs](https://reactnative.dev/docs/environment-setup) for more information.
+
+### Optional - Configuring backend address
+
+If you want the frontend to use your locally-running backend, navigate to the `config.js` file in the `Frontend/constants/` directory.
+Then, set the value of the `local_ip` variable to be your computer's IP address. Then, change the value of `ip` to be equal to `local_ip`
+rather than `aws_ip`.
+
+## Deployment
+
+Our backend is dockerized and deployed to an AWS EC2 instance. We also use AWS RDS and S3 for data storage.
+
+Since the AWS console frequently changes, we believe it would be best to post articles dictating how to create/manage
+these AWS services:
+
+[AWS EC2 Instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html)
+
+[AWS RDS - Creation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_RDS_Configuring.html)
+
+[AWS RDS - Management](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_RDS_Managing.html)
+
+[AWS S3 - Setup](https://docs.aws.amazon.com/AmazonS3/latest/userguide/GetStartedWithS3.html)
+
+As long as the EC2 instance is up and healthy, the backend should automatically be deployed and reachable
+after code is merged into main (through a CI/CD pipeline).
 
 ## Support
 
