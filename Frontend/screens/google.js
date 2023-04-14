@@ -22,14 +22,10 @@ export default function GoogleLogin({ navigation }) {
   const [userDataReceived, setUserDataReceived] = useState(false);
   const inviteLink = useContext(InviteLinkContext);
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId:
-      '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
-    iosClientId:
-      '899499604143-5oqn70f2r4uu7lp1mbajpkv15ks3p368.apps.googleusercontent.com',
-    androidClientId:
-      '899499604143-q5b803tsomq5k9tu0vv0fjb0ap1551gm.apps.googleusercontent.com',
-    webClientId:
-      '899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com',
+    expoClientId: '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
+    iosClientId: '899499604143-5oqn70f2r4uu7lp1mbajpkv15ks3p368.apps.googleusercontent.com',
+    androidClientId: '899499604143-q5b803tsomq5k9tu0vv0fjb0ap1551gm.apps.googleusercontent.com',
+    webClientId: '899499604143-ps7gl6ktu9796gticni41c10o1evfp2t.apps.googleusercontent.com',
   });
 
   // On load, try logging in automatically
@@ -40,13 +36,12 @@ export default function GoogleLogin({ navigation }) {
   // Handles when user clicks on login
   const loginHandler = useCallback(async () => {
     const userAccess = await validateTokens();
-    if (userAccess === "authenticated") {
+    if (userAccess === 'authenticated') {
       AuthenticatedUserHandler();
-    }
-    else {
+    } else {
       promptAsync();
     }
-  }, [promptAsync])
+  }, [promptAsync]);
 
   // Called when google login prompt responds
   useEffect(() => {
@@ -54,7 +49,6 @@ export default function GoogleLogin({ navigation }) {
       setAccessToken(response.authentication.accessToken);
     }
   }, [response]);
-
 
   // Runs when google access token is set
   useEffect(() => {
@@ -72,22 +66,18 @@ export default function GoogleLogin({ navigation }) {
             }
             setCookies(serverAccessTokens);
           } else {
-            let userInfoResponse = await fetch(
-              'https://www.googleapis.com/userinfo/v2/me',
-              {
-                headers: { Authorization: `Bearer ${accessToken}` },
-              }
-            );
+            let userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            });
             let data = await userInfoResponse.json();
             setLoading(false);
             navigation.navigate('RegisterUser', { googleData: data, googleToken: accessToken });
           }
-        }
-        else {
+        } else {
           setLoading(false);
           console.log('Cannot get access token');
         }
-      }
+      };
       tokenRequest();
     }
   }, [accessToken]);
@@ -109,7 +99,7 @@ export default function GoogleLogin({ navigation }) {
         navigation.navigate('GroupSelector');
       }
     }
-  }, [userDataReceived, user]);
+  }, [userDataReceived, user, inviteLink]);
 
   async function AuthenticatedUserHandler() {
     try {
@@ -131,12 +121,7 @@ export default function GoogleLogin({ navigation }) {
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.container}>
-        <Spinner
-          color='#add8e6'
-          visible={loading}
-          textStyle={styles.spinnerTextStyle}
-          size={'large'}
-        />
+        <Spinner color="#add8e6" visible={loading} textStyle={styles.spinnerTextStyle} size={'large'} />
         <View style={styles.wFull}>
           <View style={styles.row}>
             <Text style={styles.welcomeText}>Welcome to CareCoord!</Text>
@@ -145,14 +130,11 @@ export default function GoogleLogin({ navigation }) {
             <Text style={styles.subWelcomeText}>Let's get started.</Text>
           </View>
           <View style={styles.row}>
-            <Image
-              style={styles.image}
-              source={require('../assets/caretaker.png')}
-            />
+            <Image style={styles.image} source={require('../assets/caretaker.png')} />
           </View>
           <FontAwesome.Button
-            name='google'
-            backgroundColor='#FFFFFF'
+            name="google"
+            backgroundColor="#FFFFFF"
             size={35}
             iconStyle={styles.icon}
             onPress={async () => {
@@ -164,9 +146,7 @@ export default function GoogleLogin({ navigation }) {
           </FontAwesome.Button>
         </View>
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Proudly presented by the Caretechers
-          </Text>
+          <Text style={styles.footerText}>Proudly presented by the Caretechers</Text>
         </View>
       </View>
     </SafeAreaView>
