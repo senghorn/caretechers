@@ -56,7 +56,15 @@ export default function Navigation({ expoPushToken, inviteToken }) {
   const [refreshVisit, setRefreshVisit] = useState(() => initRefreshVisit);
   const [dateString, setDateString] = useState(getDateString(new Date()));
   const [groupId, setGroupId] = useState('');
-  const [socket, setSocket] = useState(null);
+  const [socket, setNewSocket] = useState(null);
+
+  const setSocket = (new_socket) => {
+    if (socket) {
+      // Ensuring that we only have one living socket!
+      socket.disconnect();
+    }
+    setNewSocket(new_socket);
+  }
 
   useEffect(() => {
     if (socket) {
