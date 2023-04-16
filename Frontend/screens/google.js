@@ -113,7 +113,6 @@ export default function GoogleLogin({ navigation }) {
       const access_token = await getAPIAccessToken();
       const result = await setUserDataInfo(setUser, access_token);
       if (result) {
-        console.log('setting user data to be received');
         setUserDataReceived(true);
       } else {
         setLoading(false);

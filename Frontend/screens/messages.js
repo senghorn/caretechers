@@ -186,6 +186,10 @@ export default function Messages({ navigation }) {
   // When socket is connected, sets the event to listen for messages
   useEffect(() => {
     if (socket && users) {
+      // OFF is set because there's times where event is set multiple times causing the same event
+      // being handled multiple times. We don't want that. To ensure that doesn't happen, we make sure
+      // we set it off before turning on a fresh one. not the best solution!
+      socket.off('message');
       socket.on('message', (message) => {
         const msg = {
           text: message.messageType === 'I' ? '' : message.content,
