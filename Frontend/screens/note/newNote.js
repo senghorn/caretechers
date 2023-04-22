@@ -131,7 +131,6 @@ export default function NewNote({ navigation, route }) {
                 onPress={async () => {
                   if (noteId) {
                     setEditMode(false);
-                    console.log(editContent);
                     await UpdateNote(
                       {
                         id: noteId,
@@ -253,6 +252,7 @@ const addNote = async (noteTitle, noteContent, groupId, navigation, setEditMode,
         setEditMode(false);
         if (noteId) {
           toggleRefresh();
+          navigation.goBack();
         }
       })
       .catch((error) => console.error(error));
