@@ -23,7 +23,7 @@ import InviteLinkContext from '../../services/context/InviteLinkContext';
 import { NotesRefreshProvider } from '../../services/context/NotesRefreshContext';
 import Note from '../../screens/note/note';
 import NewNote from '../../screens/note/newNote';
-import RecordVisit from '../../screens/recordVisit';
+import RecordVisit from '../../screens/recordVisit2';
 import PinnedMessages from '../../screens/pinnedMessages';
 import useSWR from 'swr';
 import { fetcher } from '../../utils/dataFetching';
@@ -64,7 +64,7 @@ export default function Navigation({ expoPushToken, inviteToken }) {
       socket.disconnect();
     }
     setNewSocket(new_socket);
-  }
+  };
 
   useEffect(() => {
     if (socket) {
