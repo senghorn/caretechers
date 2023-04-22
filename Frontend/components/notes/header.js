@@ -98,5 +98,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     fontSize: 18,
     width: '50%',
+    maxWidth: '70%',
   },
 });

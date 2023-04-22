@@ -4,11 +4,11 @@ const axios = require('axios').default;
 
 /**
  * Sends api post request to backend in order to record the visit.
- * @param {string} visitId 
- * @param {Date} date 
- * @param {Object} completedTasks 
- * @param {string} notes 
- * @param {string} token 
+ * @param {string} visitId
+ * @param {Date} date
+ * @param {Object} completedTasks
+ * @param {string} notes
+ * @param {string} token
  */
 export const recordVisit = async (visitId, date, completedTasks, notes, token) => {
   try {
@@ -60,8 +60,8 @@ export const volunteerForVisit = async (date, user, token) => {
       body: JSON.stringify(newVisit),
     });
     const data = await result.json();
-    const visitId = data.insertId;
-    if (date && user.first_name !== null) {
+    const visitId = data?.insertId;
+    if (date && user.first_name !== null && visitId) {
       schedulePushNotification(visitId, user.first_name, date, token);
     }
   } catch (error) {
@@ -71,10 +71,10 @@ export const volunteerForVisit = async (date, user, token) => {
 
 /**
  * Sends an api request to update notification identifier.
- * 
- * @param {string} visitId 
- * @param {Object} identifier 
- * @param {string} token 
+ *
+ * @param {string} visitId
+ * @param {Object} identifier
+ * @param {string} token
  */
 export const setVisitNotificationIdentifier = async (visitId, identifier, token) => {
   const headers = {

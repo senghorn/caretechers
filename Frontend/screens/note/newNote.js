@@ -23,9 +23,9 @@ import uploadImage from '../../services/s3/uploadImage';
 const { height } = Dimensions.get('window');
 
 /**
- * Adding new note screen. 
- * @param {Object} navigation: React component for navigation 
- * @returns 
+ * Adding new note screen.
+ * @param {Object} navigation: React component for navigation
+ * @returns
  */
 export default function NewNote({ navigation, route }) {
   const { note } = route.params;
@@ -131,7 +131,6 @@ export default function NewNote({ navigation, route }) {
                 onPress={async () => {
                   if (noteId) {
                     setEditMode(false);
-                    console.log(editContent);
                     await UpdateNote(
                       {
                         id: noteId,
@@ -245,7 +244,7 @@ export default function NewNote({ navigation, route }) {
   );
 }
 
-// 
+//
 const addNote = async (noteTitle, noteContent, groupId, navigation, setEditMode, toggleRefresh, cookie) => {
   if (noteTitle && noteContent) {
     CreateNote({ title: noteTitle, content: noteContent }, groupId, cookie)
@@ -253,6 +252,7 @@ const addNote = async (noteTitle, noteContent, groupId, navigation, setEditMode,
         setEditMode(false);
         if (noteId) {
           toggleRefresh();
+          navigation.goBack();
         }
       })
       .catch((error) => console.error(error));
@@ -287,6 +287,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
     marginBottom: 4,
     fontSize: 18,
+    maxWidth: '70%',
   },
   dateTimeText: {
     alignSelf: 'center',
