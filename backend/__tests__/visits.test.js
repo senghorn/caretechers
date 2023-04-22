@@ -16,7 +16,7 @@ describe('visits', () => {
 
   beforeAll(async () => {
     const insertGroupQuery = sql`INSERT INTO \`Groups\` (name, visit_frequency, timezone, password) VALUES
-                                 ("Test_Group_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
+                                 ("Test_Visits_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
     const groupInsertResult = await db.query(insertGroupQuery);
     groupId = groupInsertResult.insertId;
     const userInsertQuery = sql`INSERT INTO Users (email, first_name, last_name, phone_num, curr_group)

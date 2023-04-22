@@ -10,7 +10,7 @@ const testUserEmail = 'testUserGroups@gmail.com';
 describe('notes', () => {
     let groupId;
     const cookie = token.getToken(testUserEmail);
-    const groupName = "Test_Group_ZXY4V";
+    const groupName = "Test_Groups_ZXY4V";
     const visit_frequency = 3;
     const timezone = "America/Denver";
     const data = {
