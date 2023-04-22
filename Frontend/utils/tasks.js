@@ -1,7 +1,7 @@
 import {
   addWeeks,
   addYears,
-  differenceInCalendarWeeks,
+  differenceInWeeks,
   differenceInCalendarYears,
   format,
   getDate,
@@ -9,6 +9,7 @@ import {
   getMonth,
   isSameDay,
   max,
+  differenceInDays,
 } from 'date-fns';
 
 export const REPEAT_CODES = {
@@ -78,7 +79,8 @@ export const getNextDateFromRepeatBehavior = (recurringType, startDate) => {
     case REPEAT_CODES.DAY:
       return max([today, startDate]);
     case REPEAT_CODES.WEEK:
-      let diffInWeeks = differenceInCalendarWeeks(today, startDate);
+      const diffInDays = differenceInDays(today, startDate);
+      let diffInWeeks = Math.ceil(diffInDays / 7);
       if (diffInWeeks === 0 && today > startDate && !isSameDay(today, startDate)) {
         diffInWeeks = 1;
       }
