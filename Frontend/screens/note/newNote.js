@@ -84,6 +84,39 @@ export default function NewNote({ navigation, route }) {
   const { user } = useContext(UserContext);
   const richText = useRef();
   const { toggleRefresh } = useContext(NotesRefreshContext);
+
+  const toolbar = (
+    <RichToolbar
+      editor={richText}
+      selectedIconTint={'#2095F2'}
+      onPressAddImage={() => {
+        addImage(false);
+      }}
+      actions={[
+        actions.setBold,
+        actions.setItalic,
+        actions.setUnderline,
+        actions.insertImage,
+        'insertCamera',
+        actions.insertBulletsList,
+        actions.insertOrderedList,
+        actions.alignLeft,
+        actions.alignCenter,
+        actions.alignRight,
+        actions.heading2,
+        actions.undo,
+        actions.redo,
+      ]}
+      iconMap={{
+        insertCamera: ({ tintColor }) => <Text style={[{ color: tintColor }]}>CAM</Text>,
+        [actions.heading2]: ({ tintColor }) => <Text style={[{ color: tintColor }]}>H1</Text>,
+      }}
+      insertCamera={() => {
+        addImage(true);
+      }}
+    />
+  );
+
   return (
     <Fragment>
       <SafeAreaView style={styles.container}>
@@ -202,37 +235,7 @@ export default function NewNote({ navigation, route }) {
               style={styles.richEditor}
             />
           </ScrollView>
-          {editMode && (
-            <RichToolbar
-              editor={richText}
-              selectedIconTint={'#2095F2'}
-              onPressAddImage={() => {
-                addImage(false);
-              }}
-              actions={[
-                actions.setBold,
-                actions.setItalic,
-                actions.setUnderline,
-                actions.insertImage,
-                'insertCamera',
-                actions.insertBulletsList,
-                actions.insertOrderedList,
-                actions.alignLeft,
-                actions.alignCenter,
-                actions.alignRight,
-                actions.heading2,
-                actions.undo,
-                actions.redo,
-              ]}
-              iconMap={{
-                insertCamera: ({ tintColor }) => <Text style={[{ color: tintColor }]}>CAM</Text>,
-                [actions.heading2]: ({ tintColor }) => <Text style={[{ color: tintColor }]}>H1</Text>,
-              }}
-              insertCamera={() => {
-                addImage(true);
-              }}
-            />
-          )}
+          {editMode && toolbar}
         </KeyboardAvoidingView>
         {imageUploading && (
           <View style={styles.loading}>
