@@ -41,6 +41,13 @@ describe('messages', () => {
     await db.query(deleteMemberQuery);
   });
 
+  describe('Pin a message', () => {
+    test('POST /pin/:messageId', async () => {
+      const response = await supertest(app).post(`/messages/pin/${messageId}`).set('Authorization', `Bearer ${cookie}`).send();
+      expect(response.status).toBe(204);
+    });
+  });
+
   describe('Get messages by group ID', () => {
     test('GET /messages/fetch/:groupId', async () => {
       const response = await supertest(app).get(`/messages/fetch/${groupId}`).set('Authorization', `Bearer ${cookie}`).send();
@@ -49,19 +56,19 @@ describe('messages', () => {
     });
   });
 
-  describe('Pin a message', () => {
-    test('POST /pin/:messageId', async () => {
-      const response = await supertest(app).post(`/messages/pin/${messageId}`).set('Authorization', `Bearer ${cookie}`).send();
-      expect(response.status).toBe(204);
-    });
-  });
-
   describe('Get pinned messages by group ID', () => {
-    test('GET /pin/:groupId', async () => {
+    test('GET /messages/pin/:groupId', async () => {
       const response = await supertest(app).get(`/messages/pin/${groupId}`).set('Authorization', `Bearer ${cookie}`).send();
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(1);
       expect(response.body[0].id).toBe(messageId);
+    });
+  });
+
+  describe('Unpin messages by message ID', () => {
+    test('POST /messages/unpin/:groupId', async () => {
+      const response = await supertest(app).post(`/messages/unpin/${groupId}`).set('Authorization', `Bearer ${cookie}`).send();
+      expect(response.status).toBe(204);
     });
   });
 });
