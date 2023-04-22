@@ -6,7 +6,7 @@ module.exports.createVisit = asyncHandler(async (req, _res, next) => {
   const { groupId } = req.params;
   const { date, userEmail } = req.body;
 
-  const query = sql`INSERT INTO Visits (date, visitor, group_id) VALUES (${date}, ${userEmail}, ${groupId});`;
+  const query = sql`INSERT IGNORE INTO Visits (date, visitor, group_id) VALUES (${date}, ${userEmail}, ${groupId});`;
 
   req.result = await db.query(query);
   next();
