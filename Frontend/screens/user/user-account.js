@@ -140,6 +140,7 @@ export default function UserAccount({ navigation, route, newUser }) {
           style={styles.phone}
           activeOutlineColor={colors.primary}
           outlineColor={colors.darkblue}
+          maxLength={15}
           onChangeText={(text) => {
             setFirstName(text);
           }}
@@ -150,6 +151,7 @@ export default function UserAccount({ navigation, route, newUser }) {
           value={lastName}
           style={styles.phone}
           activeOutlineColor={colors.primary}
+          maxLength={15}
           outlineColor={colors.darkblue}
           onChangeText={(text) => {
             setLastName(text);

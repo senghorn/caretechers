@@ -13,7 +13,7 @@ describe('messages', () => {
 
   beforeAll(async () => {
     const insertGroupQuery = sql`INSERT INTO \`Groups\` (name, visit_frequency, timezone, password) VALUES
-                                 ("Test_Group_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
+                                 ("Test_Messages_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
     const groupInsertResult = await db.query(insertGroupQuery);
     groupId = groupInsertResult.insertId;
     const userInsertQuery = sql`INSERT INTO Users (email, first_name, last_name, phone_num, curr_group)
@@ -41,6 +41,13 @@ describe('messages', () => {
     await db.query(deleteMemberQuery);
   });
 
+  describe('Pin a message', () => {
+    test('POST /pin/:messageId', async () => {
+      const response = await supertest(app).post(`/messages/pin/${messageId}`).set('Authorization', `Bearer ${cookie}`).send();
+      expect(response.status).toBe(204);
+    });
+  });
+
   describe('Get messages by group ID', () => {
     test('GET /messages/fetch/:groupId', async () => {
       const response = await supertest(app).get(`/messages/fetch/${groupId}`).set('Authorization', `Bearer ${cookie}`).send();
@@ -49,19 +56,19 @@ describe('messages', () => {
     });
   });
 
-  describe('Pin a message', () => {
-    test('POST /pin/:messageId', async () => {
-      const response = await supertest(app).post(`/messages/pin/${messageId}`).set('Authorization', `Bearer ${cookie}`).send();
-      expect(response.status).toBe(204);
-    });
-  });
-
   describe('Get pinned messages by group ID', () => {
-    test('GET /pin/:groupId', async () => {
+    test('GET /messages/pin/:groupId', async () => {
       const response = await supertest(app).get(`/messages/pin/${groupId}`).set('Authorization', `Bearer ${cookie}`).send();
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(1);
       expect(response.body[0].id).toBe(messageId);
+    });
+  });
+
+  describe('Unpin messages by message ID', () => {
+    test('POST /messages/unpin/:groupId', async () => {
+      const response = await supertest(app).post(`/messages/unpin/${groupId}`).set('Authorization', `Bearer ${cookie}`).send();
+      expect(response.status).toBe(204);
     });
   });
 });

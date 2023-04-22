@@ -15,9 +15,14 @@ describe('notes', () => {
   const noteContent = 'I love that ice-cream flavor';
   const noteTitle = 'Mint Chocolate';
   const searchString = 'Chocolate';
+  const data = {
+    content: "Red bean smoothie",
+    title: "drink",
+  };
+
   beforeAll(async () => {
     const insertGroupQuery = sql`INSERT INTO \`Groups\` (name, visit_frequency, timezone, password) VALUES
-                                 ("Test_Group_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
+                                 ("Test_Notes_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
     const groupInsertResult = await db.query(insertGroupQuery);
     groupId = groupInsertResult.insertId;
     const userInsertQuery = sql`INSERT INTO Users (email, first_name, last_name, phone_num, curr_group)
@@ -67,6 +72,22 @@ describe('notes', () => {
       const response = await supertest(app).get(`/notes/search/${groupId}/${searchString}`).set('Authorization', `Bearer ${cookie}`).send();
       expect(response.status).toBe(200);
       expect(response.body[0].content).toBe(noteContent);
+    })
+  });
+
+  describe('Update note by id, content and title', () => {
+    it('PATCH /notes/:noteId', async () => {
+      const response = await supertest(app).patch(`/notes/${noteId}`).set('Authorization', `Bearer ${cookie}`).send(data);
+      expect(response.status).toBe(200);
+      expect(response.body.title).toBe(data.title);
+      expect(response.body.content).toBe(data.content);
+    });
+  });
+
+  describe('Delete note by note id', () => {
+    it('DELETE /notes/:noteId', async () => {
+      const response = await supertest(app).delete(`/notes/${noteId}`).set('Authorization', `Bearer ${cookie}`).send();
+      expect(response.status).toBe(204);
     })
   });
 

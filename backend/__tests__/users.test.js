@@ -14,7 +14,7 @@ describe('user', () => {
     const deleteExistingUserQuery = sql`DELETE FROM Users WHERE email = ${testUserEmail};`;
     await db.query(deleteExistingUserQuery);
     const insertGroupQuery = sql`INSERT INTO \`Groups\` (name, visit_frequency, timezone, password) VALUES
-                                 ("Test_Group_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
+                                 ("Test_Users_ZXY4V", 3, "America/Denver", SUBSTR(MD5(RAND()), 1, 15));`;
     const groupInsertResult = await db.query(insertGroupQuery);
     groupId = groupInsertResult.insertId;
   });
