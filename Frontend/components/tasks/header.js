@@ -75,5 +75,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
     marginBottom: 4,
     fontSize: 18,
+    maxWidth: '70%',
   },
 });

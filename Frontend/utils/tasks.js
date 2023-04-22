@@ -84,7 +84,10 @@ export const getNextDateFromRepeatBehavior = (recurringType, startDate) => {
       }
       return max([addWeeks(startDate, diffInWeeks), startDate]);
     case REPEAT_CODES.ANNUAL:
-      const diffInYears = differenceInCalendarYears(today, startDate);
+      let diffInYears = differenceInCalendarYears(today, startDate);
+      if (diffInYears === 0 && today > startDate && !isSameDay(today, startDate)) {
+        diffInYears = 1;
+      }
       return max([addYears(startDate, diffInYears), startDate]);
     default:
       return startDate;
