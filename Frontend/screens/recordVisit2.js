@@ -8,6 +8,8 @@ import VisitTasksRefreshContext from '../services/context/VisitTasksRefreshConte
 import VisitRefreshContext from '../services/context/VisitRefreshContext';
 import config from '../constants/config';
 import Header from '../components/recordVisit/Header';
+import { Button } from 'react-native-paper';
+import colors from '../constants/colors';
 
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
@@ -67,6 +69,18 @@ export default function RecordVisit({ navigation }) {
       <Header visits={visits} navigation={navigation} />
       <View style={styles.contentContainer}>
         <Text style={styles.dateLabel}>{humanReadable}</Text>
+        <Button
+          icon="note"
+          color={colors.lightYellow}
+          uppercase={false}
+          mode={'contained'}
+          style={styles.goToNotesButton}
+          onPress={() => {
+            navigation.navigate('Record Visit Notes');
+          }}
+        >
+          Record Notes
+        </Button>
         <View style={styles.taskAndNotesContainer}>
           <Tasks
             tasks={tasks}
@@ -109,4 +123,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   taskAndNotesContainer: {},
+  goToNotesButton: {
+    marginTop: 12,
+  },
 });

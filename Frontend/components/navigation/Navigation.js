@@ -33,6 +33,7 @@ import TodaysVisitorContext from '../../services/context/TodaysVisitorContext';
 import RecordVisitContext from '../../services/context/RecordVisitContext';
 import { setUserNotificationIdentifier } from '../../services/api/user';
 import createSocket from '../messages/socket';
+import RecordVisitNotes from '../recordVisit/VisitNotes';
 
 const initRefreshCalendar = () => {
   console.log('calendar refresh not set');
@@ -161,6 +162,7 @@ export default function Navigation({ expoPushToken, inviteToken }) {
                           />
                           <Stack.Screen name="Visit" component={Visit} options={{ headerShown: false }} />
                           <Stack.Screen name="Record Visit" component={RecordVisit} options={{ headerShown: false }} />
+                          <Stack.Screen name="Record Visit Notes" component={RecordVisitNotes} options={{ headerShown: false }} />
                           <Stack.Screen name="Task" component={Task} options={{ headerShown: false }} />
                           <Stack.Screen name="Note" component={Note} options={{ headerShown: false }} />
                           <Stack.Screen name="New Note" component={NewNote} options={{ headerShown: false }} />
