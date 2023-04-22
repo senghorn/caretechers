@@ -57,6 +57,7 @@ export default function CreateGroup({ navigation, route }) {
           onChangeText={(text) => setGroupName(text)}
           label={'Group Name'}
           activeUnderlineColor={colors.primary}
+          maxLength={40}
           underlineColor='grey'
         />
       </View>

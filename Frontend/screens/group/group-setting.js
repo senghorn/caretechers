@@ -6,7 +6,6 @@ import {
   Divider,
   Text,
   TextInput,
-  Modal,
   Portal,
   Provider,
   Button,
@@ -23,7 +22,8 @@ import useSWR from 'swr';
 import SocketContext from '../../services/context/SocketContext';
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import RoleBadge from '../../components/user/role-badge';
+import ManageUserModal from '../../components/user/user-info-modal';
 import { getUserRole, setUserDataInfo } from '../../utils/userController';
 const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -376,8 +376,8 @@ const MemberItem = ({ user, setSelectedUser, visitHistory, visitHistoryLoading }
           <View style={styles.inline}>
             <Avatar.Image size={34} source={{ uri: user.profile_pic }} />
             <Text style={styles.username}>{user.first_name + ' ' + user.last_name}</Text>
+            {<RoleBadge group={user} />}
           </View>
-          {<RoleBadge group={user} />}
         </View>
         {historySummary}
       </TouchableOpacity>
@@ -390,123 +390,7 @@ const MemberItem = ({ user, setSelectedUser, visitHistory, visitHistoryLoading }
   );
 };
 
-/**
- *
- * React Native functional component that displays a role badge for a user group.
- * @param {object} param0 Props object
- * @param {object} param0.group User group object
- * @returns {JSX.Element} RoleBadge component JSX.Element
- */
-const RoleBadge = ({ group }) => {
-  if (group?.admin_status === 2) {
-    return <Avatar.Image size={26} source={require('../../assets/crown.png')} style={styles.roleBadge} />;
-  } else if (group?.admin_status === 1) {
-    return <Avatar.Image size={26} source={require('../../assets/badge.png')} style={styles.roleBadge} />;
-  } else {
-    return <Avatar.Image size={26} source={require('../../assets/circle.png')} style={styles.roleBadge} />;
-  }
-};
 
-/**
- * React Native functional component that displays a modal for managing a user.
- * @param {object} param0 Props object
- * @param {object} param0.selectedUser Currently selected user
- * @param {function} param0.setSelectedUser Function to update the currently selected user
- * @param {object} param0.user Current user
- * @returns {JSX.Element} ManageUserModal component JSX.Element
- */
-const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
-  const [userRole, setUserRole] = useState(0);
-  useEffect(() => {
-    if (user && selectedUser) {
-      // If user see their info, hide remove user button
-      if (user.id !== selectedUser?.email) {
-        const role = getUserRole(user);
-        setUserRole(role);
-      } else {
-        setUserRole(0);
-      }
-    }
-  }, [selectedUser, user]);
-
-  const handleRemoveUser = () => {
-    console.log('removeing user ', selectedUser);
-  };
-  const handleCancel = () => {};
-  const removeUserHandler = () => {
-    Alert.alert(
-      'Remove User',
-      'Are you sure you want to remove this user?',
-      [
-        {
-          text: 'Cancel',
-          onPress: handleCancel,
-          style: 'cancel',
-        },
-        {
-          text: 'Remove',
-          onPress: handleRemoveUser,
-          style: 'destructive',
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-
-  return (
-    <Modal
-      visible={selectedUser !== null}
-      onDismiss={() => {
-        setSelectedUser(null);
-      }}
-      contentContainerStyle={styles.modal}
-    >
-      <View style={styles.modalContainerStyle}>
-        <View style={styles.profileContainer}>
-          <View style={styles.leftContainer}>
-            <Avatar.Image size={65} source={{ uri: selectedUser?.profile_pic }} style={styles.photo} />
-          </View>
-          <View style={styles.rightContainer}>
-            <View style={styles.nameRow}>
-              <Text style={styles.name}>{selectedUser?.first_name + ' ' + selectedUser?.last_name}</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.infoRow}
-              onPress={() => {
-                console.log('pressed');
-              }}
-            >
-              <Ionicons name="call-outline" size={26} color="red" style={styles.infoIcon} />
-              <Text style={styles.phone}>{selectedUser?.phone_num}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.infoRow}
-              onPress={() => {
-                console.log('pressed');
-              }}
-            >
-              <Ionicons name="mail-outline" size={26} color="green" style={styles.infoIcon} />
-              <Text style={styles.phone}>{selectedUser?.email}</Text>
-            </TouchableOpacity>
-            <View style={styles.infoRow}>
-              <RoleBadge group={selectedUser} />
-              <Text style={styles.role}>
-                {selectedUser?.admin_status === 2 ? 'Admin' : selectedUser?.admin_status === 1 ? 'Co-Admin' : 'Non-Admin'}
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View style={styles.manageButtons}>
-          {userRole === 0 ? null : (
-            <Button style={styles.removeButton} color="red" onPress={removeUserHandler}>
-              Remove User
-            </Button>
-          )}
-        </View>
-      </View>
-    </Modal>
-  );
-};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -576,6 +460,7 @@ const styles = StyleSheet.create({
     padding: 5,
     fontSize: 16,
     marginLeft: 10,
+    flex: 5
   },
   changeName: {
     fontSize: 12,
@@ -589,71 +474,6 @@ const styles = StyleSheet.create({
     margin: 10,
     width: '60%',
     alignSelf: 'center',
-  },
-  roleBadge: {
-    backgroundColor: 'transparent',
-  },
-  modal: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainerStyle: {
-    backgroundColor: 'white',
-    padding: 20,
-    minHeight: '30%',
-    borderRadius: '100%',
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
-    width: '95%',
-  },
-  profileContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginTop: 20,
-  },
-  leftContainer: {
-    alignContent: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rightContainer: {},
-  nameRow: {
-    marginBottom: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  infoIcon: {
-    marginRight: 10,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  name: {
-    fontSize: 24,
-    color: colors.black,
-  },
-  phone: {
-    fontSize: 14,
-    color: 'gray',
-  },
-  manageButtons: {
-    marginTop: 40,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-  },
-  removeButton: {
-    backgroundColor: colors.lightYellow,
-  },
-  role: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: 'gray',
   },
   showHistoryText: {
     fontWeight: '400',

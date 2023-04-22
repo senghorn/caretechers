@@ -136,6 +136,7 @@ export default function Inputs({ route, navigation }) {
         onChangeText={handleNameChange}
         autoCorrect={false}
         error={nameMissing}
+        maxLength={15}
         underlineColor='grey'
         activeUnderlineColor='blue'
       />
@@ -147,6 +148,7 @@ export default function Inputs({ route, navigation }) {
         onChangeText={handleLastNameChange}
         autoCorrect={false}
         error={missLastName}
+        maxLength={15}
         underlineColor='grey'
         activeUnderlineColor='blue'
       />

@@ -34,7 +34,7 @@ export default function GroupCard({ setSelected, group }) {
                     <Avatar.Image size={34} source={require('../../assets/house.jpg')} />
                 </View>
                 <View style={styles.name}>
-                    <Text>{group.name}</Text>
+                    <Text>{(group.name?.length <= 35) ? group.name : group.name.substr(0, 22) + "..."}</Text>
                 </View>
                 <View style={styles.role}>
                     <RoleBadge />
@@ -63,13 +63,15 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     logo: {
-        marginRight: 15
+        marginRight: 15,
+        flex: 1
     },
     name: {
-        alignSelf: 'center'
+        alignSelf: 'center',
+        flex: 6
     },
     role: {
-
+        flex: 1
     },
     roleBadge: {
         backgroundColor: 'transparent'
