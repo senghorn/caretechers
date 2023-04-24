@@ -18,7 +18,7 @@ import { setUserDataInfo } from '../../utils/userController';
  */
 export default function Groups({ navigation }) {
   const { setUser, user } = useContext(UserContext);
-  const inviteLinkContext = useContext(InviteLinkContext);
+  const [inviteLinkContext, setInviteToken] = useContext(InviteLinkContext);
   const [groupName, setGroupName] = useState('');
   const [password, setPassword] = useState('');
   const [socket, setSocket] = useContext(SocketContext);
@@ -40,21 +40,22 @@ export default function Groups({ navigation }) {
             'authorization': `Bearer ${user.access_token}`
           }
         });
-        if(user.groups.map(group => group.name).includes(response.data.groupName)) {
+        if (user.groups.map(group => group.name).includes(response.data.groupName)) {
           navigation.navigate('Home')
         }
         setGroupName(response.data.groupName);
         setPassword(response.data.groupPassword);
-
       } catch (e) {
-        console.log(e);
+        console.log('process invite link error', e);
         console.log('COULD NOT FETCH NAME AND PASSWORD FROM LINK.');
       }
     }
   }
 
   useEffect(() => {
-    processInviteLink();
+    if (inviteLinkContext) {
+      processInviteLink();
+    }
   }, [inviteLinkContext]);
 
   return (

@@ -335,6 +335,7 @@ const MemberItem = ({ user, setSelectedUser, visitHistory, visitHistoryLoading }
 
   useEffect(() => {
     if (user && user.email && visitHistory) {
+      console.log('user info', user);
       const userHistory = visitHistory.filter((visit) => visit.member_id === user.email);
       setHistory(userHistory?.[0]);
     }
