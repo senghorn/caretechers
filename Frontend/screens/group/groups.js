@@ -40,7 +40,9 @@ export default function Groups({ navigation }) {
             'authorization': `Bearer ${user.access_token}`
           }
         });
-        console.log(response.data)
+        if(user.groups.map(group => group.name).includes(response.data.groupName)) {
+          navigation.navigate('Home')
+        }
         setGroupName(response.data.groupName);
         setPassword(response.data.groupPassword);
 
