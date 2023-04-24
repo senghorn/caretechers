@@ -222,9 +222,6 @@ export default function GroupSettings({ navigation }) {
           >
             <View style={styles.titleBox}>
               <Text style={styles.titleText}>{group.name}</Text>
-              <TouchableOpacity onPress={changeGroupNameHandler}>
-                <Text style={styles.changeName}>Change name</Text>
-              </TouchableOpacity>
             </View>
           </ImageBackground>
           <View style={styles.buttonList}>
@@ -461,11 +458,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
     flex: 5
-  },
-  changeName: {
-    fontSize: 12,
-    color: colors.white,
-    marginTop: 15,
   },
   title: {
     fontSize: 18,
