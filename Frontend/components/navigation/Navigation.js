@@ -49,7 +49,7 @@ const initRefreshVisit = () => {
 
 const Stack = createNativeStackNavigator();
 
-export default function Navigation({ expoPushToken, inviteToken }) {
+export default function Navigation({ expoPushToken, inviteToken, setInviteToken }) {
   const [user, setUser] = useState(null);
   const [refreshCalendar, setRefreshCalendar] = useState(() => initRefreshCalendar);
   const [refreshTasks, setRefreshTasks] = useState(() => initRefreshTasks);
@@ -141,7 +141,7 @@ export default function Navigation({ expoPushToken, inviteToken }) {
                         setVisitTasks,
                       }}
                     >
-                      <InviteLinkContext.Provider value={inviteToken}>
+                      <InviteLinkContext.Provider value={[inviteToken, setInviteToken]}>
                         <Stack.Navigator screenOptions={{}} initialRouteName={'Login'}>
                           <Stack.Screen name={'Login'} component={GoogleLogin} options={{ headerShown: false }} />
                           <Stack.Screen

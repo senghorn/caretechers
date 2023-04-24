@@ -25,7 +25,7 @@ export default function GoogleLogin({ navigation }) {
   const [cookies, setCookies] = useState(null);
   const [loading, setLoading] = useState(false);
   const [userDataReceived, setUserDataReceived] = useState(false);
-  const inviteLink = useContext(InviteLinkContext);
+  const [inviteLink] = useContext(InviteLinkContext);
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: '899499604143-nq831c8qd2u72r9h6842ion24rgcj8me.apps.googleusercontent.com',
     iosClientId: '899499604143-5oqn70f2r4uu7lp1mbajpkv15ks3p368.apps.googleusercontent.com',

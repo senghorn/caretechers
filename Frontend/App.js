@@ -2,7 +2,7 @@ import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-gesture-handler';
 import Navigation from './components/navigation/Navigation';
-import { NavigationContainer } from '@react-navigation/native';
+import { Link, NavigationContainer } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import colors from './constants/colors';
 import { Asset } from 'expo-asset';
@@ -65,18 +65,22 @@ export default function App() {
     },
   });
 
-  // used for deep linking
-  const url = Linking.useURL();
   useEffect(() => {
-    var regex = /[?&]([^=#]+)=([^&#]*)/g,
-      params = {},
-      match;
-    while (match = regex.exec(url)) {
-      params[match[1]] = match[2];
-    }
-    setInviteToken(params.token)
-  }, [url]);
+    Linking.addEventListener('url', (event) => {
+      if (event) {
+        setInviteToken(null);
+        const url = event.url;
+        var regex = /[?&]([^=#]+)=([^&#]*)/g,
+          params = {},
+          match;
+        while (match = regex.exec(url)) {
+          params[match[1]] = match[2];
+        }
+        setInviteToken(params.token)
+      }
+    });
 
+  }, [])
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
@@ -99,7 +103,7 @@ export default function App() {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      <Navigation expoPushToken={expoPushToken} inviteToken={inviteToken} />
+      <Navigation expoPushToken={expoPushToken} inviteToken={inviteToken} setInviteToken={setInviteToken} />
       <StatusBar style="auto" />
     </NavigationContainer>
   );
