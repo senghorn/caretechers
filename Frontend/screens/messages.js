@@ -49,15 +49,24 @@ export default function Messages({ navigation }) {
     if (user) {
       FetchUsers(user, setUsers, setThisUser, user.access_token);
     }
+
   }, [user]);
 
+  // Messages disappear when user change their name
+  // This is caused by changing user causes the FetchUsers to happen
+  // again. Then, users get updated and the setDisplayMessages happen again
 
   // Format and set message when received
   useEffect(() => {
     if (!isLoading && data && users) {
       const formatted = FormatMessagesForChat(users, data);
-      setMessages(formatted);
-      setDisplayMessages(formatted);
+      if (displayMessages.length === 0) {
+        setMessages(formatted);
+        setDisplayMessages(formatted);
+      }
+      else {
+        console.log('messages already loaded');
+      }
     }
     if (!isLoading) {
       setLoading(false);
@@ -191,7 +200,6 @@ export default function Messages({ navigation }) {
       // we set it off before turning on a fresh one. not the best solution!
       socket.off('message');
       socket.on('message', async (message) => {
-        console.log('user is', users[message.sender]);
         var newUsers = null;
         if (!users[message.sender]) {
           newUsers = [];

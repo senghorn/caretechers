@@ -58,7 +58,6 @@ export default function UserAccount({ navigation, route, newUser }) {
       await (async () => {
         let profileURL;
         if (newProfile) {
-          // setNewProfile(null);
           profileURL = await uploadImage(newProfile);
         }
         const update = await UpdateUserData(
