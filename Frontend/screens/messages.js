@@ -190,14 +190,24 @@ export default function Messages({ navigation }) {
       // being handled multiple times. We don't want that. To ensure that doesn't happen, we make sure
       // we set it off before turning on a fresh one. not the best solution!
       socket.off('message');
-      socket.on('message', (message) => {
+      socket.on('message', async (message) => {
+        console.log('user is', users[message.sender]);
+        var newUsers = null;
+        if (!users[message.sender]) {
+          newUsers = [];
+          newUsers = await FetchUsers(user, setUsers, setThisUser, user.access_token);
+        }
+        var currUsers = users;
+        if (newUsers) {
+          currUsers = newUsers;
+        }
         const msg = {
           text: message.messageType === 'I' ? '' : message.content,
           createdAt: message.date_time,
           _id: message.id,
           messageType: message.messageType === 'I' ? 'image' : 'text',
           image: message.messageType === 'I' ? message.content : null,
-          user: users[message.sender] ? users[message.sender] : { _id: 'Deleted user', avatar: '', name: 'Deleted User' },
+          user: currUsers[message.sender] ? currUsers[message.sender] : { _id: 'Deleted user', avatar: '', name: 'Deleted User' },
         };
         setMessages((previousMessages) => GiftedChat.append(previousMessages, msg));
       });

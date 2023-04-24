@@ -216,7 +216,7 @@ export async function FetchUsers(user, setUsers, setThisUser, cookie) {
           }
         });
         setUsers(users);
-        return response.data;
+        return users;
       })
       .catch((error) => {
         console.log('fetch user error', error);
