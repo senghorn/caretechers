@@ -4,12 +4,15 @@ import {
     Text,
     Modal,
     Button,
+    ActivityIndicator
 } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import colors from '../../constants/colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { RemoveUserFromGroup } from '../../services/api/user';
 import { getUserRole, setUserDataInfo } from '../../utils/userController';
 import RoleBadge from './role-badge';
+
 /**
  * React Native functional component that displays a modal for managing a user.
  * @param {object} param0 Props object
@@ -20,6 +23,7 @@ import RoleBadge from './role-badge';
  */
 const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
     const [userRole, setUserRole] = useState(0);
+    const [removing, setRemoving] = useState(false);
     useEffect(() => {
         if (user && selectedUser) {
             // If user see their info, hide remove user button
@@ -32,8 +36,14 @@ const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
         }
     }, [selectedUser, user]);
 
-    const handleRemoveUser = () => {
-        console.log('removeing user ', selectedUser);
+    const handleRemoveUser = async () => {
+        setRemoving(true);
+        const removed = await RemoveUserFromGroup(selectedUser.email, user.curr_group, user.access_token);
+        if (!removed) {
+            Alert.alert('Failed to remove', selectedUser.first_name + ' ' + selectedUser.last_name);
+        }
+        setRemoving(false);
+        setSelectedUser(null);
     };
     const handleCancel = () => { };
     const removeUserHandler = () => {
@@ -100,11 +110,12 @@ const ManageUserModal = ({ selectedUser, setSelectedUser, user }) => {
                     </View>
                 </View>
                 <View style={styles.manageButtons}>
-                    {userRole === 0 ? null : (
+                    {userRole === 0 && !removing ? null : (
                         <Button style={styles.removeButton} color="red" onPress={removeUserHandler}>
                             Remove User
                         </Button>
                     )}
+                    {removing ? <ActivityIndicator /> : null}
                 </View>
             </View>
         </Modal>
