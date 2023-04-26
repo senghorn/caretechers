@@ -387,7 +387,6 @@ const MemberItem = ({ user, setSelectedUser, visitHistory, visitHistoryLoading }
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -418,6 +417,7 @@ const styles = StyleSheet.create({
   },
   memberListBox: {
     margin: 20,
+    flex: 1,
   },
   iconButton: {
     backgroundColor: colors.white,
@@ -448,8 +448,8 @@ const styles = StyleSheet.create({
   listContainer: {
     marginTop: 20,
     flex: 0,
-    height: '100%',
   },
+  listContainerView: {},
   memberItem: {
     paddingVertical: 10,
   },
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
     padding: 5,
     fontSize: 16,
     marginLeft: 10,
-    flex: 5
+    flex: 5,
   },
   title: {
     fontSize: 18,
