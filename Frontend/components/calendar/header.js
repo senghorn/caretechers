@@ -1,15 +1,17 @@
 import { format, startOfDay } from 'date-fns';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import UserContext from '../../services/context/UserContext';
 import CalendarRefreshContext from '../../services/context/CalendarRefreshContext';
 import VisitRefreshContext from '../../services/context/VisitRefreshContext';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function Header({ date, setInitDate, navigation }) {
   const { user } = useContext(UserContext);
   const [refreshCalendar] = useContext(CalendarRefreshContext);
   const [refreshVisit] = useContext(VisitRefreshContext);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   return (
     <View style={styles.outerContainer}>
       <Appbar.Header style={styles.container}>
@@ -19,7 +21,34 @@ export default function Header({ date, setInitDate, navigation }) {
             navigation.navigate('Settings');
           }}
         />
-        <Appbar.Content title={format(date, 'LLLL Y')} titleStyle={styles.titleText} />
+
+        {showDatePicker ? (
+          <Appbar.Content
+            title={
+              <DateTimePicker
+                testID="dateTimePicker2"
+                onChange={(event, date) => {
+                  if (event.type === 'set') {
+                    setInitDate(startOfDay(date));
+                  }
+                  setShowDatePicker(false);
+                }}
+                value={new Date()}
+                mode={'date'}
+                display="compact"
+                is24Hour={true}
+              />
+            }
+          />
+        ) : (
+          <Appbar.Content
+            title={format(date, 'LLLL Y')}
+            titleStyle={styles.titleText}
+            onPress={() => {
+              setShowDatePicker(true);
+            }}
+          />
+        )}
         <Appbar.Action
           icon="calendar"
           onPress={() => {

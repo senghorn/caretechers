@@ -105,7 +105,8 @@ export default function RepeatBehavior({
                   setEditRepeatTitle(getLabel(recurringType, date));
                 }}
                 mode={'date'}
-                display="default"
+                display="compact"
+                style={{ paddingRight: 20 }}
                 is24Hour={true}
                 minimumDate={new Date()}
               />
