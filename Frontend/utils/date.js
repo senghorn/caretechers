@@ -7,6 +7,11 @@ export const getDateFromDateString = (dateString) => {
   return new Date(year, Number(month) - 1, day);
 };
 
+export const getDateFromUTCDate = (dateString) => {
+  const dateS = new Date(dateString.split(' ').join('T') + '.000Z');
+  return dateS;
+};
+
 export const getDateString = (date) => {
   return format(date, 'yyyy-MM-dd');
 };
@@ -18,6 +23,10 @@ export const getCurrentDateString = () => {
 export const getHumanReadableDate = (date, noTodayOrTomorrow) => {
   if (noTodayOrTomorrow) return format(date, 'MMMM do, y');
   return (isTomorrow(date) && 'tomorrow') || (isToday(date) && 'today') || format(date, 'MMMM do, y');
+};
+
+export const getNoteDate = (date) => {
+  return format(date, 'E, LLL do, y');
 };
 
 export const formatDate = (dateString) => {
@@ -41,7 +50,7 @@ export const formatDate = (dateString) => {
 
   const formattedDate = `${dayOfWeek}, ${month} ${dayOfMonth}${suffix}, ${year}`;
   return formattedDate;
-}
+};
 
 export const getMonthDate = (dateString) => {
   const date = new Date(dateString);
@@ -62,4 +71,4 @@ export const getMonthDate = (dateString) => {
 
   const formattedDate = `${month} ${dayOfMonth}${suffix}, ${year}`;
   return formattedDate;
-}
+};

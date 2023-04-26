@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import COLORS from '../../constants/colors';
 import RenderHTML from 'react-native-render-html';
-import { formatDate } from '../../utils/date';
+import { getDateFromDateString, getDateFromUTCDate, getNoteDate } from '../../utils/date';
 const width = Dimensions.get('window').width;
 
 /**
  * Component that displays notes
- * @param {Object} navigation: React component for navigation 
+ * @param {Object} navigation: React component for navigation
  * @param {Object} note: note to display that has content, last_edited, title
- * @returns 
+ * @returns
  */
 const Note = ({ navigation, route, note }) => {
   return (
@@ -24,7 +24,7 @@ const Note = ({ navigation, route, note }) => {
         <Text style={styles.title}>
           {note.title && note.title.length > 15 ? note.title.substring(0, 15) + '...' : note.title}
         </Text>
-        <Text style={styles.timeText}>{formatDate(note.last_edited)}</Text>
+        <Text style={styles.timeText}>{getNoteDate(getDateFromUTCDate(note.last_edited), true)}</Text>
       </View>
       <View style={styles.htmlRenderer}>
         <RenderHTML source={{ html: note.content }} contentWidth={width} />
