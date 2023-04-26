@@ -47,9 +47,9 @@ export default function Messages({ navigation }) {
   // Fetch all Users
   useEffect(() => {
     if (user) {
+      mutate();
       FetchUsers(user, setUsers, setThisUser, user.access_token);
     }
-
   }, [user]);
 
   // Messages disappear when user change their name
@@ -60,13 +60,8 @@ export default function Messages({ navigation }) {
   useEffect(() => {
     if (!isLoading && data && users) {
       const formatted = FormatMessagesForChat(users, data);
-      if (displayMessages.length === 0) {
-        setMessages(formatted);
-        setDisplayMessages(formatted);
-      }
-      else {
-        console.log('messages already loaded');
-      }
+      setMessages(formatted);
+      setDisplayMessages(formatted);
     }
     if (!isLoading) {
       setLoading(false);
