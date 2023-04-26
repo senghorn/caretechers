@@ -16,8 +16,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 /**
  * Component that supports repeat behavior options for a task
- * @param {Object} navigation: React component for navigation 
- * @returns 
+ * @param {Object} navigation: React component for navigation
+ * @returns
  */
 export default function RepeatBehavior({
   id,
@@ -155,6 +155,17 @@ export default function RepeatBehavior({
               setEditRepeatTitle={setEditRepeatTitle}
               setEditRepeat={() => {
                 setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.WEEK, dateToUse, id));
+              }}
+              setExpanded={setExpanded}
+            />
+            <RepeatItem
+              title={getLabel(REPEAT_CODES.MONTH, dateToUse)}
+              selected={title}
+              setSelected={setTitle}
+              editMode={editMode}
+              setEditRepeatTitle={setEditRepeatTitle}
+              setEditRepeat={() => {
+                setEditRepeat(getRepeatBehaviorObject(REPEAT_CODES.MONTH, dateToUse, id));
               }}
               setExpanded={setExpanded}
             />
