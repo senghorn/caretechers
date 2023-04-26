@@ -17,8 +17,8 @@ const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 /**
  * Message screen that display group messages and support send/receive/pin messages.
- * @param {Object} navigation: React component for navigation 
- * @returns 
+ * @param {Object} navigation: React component for navigation
+ * @returns
  */
 export default function Messages({ navigation }) {
   const [this_user, setThisUser] = useState(null);
@@ -117,15 +117,15 @@ export default function Messages({ navigation }) {
     setImageUploading(true);
     const result = isCamera
       ? await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.3,
-        base64: true,
-      })
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.3,
+          base64: true,
+        })
       : await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.3,
-        base64: true,
-      });
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          quality: 0.3,
+          base64: true,
+        });
     if (!result.canceled) {
       try {
         const imageUrl = await uploadImage(result.assets[0].base64);
@@ -286,7 +286,7 @@ export default function Messages({ navigation }) {
   return (
     <View style={styles.container}>
       <Header title={'Messages'} navigation={navigation} pin setSearchQuery={setSearchQuery} setSearchingMode={setSearchMode} />
-      {loading && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
+      {(loading || imageUploading) && <ActivityIndicator size="large" color="#2196f3" style={styles.loader} />}
       {/* <View style={styles.chatContainer}> */}
       <GiftedChat
         renderActions={CameraButton}
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
  * Formats the message received form backend to GiftedChat messages prop.
  * @param {Array} all_users : All users in the group
  * @param {Array} messages : Messages to format
- * @returns 
+ * @returns
  */
 const FormatMessagesForChat = (all_users, messages) => {
   var formatted_messages = [];
