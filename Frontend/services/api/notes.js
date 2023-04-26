@@ -5,12 +5,16 @@ export async function UpdateNote(updated_note, cookie) {
   try {
     let connection_string = config.backend_server + '/notes/' + updated_note.id;
     await axios
-      .patch(connection_string, {
-        title: updated_note.title,
-        content: updated_note.content,
-      }, {
-        headers: { 'Authorization': 'Bearer ' + cookie }
-      })
+      .patch(
+        connection_string,
+        {
+          title: updated_note.title,
+          content: updated_note.content,
+        },
+        {
+          headers: { Authorization: 'Bearer ' + cookie },
+        }
+      )
       .then((response) => {
         return true;
       })
@@ -26,18 +30,19 @@ export async function UpdateNote(updated_note, cookie) {
 
 /**
  * Sends a request to remove the provided noteId's note
- * @param {string} noteId 
- * @returns 
+ * @param {string} noteId
+ * @returns
  */
 export async function RemoveNote(noteId, cookie) {
   try {
     let connection_string = config.backend_server + '/notes/' + noteId;
-    await axios.delete(connection_string, {
-      headers: {
-        'Authorization': 'Bearer ' + cookie
-      }
-    })
-      .then((response) => { })
+    await axios
+      .delete(connection_string, {
+        headers: {
+          Authorization: 'Bearer ' + cookie,
+        },
+      })
+      .then((response) => {})
       .catch((error) => {
         console.log('delete note error', error);
       });
@@ -46,12 +51,11 @@ export async function RemoveNote(noteId, cookie) {
   }
 }
 
-
 /**
  * Saves the new note created by send the request to the server.
- * @param {object} newNote 
- * @param {string} group_id 
- * @returns 
+ * @param {object} newNote
+ * @param {string} group_id
+ * @returns
  */
 export async function CreateNote(newNote, group_id, cookie) {
   try {
@@ -59,11 +63,11 @@ export async function CreateNote(newNote, group_id, cookie) {
     const result = await axios.post(connection_string, newNote, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + cookie
+        Authorization: 'Bearer ' + cookie,
       },
       params: {
-        groupId: group_id
-      }
+        groupId: group_id,
+      },
     });
     const data = result.data;
     return data.noteId;
@@ -73,23 +77,20 @@ export async function CreateNote(newNote, group_id, cookie) {
   }
 }
 
-
 /**
  * Returns the result of searching. Returns null if fail.
- * @param {string} search_string 
- * @param {string} group_id 
- * @returns 
+ * @param {string} search_string
+ * @param {string} group_id
+ * @returns
  */
 export async function SearchNotes(search_string, group_id, cookie) {
   try {
-
     const seachQuery = search_string.trim();
-    let url =
-      config.backend_server + `/notes/search/${group_id}/${seachQuery}`;
+    let url = config.backend_server + `/notes/search/${group_id}/${seachQuery}`;
     const result = await fetch(url, {
       headers: {
-        'Authorization': 'Bearer ' + cookie
-      }
+        Authorization: 'Bearer ' + cookie,
+      },
     });
     const data = await result.json();
     return data;

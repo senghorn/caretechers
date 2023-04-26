@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { Fragment, useContext, useEffect, useRef, useState } from 'react';
-import { formatDate } from '../../utils/date';
+import { formatDate, getDateFromUTCDate, getNoteDate } from '../../utils/date';
 import {
   Alert,
   Dimensions,
@@ -219,7 +219,9 @@ export default function NewNote({ navigation, route }) {
           </Appbar.Header>
         </View>
         {note && (
-          <Text style={styles.dateTimeText}>{note.last_edited ? formatDate(note.last_edited) : formatDate(new Date())}</Text>
+          <Text style={styles.dateTimeText}>
+            {note.last_edited ? getNoteDate(getDateFromUTCDate(note.last_edited)) : formatDate(new Date())}
+          </Text>
         )}
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
           <ScrollView style={styles.scrollView}>

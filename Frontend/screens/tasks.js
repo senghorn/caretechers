@@ -16,9 +16,9 @@ const fetcher = (url, token) => fetch(url, token).then((res) => res.json());
 
 /**
  * Filters the tasks given using the specified filter
- * @param {Array} tasks to filter 
+ * @param {Array} tasks to filter
  * @param {string} filter type of filter
- * @returns 
+ * @returns
  */
 const getFilteredTasks = (tasks, filter) => {
   switch (filter) {
@@ -47,8 +47,8 @@ const getNextDate = (task) => {
 
 /**
  * Displays all the tasks and allow sorting tasks for UI
- * @param {Object} navigation: React component for navigation 
- * @returns 
+ * @param {Object} navigation: React component for navigation
+ * @returns
  */
 export default function Tasks({ navigation }) {
   const [renderedTasks, setRenderedTasks] = useState(null);
@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
   },
   tasksContainer: {
     marginTop: 0,
+    paddingBottom: 40,
   },
   loader: {
     marginTop: 96,
