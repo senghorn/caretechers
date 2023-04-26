@@ -8,6 +8,7 @@ import UserContext from '../../services/context/UserContext'
 import SocketContext from '../../services/context/SocketContext'
 import Spinner from 'react-native-loading-spinner-overlay';
 import { setUserDataInfo } from '../../utils/userController'
+import { clearAsyncStorage } from '../../services/storage/asyncStorage'
 
 /**
  * This component displays groups users are in and option to navigate to join/create group screen.
@@ -21,6 +22,17 @@ export default function GroupSelector({ navigation }) {
     const [groupList, setGroupList] = useState([]);
     const [groups, setGroups] = useState([]);
 
+
+    // handles the logout
+    const logoutHandler = async () => {
+        const clear = await clearAsyncStorage();
+        if (clear) {
+            setUser({});
+            socket.disconnect();
+            setSocket(null);
+            navigation.navigate('Login');
+        }
+    }
 
     useEffect(() => {
         if (user && user.groups) {
@@ -83,8 +95,9 @@ export default function GroupSelector({ navigation }) {
                 size={'large'}
             />
             <Appbar style={styles.headerContainer}>
-                <Appbar.Content title="Care Groups" titleStyle={styles.title} />
                 <Appbar.Action icon="plus" onPress={() => navigation.navigate("Group")} style={styles.joinGroupButton} />
+                <Appbar.Content title="Care Groups" titleStyle={styles.title} />
+                <Appbar.Action icon="logout" onPress={logoutHandler} color='red' />
             </Appbar>
             <Text style={styles.welcomeMessage}>Select a group or join a new one!</Text>
             {groupList}
