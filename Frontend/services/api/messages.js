@@ -93,8 +93,9 @@ export async function fetchMoreMessages(group_id, last_id, users, cookie) {
  */
 export async function searchMessage(group_id, query, cookie) {
   try {
+    const searchQuery = query.trim();
     let url =
-      config.backend_server + '/messages/search/' + group_id + '/' + query;
+      config.backend_server + '/messages/search/' + group_id + '/' + searchQuery;
     const result = await axios.get(url, {
       withCredentials: true,
       headers: {
