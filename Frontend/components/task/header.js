@@ -13,9 +13,9 @@ import SocketContext from '../../services/context/SocketContext';
 
 /**
  * Tasks screen header component that allow editing modes
- * 
- * @param {Object} navigation: React component for navigation 
- * @returns 
+ *
+ * @param {Object} navigation: React component for navigation
+ * @returns
  */
 export default function Header({ id, title, navigation, editMode, setEditMode, editTitle, setEditTitle, hideButtons }) {
   const [refreshTasks] = useContext(TasksRefreshContext);
@@ -35,7 +35,7 @@ export default function Header({ id, title, navigation, editMode, setEditMode, e
         />
         {editMode ? (
           <TextInput
-            style={styles.titleInput}
+            style={[styles.titleInput, hideButtons ? { maxWidth: '80%' } : { maxWidth: '61%' }]}
             dense
             label="Title"
             value={editTitle}
