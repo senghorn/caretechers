@@ -58,7 +58,7 @@ export default function NewNote({ navigation, route }) {
         richText.current?.insertHTML(
           `
             <div align="center" >
-              <img src="${imageUrl}" style="height: 500px;" />
+              <img src="${imageUrl}" style="height: 400px;" />
             </div>
           `
         );
@@ -235,7 +235,7 @@ export default function NewNote({ navigation, route }) {
               style={styles.richEditor}
             />
           </ScrollView>
-          {editMode && toolbar}
+          <ToolBar richText={richText} addImage={addImage} editMode={editMode} />
         </KeyboardAvoidingView>
         {imageUploading && (
           <View style={styles.loading}>
@@ -244,6 +244,44 @@ export default function NewNote({ navigation, route }) {
         )}
       </SafeAreaView>
     </Fragment>
+  );
+}
+
+function ToolBar({ richText, addImage, editMode }) {
+  if (!editMode) {
+    return null;
+  }
+
+  return (
+    <RichToolbar
+      editor={richText}
+      selectedIconTint={'#2095F2'}
+      onPressAddImage={() => {
+        addImage(false);
+      }}
+      insertCamera={() => {
+        addImage(true);
+      }}
+      actions={[
+        actions.setBold,
+        actions.setItalic,
+        actions.setUnderline,
+        actions.insertImage,
+        'insertCamera',
+        actions.insertBulletsList,
+        actions.insertOrderedList,
+        actions.alignLeft,
+        actions.alignCenter,
+        actions.alignRight,
+        actions.heading2,
+        actions.undo,
+        actions.redo,
+      ]}
+      iconMap={{
+        insertCamera: ({ tintColor }) => <Text style={[{ color: tintColor }]}>CAM</Text>,
+        [actions.heading2]: ({ tintColor }) => <Text style={[{ color: tintColor }]}>H1</Text>,
+      }}
+    />
   );
 }
 
