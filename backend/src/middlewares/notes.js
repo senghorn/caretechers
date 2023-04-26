@@ -60,13 +60,13 @@ module.exports.updateNote = asyncHandler(async (req, _res, next) => {
 		return next(newError('Note title or content must be provided!', 400));
 	}
 	if (req.body.title && req.body.content) {
-		query.append(sql`title = ${req.body.title}, content = ${req.body.content}`);
+		query.append(sql`title = ${req.body.title}, content = ${req.body.content}, last_edited = ${getUTCDateTime()}`);
 	} else {
 		if (req.body.title) {
-			query.append(sql`title = ${req.body.title}`);
+			query.append(sql`title = ${req.body.title}, last_edited = ${getUTCDateTime()}`);
 		}
 		if (req.body.content) {
-			query.append(sql`content = ${req.body.content}`);
+			query.append(sql`content = ${req.body.content}, last_edited = ${getUTCDateTime()}`);
 		}
 	}
 
