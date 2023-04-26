@@ -52,6 +52,13 @@ export default function ViewSetter({ setFilter }) {
           setValue={setFilter}
         />
         <MenuItemWrapper
+          label="Monthly Tasks"
+          setLabel={setLabel}
+          closeMenu={closeMenu}
+          value={REPEAT_CODES.MONTH}
+          setValue={setFilter}
+        />
+        <MenuItemWrapper
           label="Annual Tasks"
           setLabel={setLabel}
           closeMenu={closeMenu}
