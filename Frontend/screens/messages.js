@@ -117,15 +117,15 @@ export default function Messages({ navigation }) {
     setImageUploading(true);
     const result = isCamera
       ? await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 0.3,
-          base64: true,
-        })
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.3,
+        base64: true,
+      })
       : await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 0.3,
-          base64: true,
-        });
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.3,
+        base64: true,
+      });
     if (!result.canceled) {
       try {
         const imageUrl = await uploadImage(result.assets[0].base64);
@@ -240,8 +240,7 @@ export default function Messages({ navigation }) {
   const onLongPress = (context, message) => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['Cancel', 'Pin', 'Remove'],
-        destructiveButtonIndex: 2,
+        options: ['Cancel', 'Pin'],
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
       },
@@ -250,7 +249,6 @@ export default function Messages({ navigation }) {
           // cancel action
         } else if (buttonIndex === 1) {
           setPinMessage(message);
-        } else if (buttonIndex === 2) {
         }
       }
     );
