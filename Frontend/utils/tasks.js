@@ -74,7 +74,7 @@ export const getRepeatBehaviorObject = (recurringType, dateToUse, id) => {
         day_of_week: -1,
         week_of_month: null,
         day_of_month: getDate(dateToUse),
-        month_of_year: getMonth(dateToUse),
+        month_of_year: getMonth(dateToUse) + 1,
         recurring_type: REPEAT_CODES.ANNUAL,
         task_id: id,
       };
